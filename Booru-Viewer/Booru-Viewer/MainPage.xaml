@@ -5,7 +5,12 @@
 	xmlns:local="using:Booru_Viewer"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	mc:Ignorable="d">
+	xmlns:vm="using:Booru_Viewer.ViewModels"
+	mc:Ignorable="d"
+	>
+	<Page.DataContext>
+		<vm:MainPageViewModel></vm:MainPageViewModel>
+	</Page.DataContext>
 	<Page.Resources>
 		<ResourceDictionary>
 			<DataTemplate x:Name="ImageTemplate">
@@ -14,14 +19,40 @@
 		</ResourceDictionary>
 	</Page.Resources>
 
-	<GridView>
-
+	<GridView SelectionChanged="GridView_SelectionChanged"
+			  Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+			  ItemTemplate="{StaticResource ImageTemplate}"
+			  ItemsSource="{Binding Path=ImageLinks}">
+		
 	</GridView>
+	
 	<Page.BottomAppBar>
 		<CommandBar VerticalAlignment="Bottom">
 			<CommandBar.PrimaryCommands>
+				<AppBarButton Label="Search" Icon="Find">
+					<AppBarButton.Flyout>
+						<Flyout>
+							<StackPanel Orientation="Vertical">
+								<TextBlock Text="Search for tags"></TextBlock>
+								<StackPanel Orientation="Horizontal">
+									<TextBox PlaceholderText="Tags"
+								 MinWidth="300"/>
+									<Button Name="SearcfhButton" 
+											Margin="5, 0, 0, 0"
+											Background="{ThemeResource SearchBoxButtonBackgroundThemeBrush}" 
+											Foreground="{ThemeResource SearchBoxButtonForegroundThemeBrush}">
+										<Button.Content>
+											<SymbolIcon>Find</SymbolIcon>
+										</Button.Content>
+									</Button>
+								</StackPanel>
+
+							</StackPanel>
+						</Flyout>
+					</AppBarButton.Flyout>
+				</AppBarButton>
 				<AppBarButton Label="Settings" Icon="Setting"/>
-				<AppBarButton Label="Search" Icon="Search"/>
+				
 			</CommandBar.PrimaryCommands>
 		</CommandBar>
 	</Page.BottomAppBar>
