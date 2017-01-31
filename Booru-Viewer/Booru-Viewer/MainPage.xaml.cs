@@ -12,6 +12,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Booru_Viewer.Types;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -35,6 +36,17 @@ namespace Booru_Viewer
 		private void GridView_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 
+		}
+
+		private void SearchClicked(object sender, RoutedEventArgs e)
+		{
+			SearchFlyout.Hide();
+		}
+
+		private void AddTagClicked(object sender, RoutedEventArgs e)
+		{
+			GlobalInfo.CurrentTags.Add(TagTextBox.Text);
+			TagTextBox.Text = "";
 		}
 	}
 }

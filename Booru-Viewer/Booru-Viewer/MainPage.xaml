@@ -22,7 +22,8 @@
 	<GridView SelectionChanged="GridView_SelectionChanged"
 			  Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
 			  ItemTemplate="{StaticResource ImageTemplate}"
-			  ItemsSource="{Binding Path=ImageLinks}">
+			  ItemsSource="{Binding Path=ImageLinks}"
+			  SelectionMode="None">
 		
 	</GridView>
 	
@@ -31,22 +32,34 @@
 			<CommandBar.PrimaryCommands>
 				<AppBarButton Label="Search" Icon="Find">
 					<AppBarButton.Flyout>
-						<Flyout>
+						<Flyout x:Name="SearchFlyout">
 							<StackPanel Orientation="Vertical">
-								<TextBlock Text="Search for tags"></TextBlock>
+								<TextBlock Text="Add tags"></TextBlock>
 								<StackPanel Orientation="Horizontal">
-									<TextBox PlaceholderText="Tags"
+									<TextBox PlaceholderText="Tag"
+											 Name="TagTextBox"
 								 MinWidth="300"/>
-									<Button Name="SearcfhButton" 
+									<Button Name="AddTagButton" 
 											Margin="5, 0, 0, 0"
 											Background="{ThemeResource SearchBoxButtonBackgroundThemeBrush}" 
-											Foreground="{ThemeResource SearchBoxButtonForegroundThemeBrush}">
+											Foreground="{ThemeResource SearchBoxButtonForegroundThemeBrush}"
+											Click="AddTagClicked"
+											Command="{Binding AddTag}">
 										<Button.Content>
-											<SymbolIcon>Find</SymbolIcon>
+											<SymbolIcon>Add</SymbolIcon>
 										</Button.Content>
 									</Button>
+									
 								</StackPanel>
-
+								<GridView ItemsSource="{Binding Path=Tags, Mode=OneWay}"/>
+								<Button MinWidth="350" HorizontalAlignment="Center"
+										Background="{ThemeResource SearchBoxButtonBackgroundThemeBrush}"
+										Foreground="{ThemeResource SearchBoxButtonForegroundThemeBrush}"
+										Click="SearchClicked">
+									<Button.Content>
+										<SymbolIcon>Find</SymbolIcon>
+									</Button.Content>
+								</Button>
 							</StackPanel>
 						</Flyout>
 					</AppBarButton.Flyout>
