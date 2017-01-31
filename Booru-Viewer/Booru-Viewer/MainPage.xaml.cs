@@ -45,8 +45,7 @@ namespace Booru_Viewer
 
 		private void AddTagClicked(object sender, RoutedEventArgs e)
 		{
-			GlobalInfo.CurrentTags.Add(TagTextBox.Text);
-			TagTextBox.Text = "";
+			
 		}
 	}
 }

@@ -5,16 +5,26 @@
 	xmlns:local="using:Booru_Viewer"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	xmlns:vm="using:Booru_Viewer.ViewModels"
+	xmlns:vm1="using:Booru_Viewer.ViewModels"
 	mc:Ignorable="d"
 	>
 	<Page.DataContext>
-		<vm:MainPageViewModel></vm:MainPageViewModel>
+		<vm1:MainPageViewModel></vm1:MainPageViewModel>
 	</Page.DataContext>
 	<Page.Resources>
 		<ResourceDictionary>
 			<DataTemplate x:Name="ImageTemplate">
 				<Image Name="Image"></Image>
+			</DataTemplate>
+			<DataTemplate x:Name="Tag">
+				<StackPanel Orientation="Horizontal">
+					<TextBlock Name="Tag"
+						   Text="{Binding CurrentTags}"/>
+					<Button Command="{Binding RemoveTag}">
+						<SymbolIcon Symbol="Cancel"
+									/>
+					</Button>
+				</StackPanel>
 			</DataTemplate>
 		</ResourceDictionary>
 	</Page.Resources>
@@ -24,9 +34,9 @@
 			  ItemTemplate="{StaticResource ImageTemplate}"
 			  ItemsSource="{Binding Path=ImageLinks}"
 			  SelectionMode="None">
-		
+
 	</GridView>
-	
+
 	<Page.BottomAppBar>
 		<CommandBar VerticalAlignment="Bottom">
 			<CommandBar.PrimaryCommands>
@@ -41,20 +51,21 @@
 								 MinWidth="300"/>
 									<Button Name="AddTagButton" 
 											Margin="5, 0, 0, 0"
-											Background="{ThemeResource SearchBoxButtonBackgroundThemeBrush}" 
-											Foreground="{ThemeResource SearchBoxButtonForegroundThemeBrush}"
+											Background="{ThemeResource SystemControlBackgroundAccentBrush}" 
+											Foreground="White"
 											Click="AddTagClicked"
 											Command="{Binding AddTag}">
 										<Button.Content>
 											<SymbolIcon>Add</SymbolIcon>
 										</Button.Content>
 									</Button>
-									
+
 								</StackPanel>
-								<GridView ItemsSource="{Binding Path=Tags, Mode=OneWay}"/>
+								<GridView ItemsSource="{Binding Path=CurrentTags, Mode=OneWay}"
+										  ItemTemplate="{StaticResource Tag}"/>
 								<Button MinWidth="350" HorizontalAlignment="Center"
-										Background="{ThemeResource SearchBoxButtonBackgroundThemeBrush}"
-										Foreground="{ThemeResource SearchBoxButtonForegroundThemeBrush}"
+										Background="{ThemeResource SystemControlBackgroundAccentBrush}" 
+										Foreground="White"
 										Click="SearchClicked">
 									<Button.Content>
 										<SymbolIcon>Find</SymbolIcon>
@@ -65,7 +76,7 @@
 					</AppBarButton.Flyout>
 				</AppBarButton>
 				<AppBarButton Label="Settings" Icon="Setting"/>
-				
+
 			</CommandBar.PrimaryCommands>
 		</CommandBar>
 	</Page.BottomAppBar>

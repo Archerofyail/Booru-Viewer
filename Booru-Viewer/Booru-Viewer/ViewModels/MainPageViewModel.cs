@@ -16,6 +16,7 @@ namespace Booru_Viewer.ViewModels
 	class MainPageViewModel : INotifyPropertyChanged
 	{
 		public ObservableCollection<string> ImageLinks { get { return GlobalInfo.ImageURLs; } }
+		
 		public ObservableCollection<string> CurrentTags { get { return GlobalInfo.CurrentTags; } 
 		}
 
@@ -49,6 +50,17 @@ namespace Booru_Viewer.ViewModels
 			return true;
 		}
 
+		void RemoveTageExecute()
+		{
+
+		}
+
+		bool RemoveTagCanExecute()
+		{
+			return true;
+		}
+
 		public ICommand AddTag { get { return  new RelayCommand(AddTagExecute, AddTagCanExecute);} }
+		public ICommand RemoveTag { get { return new RelayCommand(RemoveTageExecute, RemoveTagCanExecute); } }
 	}
 }
