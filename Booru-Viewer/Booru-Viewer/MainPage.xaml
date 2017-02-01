@@ -6,6 +6,7 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:vm1="using:Booru_Viewer.ViewModels"
+	xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
 	mc:Ignorable="d"
 	>
 	<Page.DataContext>
@@ -14,13 +15,26 @@
 	<Page.Resources>
 		<ResourceDictionary>
 			<DataTemplate x:Name="ImageTemplate">
-				<Image Name="Image"></Image>
+				<controls:ImageEx Name="Image"
+								  Source="{Binding Path=PreviewImageURL}"></controls:ImageEx>
 			</DataTemplate>
 			<DataTemplate x:Name="Tag">
-				<StackPanel Orientation="Horizontal">
+				<StackPanel Orientation="Horizontal"
+							Background="{ThemeResource SystemAccentColor}"
+							BorderThickness="1"
+							>
+					<StackPanel.BorderBrush>
+						<SolidColorBrush Color="{ThemeResource SystemBaseLowColor}"/>
+					</StackPanel.BorderBrush>
 					<TextBlock Name="Tag"
-						   Text="{Binding CurrentTags}"/>
-					<Button Command="{Binding RemoveTag}">
+						   Text="{Binding Path=Tag, Mode=TwoWay}" 
+							   MinWidth="20" 
+							   Margin="10,0" 
+							   HorizontalAlignment="Center" 
+							   VerticalAlignment="Center"
+							   />
+					<Button Command="{Binding Path=RemoveTag, Mode=TwoWay}"
+							Background="#FF7C7C7C">
 						<SymbolIcon Symbol="Cancel"
 									/>
 					</Button>
@@ -34,6 +48,7 @@
 			  ItemTemplate="{StaticResource ImageTemplate}"
 			  ItemsSource="{Binding Path=ImageLinks}"
 			  SelectionMode="None">
+		<!--<TabControl c:Util.ShouldFocus="{Binding ShouldClearFocus}">-->
 
 	</GridView>
 
@@ -43,15 +58,20 @@
 				<AppBarButton Label="Search" Icon="Find">
 					<AppBarButton.Flyout>
 						<Flyout x:Name="SearchFlyout">
-							<StackPanel Orientation="Vertical">
+							<StackPanel Orientation="Vertical" MaxWidth="350">
 								<TextBlock Text="Add tags"></TextBlock>
 								<StackPanel Orientation="Horizontal">
 									<TextBox PlaceholderText="Tag"
 											 Name="TagTextBox"
-								 MinWidth="300"/>
+											 MinWidth="300"
+											 Text="{Binding CurrentTag, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+											 TextChanged="TagTextBox_TextChanged"
+											 AllowFocusOnInteraction="True"
+											 AcceptsReturn="True"
+											 KeyDown="TagTextBox_KeyDown"/>
 									<Button Name="AddTagButton" 
 											Margin="5, 0, 0, 0"
-											Background="{ThemeResource SystemControlBackgroundAccentBrush}" 
+											Background="{ThemeResource SystemAccentColor}" 
 											Foreground="White"
 											Click="AddTagClicked"
 											Command="{Binding AddTag}">
@@ -61,12 +81,14 @@
 									</Button>
 
 								</StackPanel>
-								<GridView ItemsSource="{Binding Path=CurrentTags, Mode=OneWay}"
-										  ItemTemplate="{StaticResource Tag}"/>
+								<ListBox ItemsSource="{Binding CurrentTags, Mode=TwoWay}"
+										  ItemTemplate="{StaticResource Tag}"
+										  />
 								<Button MinWidth="350" HorizontalAlignment="Center"
-										Background="{ThemeResource SystemControlBackgroundAccentBrush}" 
+										Background="{ThemeResource SystemAccentColor}" 
 										Foreground="White"
-										Click="SearchClicked">
+										Click="SearchClicked"
+										Command="{Binding StartSearch}">
 									<Button.Content>
 										<SymbolIcon>Find</SymbolIcon>
 									</Button.Content>
@@ -75,7 +97,43 @@
 						</Flyout>
 					</AppBarButton.Flyout>
 				</AppBarButton>
-				<AppBarButton Label="Settings" Icon="Setting"/>
+				<AppBarButton Label="Settings" Icon="Setting">
+					<AppBarButton.Flyout>
+						<Flyout>
+							<Flyout.FlyoutPresenterStyle>
+								<Style TargetType="FlyoutPresenter">
+									<Setter Property="Height" Value="{ThemeResource FlyoutThemeMaxHeight}"></Setter>
+									<Setter Property="IsTapEnabled" Value="True"></Setter>
+								</Style>
+							</Flyout.FlyoutPresenterStyle>
+							<StackPanel Orientation="Vertical" MinWidth="300">
+								<TextBlock Text="Login Details"
+										   Margin="0, 0, 0, 5"/>
+								<TextBox PlaceholderText="Username"
+										 Margin="0, 0, 0, 5"
+										 Text="{Binding Username, Mode=TwoWay}"
+										 AllowFocusOnInteraction="True"
+										 Name="UsernameTextBox"/>
+								<TextBox PlaceholderText="API Key"
+										 Margin="0, 0, 0, 5"
+										 Text="{Binding APIKey, Mode=TwoWay}"
+										 AllowFocusOnInteraction="True"
+										 IsEnabled="True" InputScope="Text" IsSpellCheckEnabled="False"
+										 Name="APIKeyTextBox"
+										 TextChanged="APIKeyTextBox_TextChanged"/>
+								<Button Width="280" HorizontalAlignment="Center"
+										Background="{ThemeResource SystemAccentColor}"
+										Foreground="White"
+										Command="{Binding SaveLoginData}"
+										Tapped="SaveLoginDataButtonTapped">
+									<Button.Content>
+										<SymbolIcon>Save</SymbolIcon>
+									</Button.Content>
+								</Button>
+							</StackPanel>
+						</Flyout>
+					</AppBarButton.Flyout>
+				</AppBarButton>
 
 			</CommandBar.PrimaryCommands>
 		</CommandBar>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Booru_Viewer.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -10,6 +11,11 @@ namespace Booru_Viewer.Types
 	public static class GlobalInfo
 	{
 		public static ObservableCollection<string> ImageURLs { get; set; } = new ObservableCollection<string>();
-		public static ObservableCollection<string> CurrentTags { get; set; } = new ObservableCollection<string>();
+		public static ObservableCollection<TagViewModel> CurrentTags { get; set; } = new ObservableCollection<TagViewModel>();
+
+		public static void RemoveTag(TagViewModel tag)
+		{
+			CurrentTags.Remove(tag);
+		}
 	}
 }

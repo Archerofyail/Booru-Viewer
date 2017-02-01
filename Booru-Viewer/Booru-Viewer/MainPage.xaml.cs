@@ -13,6 +13,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Booru_Viewer.Types;
+using Windows.Storage;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -25,7 +26,8 @@ namespace Booru_Viewer
 	{
 		public MainPage()
 		{
-			this.InitializeComponent();
+			InitializeComponent();
+			
 		}
 
 		private void ImageClicked(object sender, ItemClickEventArgs e)
@@ -45,7 +47,32 @@ namespace Booru_Viewer
 
 		private void AddTagClicked(object sender, RoutedEventArgs e)
 		{
-			
+			//AddTagButton.Focus(FocusState.Programmatic);
+			TagTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+		}
+
+		private void SaveLoginDataButtonTapped(object sender, TappedRoutedEventArgs e)
+		{
+			UsernameTextBox.Focus(FocusState.Programmatic);
+			APIKeyTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+		}
+
+		private void TagTextBox_TextChanged(object sender, TextChangedEventArgs e)
+		{
+			TagTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+		}
+
+		private void APIKeyTextBox_TextChanged(object sender, TextChangedEventArgs e)
+		{
+			APIKeyTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+		}
+
+		private void TagTextBox_KeyDown(object sender, KeyRoutedEventArgs e)
+		{
+			if (e.Key == Windows.System.VirtualKey.Enter)
+			{
+				AddTagButton.Command.Execute(AddTagButton);
+			}
 		}
 	}
 }
