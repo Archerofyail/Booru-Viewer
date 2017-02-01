@@ -16,7 +16,7 @@
 		<ResourceDictionary>
 			<DataTemplate x:Name="ImageTemplate">
 				<controls:ImageEx Name="Image"
-								  Source="{Binding Path=PreviewImageURL}"></controls:ImageEx>
+								  Source="{Binding Path=PreviewURL}"></controls:ImageEx>
 			</DataTemplate>
 			<DataTemplate x:Name="Tag">
 				<StackPanel Orientation="Horizontal"
@@ -42,16 +42,23 @@
 			</DataTemplate>
 		</ResourceDictionary>
 	</Page.Resources>
-
-	<GridView SelectionChanged="GridView_SelectionChanged"
+	<Grid>
+		<GridView SelectionChanged="GridView_SelectionChanged"
 			  Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
 			  ItemTemplate="{StaticResource ImageTemplate}"
-			  ItemsSource="{Binding Path=ImageLinks}"
-			  SelectionMode="None">
-		<!--<TabControl c:Util.ShouldFocus="{Binding ShouldClearFocus}">-->
+			  ItemsSource="{Binding Path=Thumbnails}"
+			  SelectionMode="None"
+			  >
+			<!--<TabControl c:Util.ShouldFocus="{Binding ShouldClearFocus}">-->
 
-	</GridView>
-
+		</GridView>
+		<Button VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="35" Margin="0,0,0,10" Width="117"
+				Command="{Binding LoadNextPage}">
+			<Button.Content>
+				Load More
+			</Button.Content>
+		</Button>
+	</Grid>
 	<Page.BottomAppBar>
 		<CommandBar VerticalAlignment="Bottom">
 			<CommandBar.PrimaryCommands>
@@ -81,7 +88,7 @@
 									</Button>
 
 								</StackPanel>
-								<ListBox ItemsSource="{Binding CurrentTags, Mode=TwoWay}"
+								<ListView ItemsSource="{Binding CurrentTags, Mode=TwoWay}"
 										  ItemTemplate="{StaticResource Tag}"
 										  />
 								<Button MinWidth="350" HorizontalAlignment="Center"

@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
+using Windows.Web.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Booru_Viewer.ViewModels;
@@ -21,23 +20,32 @@ namespace Booru_Viewer.Types
 
 
 		//Tags must have a space added to them when they are passed to this function. This returns a null list if failed
-		public static async Task<Tuple<bool, List<ImageModel>, HttpStatusCode>> SearchPosts(string[] tags, int page)
+		public static async Task<Tuple<bool, List<ImageModel>, HttpStatusCode>> SearchPosts(string[] tags, int page, bool restartSearch = true)
 		{
-
 			List<ImageModel> imageLinks = new List<ImageModel>();
-			string tagsAsOne = string.Concat(tags);
+			
+			string tagsAsOne = "";
+			foreach (var tag in tags)
+			{
+				tagsAsOne += tag.Replace(" ", "%20");
+			}
+			
 			var requestURI =
 				new Uri(BaseURL + PostsURL + "?limit=20&page=" + page + "&tags=" + tagsAsOne +
 				        (APIKey != "" && Username != "" ? "&login=" + Username + "&api_key=" + APIKey : ""));
 			var response = await booruClient.GetAsync(requestURI);
-			if (response.StatusCode != HttpStatusCode.OK)
+			if (response.StatusCode != HttpStatusCode.Ok)
 			{
 				return new Tuple<bool, List<ImageModel>, HttpStatusCode>(false, null, response.StatusCode);
 			}
 			var json = await response.Content.ReadAsStringAsync();
 			Debug.WriteLine("Got Json:\n" + json);
 			imageLinks = JsonConvert.DeserializeObject<List<ImageModel>>(json);
-			GlobalInfo.CurrentSearch.Clear();
+			if (restartSearch)
+			{
+				GlobalInfo.CurrentSearch.Clear();
+			}
+			
 			foreach (var img in imageLinks)
 			{
 				GlobalInfo.CurrentSearch.Add(img);

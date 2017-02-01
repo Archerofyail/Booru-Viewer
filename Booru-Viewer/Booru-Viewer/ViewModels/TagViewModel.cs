@@ -28,7 +28,9 @@ namespace Booru_Viewer.ViewModels
 
 		void RemoveTagExecute()
 		{
-			parentVM.RemoveTag(this);
+			
+				parentVM.RemoveTag(this);
+			
 		}
 
 		bool RemoveTagCanExecute()
