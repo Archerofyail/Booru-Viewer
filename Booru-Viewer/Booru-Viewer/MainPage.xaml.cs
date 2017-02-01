@@ -14,6 +14,8 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Booru_Viewer.Types;
 using Windows.Storage;
+using Windows.System.Profile;
+using System.Diagnostics;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -67,12 +69,17 @@ namespace Booru_Viewer
 			APIKeyTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
 		}
 
-		private void TagTextBox_KeyDown(object sender, KeyRoutedEventArgs e)
+		private void TagTextBox_KeyUp(object sender, KeyRoutedEventArgs e)
 		{
-			if (e.Key == Windows.System.VirtualKey.Enter)
+			Debug.WriteLine("Form is " + AnalyticsInfo.DeviceForm + "And Family is " + AnalyticsInfo.VersionInfo.DeviceFamily);
+			if (e.Key == Windows.System.VirtualKey.Enter && e.KeyStatus.IsKeyReleased)
 			{
-				AddTagButton.Command.Execute(AddTagButton);
+				if (AddTagButton.Command.CanExecute(AddTagButton))
+				{
+					AddTagButton.Command.Execute(AddTagButton);
+				}
 			}
+
 		}
 	}
 }

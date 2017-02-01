@@ -21,7 +21,7 @@
 			<DataTemplate x:Name="Tag">
 				<StackPanel Orientation="Horizontal"
 							Background="{ThemeResource SystemAccentColor}"
-							BorderThickness="1"
+							BorderThickness="1" Margin="0,0,0,-5"
 							>
 					<StackPanel.BorderBrush>
 						<SolidColorBrush Color="{ThemeResource SystemBaseLowColor}"/>
@@ -35,8 +35,7 @@
 							   />
 					<Button Command="{Binding Path=RemoveTag, Mode=TwoWay}"
 							Background="#FF7C7C7C">
-						<SymbolIcon Symbol="Cancel"
-									/>
+						<SymbolIcon Symbol="Cancel"/>
 					</Button>
 				</StackPanel>
 			</DataTemplate>
@@ -74,8 +73,7 @@
 											 Text="{Binding CurrentTag, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
 											 TextChanged="TagTextBox_TextChanged"
 											 AllowFocusOnInteraction="True"
-											 AcceptsReturn="True"
-											 KeyDown="TagTextBox_KeyDown"/>
+											 KeyUp="TagTextBox_KeyUp"/>
 									<Button Name="AddTagButton" 
 											Margin="5, 0, 0, 0"
 											Background="{ThemeResource SystemAccentColor}" 
@@ -90,7 +88,7 @@
 								</StackPanel>
 								<ListView ItemsSource="{Binding CurrentTags, Mode=TwoWay}"
 										  ItemTemplate="{StaticResource Tag}"
-										  />
+										  MinHeight="20"/>
 								<Button MinWidth="350" HorizontalAlignment="Center"
 										Background="{ThemeResource SystemAccentColor}" 
 										Foreground="White"
