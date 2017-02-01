@@ -56,7 +56,8 @@ namespace Booru_Viewer.ViewModels
 		//		RaisePropertyChanged();
 		//	}
 		//}
-		public ObservableCollection<string> ImageLinks { get { RaisePropertyChanged(); return GlobalInfo.ImageURLs; } }
+		private ObservableCollection<ThumbnailViewModel> thumbnails = new ObservableCollection<ThumbnailViewModel>();
+		public ObservableCollection<ThumbnailViewModel> Thumbnails { get { RaisePropertyChanged(); return thumbnails; } }
 		
 		public ObservableCollection<TagViewModel> CurrentTags { get { RaisePropertyChanged(); return GlobalInfo.CurrentTags; } 
 		}
@@ -137,9 +138,26 @@ namespace Booru_Viewer.ViewModels
 			return true;
 		}
 
-		void StartSearchExecute()
+		async void StartSearchExecute()
 		{
-
+			string[] tags = new string[CurrentTags.Count];
+			var i = 0;
+			foreach(var tag in CurrentTags)
+			{
+				if (!string.IsNullOrEmpty(tag.Tag))
+				{
+					tags[i] = tag.Tag.Replace(" ", "_").PadRight(1);
+				}
+				i++;
+			}
+			var result = await BooruAPI.SearchPosts(tags, 0);
+			if (result.Item3 == System.Net.HttpStatusCode.Accepted)
+			{
+				foreach (var post in result.Item2)
+				{
+					Thumbnails.Add(new ThumbnailViewModel { PreviewURL = BooruAPI.BaseURL + post.preview_file_url});
+				}
+			}
 		}
 
 		bool StartSearchCanExecute()

@@ -10,7 +10,7 @@ namespace Booru_Viewer.Types
 {
 	public static class GlobalInfo
 	{
-		public static ObservableCollection<string> ImageURLs { get; set; } = new ObservableCollection<string>();
+		public static ObservableCollection<ImageModel> CurrentSearch { get; set; } = new ObservableCollection<ImageModel>();
 		public static ObservableCollection<TagViewModel> CurrentTags { get; set; } = new ObservableCollection<TagViewModel>();
 
 		public static void RemoveTag(TagViewModel tag)

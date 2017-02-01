@@ -37,6 +37,11 @@ namespace Booru_Viewer.Types
 			var json = await response.Content.ReadAsStringAsync();
 			Debug.WriteLine("Got Json:\n" + json);
 			imageLinks = JsonConvert.DeserializeObject<List<ImageModel>>(json);
+			GlobalInfo.CurrentSearch.Clear();
+			foreach (var img in imageLinks)
+			{
+				GlobalInfo.CurrentSearch.Add(img);
+			}
 			return new Tuple<bool, List<ImageModel>, HttpStatusCode>(true, imageLinks, response.StatusCode);
 		}
 

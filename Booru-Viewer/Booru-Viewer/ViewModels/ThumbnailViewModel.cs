@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 
 namespace Booru_Viewer.ViewModels
 {
-	class ThumbnailViewModel
+	public class ThumbnailViewModel
 	{
-		public string ImageURL { get; set; }
+
+
+
+		public string PreviewURL { get; set; }
 	}
 }
