@@ -103,7 +103,7 @@ namespace Booru_Viewer.ViewModels
 			}
 		}
 
-		private bool haveImages = true;
+		private bool haveImages = false;
 
 		public bool HaveImages
 		{

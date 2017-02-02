@@ -75,7 +75,8 @@
 		<!--<TextBlock Visibility="{Binding HaveImages, Mode=TwoWay}"
 				   Text="{Binding NoImagesText}"/>-->
 		<Button VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="35" Margin="0,0,0,10" Width="117"
-				Command="{Binding LoadNextPage}">
+				Command="{Binding LoadNextPage}"
+				Visibility="{Binding HaveImages}">
 			<Button.Content>
 				Load More
 			</Button.Content>
@@ -119,7 +120,8 @@
 								</StackPanel>
 								<ListView ItemsSource="{Binding CurrentTags, Mode=TwoWay}"
 										  ItemTemplate="{StaticResource Tag}"
-										  MinHeight="20"/>
+										  MinHeight="20"
+										  SelectionMode="None"/>
 								<Button MinWidth="350" HorizontalAlignment="Center"
 										Background="{ThemeResource SystemAccentColor}" 
 										Foreground="White"
