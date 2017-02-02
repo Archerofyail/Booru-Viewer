@@ -17,7 +17,7 @@
 			<DataTemplate x:Name="ImageTemplate">
 				<controls:ImageEx Name="Image"
 								  Source="{Binding Path=PreviewURL}"
-								  >
+								  MaxHeight="{Binding ElementName=ImageGridView, Path=ActualHeight}">
 					<!--MaxWidth="250"
 								  MaxHeight="250"-->
 					<controls:ImageEx.ContextFlyout>
