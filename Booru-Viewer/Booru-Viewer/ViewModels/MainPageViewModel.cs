@@ -15,6 +15,9 @@ using Windows.Storage;
 using System.Diagnostics;
 using GalaSoft.MvvmLight;
 using Windows.Web.Http;
+using Windows.UI.Xaml.Controls;
+
+//TODO: Saved Searches (should be somewhat straightforward)
 namespace Booru_Viewer.ViewModels
 {
 	public class MainPageViewModel : ViewModelBase
@@ -22,14 +25,14 @@ namespace Booru_Viewer.ViewModels
 		private int page = 1;
 		public MainPageViewModel()
 		{
-			
+
 			var appSettings = ApplicationData.Current.RoamingSettings.Values;
 			var savedUN = appSettings["Username"] as string;
 			var savedAPIKey = appSettings["APIKey"] as string;
 			if (!string.IsNullOrEmpty(savedUN))
 			{
 				Debug.WriteLine("username not empty it's " + appSettings["Username"] + ". APIKey is " + appSettings["APIKey"]);
-				
+
 				Username = savedUN;
 				if (!string.IsNullOrEmpty(savedAPIKey))
 				{
@@ -42,9 +45,9 @@ namespace Booru_Viewer.ViewModels
 					APIKey = "";
 					BooruAPI.SetLogin(savedUN, "");
 				}
-				
+
 			}
-			
+
 		}
 
 
@@ -59,20 +62,23 @@ namespace Booru_Viewer.ViewModels
 		//	}
 		//}
 		private ObservableCollection<ThumbnailViewModel> thumbnails = new ObservableCollection<ThumbnailViewModel>();
-		public ObservableCollection<ThumbnailViewModel> Thumbnails { get { RaisePropertyChanged(); return thumbnails; } }
-		
-		public ObservableCollection<TagViewModel> CurrentTags { get { RaisePropertyChanged(); return GlobalInfo.CurrentTags; } 
+		public ObservableCollection<ThumbnailViewModel> Thumbnails { get { return thumbnails; } }
+
+		public ObservableCollection<TagViewModel> CurrentTags
+		{
+			get { RaisePropertyChanged(); return GlobalInfo.CurrentTags; }
 		}
 
 		private string currentTag = "";
 
-		public string CurrentTag {
+		public string CurrentTag
+		{
 			get
 			{
 				return currentTag;
 			}
 			set { currentTag = value; RaisePropertyChanged(); }
-	}
+		}
 
 		private string username;
 		public string Username
@@ -91,12 +97,50 @@ namespace Booru_Viewer.ViewModels
 			get { return BooruAPI.APIKey; }
 			set
 			{
-				
+
 				apiKey = value;
 				RaisePropertyChanged();
 			}
 		}
 
+		private bool haveImages = true;
+
+		public bool HaveImages
+		{
+			get { return haveImages; }
+			set
+			{
+				haveImages = value;
+				RaisePropertyChanged();
+			}
+		}
+
+		private string noImagesText = "Press the search key to get started";
+		public string NoImagesText
+		{
+			get { return noImagesText; }
+			set
+			{
+				noImagesText = value;
+				RaisePropertyChanged();
+			}
+		}
+
+
+		private bool isMultiSelectOn = false;
+		public SelectionMode ImageSelectionMode
+		{
+			get { return isMultiSelectOn ? SelectionMode.Multiple : SelectionMode.Single; }
+			set
+			{
+				isMultiSelectOn =  value == SelectionMode.Multiple;
+				RaisePropertyChanged();
+			}
+		}
+		public SymbolIcon MultiSelectButtonIcon
+		{
+			get { return isMultiSelectOn ? new SymbolIcon(Symbol.Cancel) : new SymbolIcon(Symbol.SelectAll); }
+		}
 		public void RemoveTag(TagViewModel tag)
 		{
 			CurrentTags.Remove(tag);
@@ -106,7 +150,7 @@ namespace Booru_Viewer.ViewModels
 
 		void AddTagExecute()
 		{
-			
+
 			CurrentTags.Add(new TagViewModel(CurrentTag, this));
 			CurrentTag = "";
 			RaisePropertyChanged("CurrentTags");
@@ -127,11 +171,11 @@ namespace Booru_Viewer.ViewModels
 		{
 			RaisePropertyChanged("APIKey");
 			BooruAPI.SetLogin(username, apiKey);
-			
+
 			ApplicationData.Current.RoamingSettings.Values["Username"] = BooruAPI.Username;
 			ApplicationData.Current.RoamingSettings.Values["APIKey"] = BooruAPI.APIKey;
 		}
-		
+
 		bool SaveLoginDataCanExecute()
 		{
 			return true;
@@ -141,8 +185,17 @@ namespace Booru_Viewer.ViewModels
 		{
 			GlobalInfo.CurrentSearch.Clear();
 			ResyncThumbnails();
-			var tags = PrepTags();
+			var tags = await PrepTags();
 			var result = await BooruAPI.SearchPosts(tags, 0);
+			if (result.Item2.Count > 0)
+			{
+				HaveImages = true;
+			}
+			else
+			{
+				HaveImages = false;
+				NoImagesText = "No Images Found with those tags, try a different combination";
+			}
 			if (result.Item3 == HttpStatusCode.Ok)
 			{
 				AddThumbnails(result.Item2);
@@ -151,25 +204,34 @@ namespace Booru_Viewer.ViewModels
 
 		void AddThumbnails(List<ImageModel> thumbnails)
 		{
+
 			foreach (var post in thumbnails)
 			{
-				Thumbnails.Add(new ThumbnailViewModel { PreviewURL = BooruAPI.BaseURL + post.Large_File_Url });
+				Thumbnails.Add(new ThumbnailViewModel { PreviewURL = BooruAPI.BaseURL + post.Large_File_Url, FullURL = BooruAPI.BaseURL + post.Large_File_Url });
 			}
+
+
 			RaisePropertyChanged("Thumbnails");
 		}
 
-		string[] PrepTags()
+		async Task<string[]> PrepTags()
 		{
 			string[] tags = new string[CurrentTags.Count];
-			var i = 0;
-			foreach (var tag in CurrentTags)
-			{
-				if (!string.IsNullOrEmpty(tag.Tag))
-				{
-					tags[i] = tag.Tag.Replace(" ", "_") + " ";
-				}
-				i++;
-			}
+			var tagModels = new ObservableCollection<TagViewModel>(CurrentTags);
+			await Task.Run(() =>
+			 {
+				 var i = 0;
+				 foreach (var tag in tagModels)
+				 {
+					 if (!string.IsNullOrEmpty(tag.Tag))
+					 {
+						 tags[i] = tag.Tag.Replace(" ", "_") + " ";
+					 }
+					 i++;
+				 }
+			 });
+
+
 			return tags;
 		}
 
@@ -178,8 +240,9 @@ namespace Booru_Viewer.ViewModels
 			Thumbnails.Clear();
 			foreach (var post in GlobalInfo.CurrentSearch)
 			{
-				Thumbnails.Add(new ThumbnailViewModel { PreviewURL = BooruAPI.BaseURL + post.Large_File_Url });
+				Thumbnails.Add(new ThumbnailViewModel { PreviewURL = BooruAPI.BaseURL + post.Large_File_Url, FullURL = BooruAPI.BaseURL + post.Large_File_Url });
 			}
+
 			RaisePropertyChanged("Thumbnails");
 		}
 
@@ -191,7 +254,7 @@ namespace Booru_Viewer.ViewModels
 		async void LoadNextPageExecute()
 		{
 			page++;
-			var result = await BooruAPI.SearchPosts(PrepTags(), page, false);
+			var result = await BooruAPI.SearchPosts(await PrepTags(), page, false);
 			if (result.Item3 == HttpStatusCode.Ok)
 			{
 				AddThumbnails(result.Item2);
@@ -201,8 +264,8 @@ namespace Booru_Viewer.ViewModels
 		{
 			return true;
 		}
-		public ICommand AddTag { get { return  new RelayCommand(AddTagExecute, AddTagCanExecute);} }
-		
+		public ICommand AddTag { get { return new RelayCommand(AddTagExecute, AddTagCanExecute); } }
+
 		public ICommand SaveLoginData { get { return new RelayCommand(SaveLoginDataExecute, SaveLoginDataCanExecute); } }
 		public ICommand StartSearch { get { return new RelayCommand(StartSearchExecute, StartSearchCanExecute); } }
 		public ICommand LoadNextPage { get { return new RelayCommand(LoadNextPageExecute, LoadNextPageCanExecute); } }

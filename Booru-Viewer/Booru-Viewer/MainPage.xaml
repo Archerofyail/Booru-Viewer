@@ -16,7 +16,18 @@
 		<ResourceDictionary>
 			<DataTemplate x:Name="ImageTemplate">
 				<controls:ImageEx Name="Image"
-								  Source="{Binding Path=PreviewURL}"></controls:ImageEx>
+								  Source="{Binding Path=PreviewURL}"
+								  MaxWidth="250"
+								  MaxHeight="250">
+					<controls:ImageEx.ContextFlyout>
+						<MenuFlyout>
+							<MenuFlyoutItem Text="Save Image"
+											Command="{Binding SaveImage}"/>
+							<MenuFlyoutItem Text="Select"
+											Command="{Binding EnableMultiSelect}"/>
+						</MenuFlyout>
+					</controls:ImageEx.ContextFlyout>
+				</controls:ImageEx>
 			</DataTemplate>
 			<DataTemplate x:Name="Tag">
 				<StackPanel Orientation="Horizontal"
@@ -27,7 +38,7 @@
 						<SolidColorBrush Color="{ThemeResource SystemBaseLowColor}"/>
 					</StackPanel.BorderBrush>
 					<TextBlock Name="Tag"
-						   Text="{Binding Path=Tag, Mode=TwoWay}" 
+							   Text="{Binding Path=Tag, Mode=TwoWay}" 
 							   MinWidth="20" 
 							   Margin="10,0" 
 							   HorizontalAlignment="Center" 
@@ -41,16 +52,24 @@
 			</DataTemplate>
 		</ResourceDictionary>
 	</Page.Resources>
-	<Grid>
-		<GridView SelectionChanged="GridView_SelectionChanged"
-			  Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
-			  ItemTemplate="{StaticResource ImageTemplate}"
-			  ItemsSource="{Binding Path=Thumbnails}"
-			  SelectionMode="None"
-			  >
-			<!--<TabControl c:Util.ShouldFocus="{Binding ShouldClearFocus}">-->
+	<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+		<StackPanel Orientation="Vertical">
+			<GridView 
+			ItemTemplate="{StaticResource ImageTemplate}"
+			ItemsSource="{Binding Path=Thumbnails}"
+			SelectionMode="Single"
+			AllowFocusOnInteraction="True"
+			IsEnabled="True"
+			Margin="0, 25, 0, 0" 
+			Name="ImageGridView">
 
-		</GridView>
+
+			</GridView>
+
+			<TextBlock Visibility="{Binding HaveImages, Mode=TwoWay}"
+				   Text="{Binding NoImagesText}"/>
+		</StackPanel>
+
 		<Button VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="35" Margin="0,0,0,10" Width="117"
 				Command="{Binding LoadNextPage}">
 			<Button.Content>
@@ -61,6 +80,9 @@
 	<Page.BottomAppBar>
 		<CommandBar VerticalAlignment="Bottom">
 			<CommandBar.PrimaryCommands>
+				<AppBarButton Click="MultiSelectCommandButtonClicked"
+							  Icon="{Binding MultiSelectButtonIcon}"
+							  Label="Multi-Select"/>
 				<AppBarButton Label="Search" Icon="Find">
 					<AppBarButton.Flyout>
 						<Flyout x:Name="SearchFlyout">

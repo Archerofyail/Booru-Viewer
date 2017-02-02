@@ -81,5 +81,15 @@ namespace Booru_Viewer
 			}
 
 		}
+
+		private void GridView_Tapped(object sender, TappedRoutedEventArgs e)
+		{
+
+		}
+
+		private void MultiSelectCommandButtonClicked(object sender, RoutedEventArgs e)
+		{
+			ImageGridView.SelectionMode = ListViewSelectionMode.Multiple;
+		}
 	}
 }
