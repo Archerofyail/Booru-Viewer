@@ -33,7 +33,7 @@ namespace Booru_Viewer.ViewModels
 
 		void EnableMultiSelectExecute()
 		{
-			parentVM.ImageSelectionMode = SelectionMode.Multiple;
+			parentVM.ImageSelectionMode = ListViewSelectionMode.Multiple;
 		}
 		bool EnableMultiSelectCanExecute()
 		{
