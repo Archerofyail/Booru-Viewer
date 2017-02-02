@@ -128,19 +128,27 @@ namespace Booru_Viewer.ViewModels
 
 
 		private bool isMultiSelectOn = false;
-		public SelectionMode ImageSelectionMode
+		public ListViewSelectionMode ImageSelectionMode
 		{
-			get { return isMultiSelectOn ? SelectionMode.Multiple : SelectionMode.Single; }
+			get { return isMultiSelectOn ? ListViewSelectionMode.Multiple : ListViewSelectionMode.Single; }
 			set
 			{
-				isMultiSelectOn =  value == SelectionMode.Multiple;
+				isMultiSelectOn =  value == ListViewSelectionMode.Multiple;
+				MultiSelectButtonIcon = new SymbolIcon(Symbol.Cancel);
 				RaisePropertyChanged();
 			}
 		}
 		public SymbolIcon MultiSelectButtonIcon
 		{
 			get { return isMultiSelectOn ? new SymbolIcon(Symbol.Cancel) : new SymbolIcon(Symbol.SelectAll); }
+			set
+			{
+				isMultiSelectOn = value == new SymbolIcon(Symbol.Cancel);
+				RaisePropertyChanged();
+			}
 		}
+
+
 		public void RemoveTag(TagViewModel tag)
 		{
 			CurrentTags.Remove(tag);
@@ -207,7 +215,7 @@ namespace Booru_Viewer.ViewModels
 
 			foreach (var post in thumbnails)
 			{
-				Thumbnails.Add(new ThumbnailViewModel { PreviewURL = BooruAPI.BaseURL + post.Large_File_Url, FullURL = BooruAPI.BaseURL + post.Large_File_Url });
+				Thumbnails.Add(new ThumbnailViewModel(BooruAPI.BaseURL + post.Large_File_Url, BooruAPI.BaseURL + post.Large_File_Url, this));
 			}
 
 
@@ -240,7 +248,7 @@ namespace Booru_Viewer.ViewModels
 			Thumbnails.Clear();
 			foreach (var post in GlobalInfo.CurrentSearch)
 			{
-				Thumbnails.Add(new ThumbnailViewModel { PreviewURL = BooruAPI.BaseURL + post.Large_File_Url, FullURL = BooruAPI.BaseURL + post.Large_File_Url });
+				Thumbnails.Add(new ThumbnailViewModel(BooruAPI.BaseURL + post.Large_File_Url, BooruAPI.BaseURL + post.Large_File_Url, this));
 			}
 
 			RaisePropertyChanged("Thumbnails");
@@ -264,10 +272,24 @@ namespace Booru_Viewer.ViewModels
 		{
 			return true;
 		}
+
+		void ChangeSelectionModeExecute()
+		{
+			//ImageSelectionMode = (ImageSelectionMode == SelectionMode.Multiple) ? SelectionMode.Single : SelectionMode.Multiple;
+			isMultiSelectOn = !isMultiSelectOn;
+			RaisePropertyChanged("ImageSelectionMode");
+			RaisePropertyChanged("MultiSelectButtonIcon");
+		}
+
+		bool ChangeSelectionModeCanExecute()
+		{
+			return true;
+		}
 		public ICommand AddTag { get { return new RelayCommand(AddTagExecute, AddTagCanExecute); } }
 
 		public ICommand SaveLoginData { get { return new RelayCommand(SaveLoginDataExecute, SaveLoginDataCanExecute); } }
 		public ICommand StartSearch { get { return new RelayCommand(StartSearchExecute, StartSearchCanExecute); } }
 		public ICommand LoadNextPage { get { return new RelayCommand(LoadNextPageExecute, LoadNextPageCanExecute); } }
+		public ICommand ChangeSelectionMode => new RelayCommand(ChangeSelectionModeExecute, ChangeSelectionModeCanExecute);
 	}
 }

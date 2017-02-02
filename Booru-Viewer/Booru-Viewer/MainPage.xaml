@@ -17,8 +17,9 @@
 			<DataTemplate x:Name="ImageTemplate">
 				<controls:ImageEx Name="Image"
 								  Source="{Binding Path=PreviewURL}"
-								  MaxWidth="250"
-								  MaxHeight="250">
+								  >
+					<!--MaxWidth="250"
+								  MaxHeight="250"-->
 					<controls:ImageEx.ContextFlyout>
 						<MenuFlyout>
 							<MenuFlyoutItem Text="Save Image"
@@ -53,36 +54,44 @@
 		</ResourceDictionary>
 	</Page.Resources>
 	<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-		<StackPanel Orientation="Vertical">
-			<GridView 
+	
+		<GridView   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
 			ItemTemplate="{StaticResource ImageTemplate}"
 			ItemsSource="{Binding Path=Thumbnails}"
-			SelectionMode="Single"
+			SelectionMode="{Binding ImageSelectionMode}"
 			AllowFocusOnInteraction="True"
 			IsEnabled="True"
 			Margin="0, 25, 0, 0" 
-			Name="ImageGridView">
+			Name="ImageGridView"
+						VerticalAlignment="Stretch"
+						ScrollViewer.VerticalScrollMode="Enabled"
+						ScrollViewer.ZoomMode="Disabled"
+						ScrollViewer.IsVerticalRailEnabled="True"
+					SelectionChanged="GridView_SelectionChanged">
 
 
-			</GridView>
+		</GridView>
 
-			<TextBlock Visibility="{Binding HaveImages, Mode=TwoWay}"
-				   Text="{Binding NoImagesText}"/>
-		</StackPanel>
-
+		<!--<TextBlock Visibility="{Binding HaveImages, Mode=TwoWay}"
+				   Text="{Binding NoImagesText}"/>-->
 		<Button VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="35" Margin="0,0,0,10" Width="117"
 				Command="{Binding LoadNextPage}">
 			<Button.Content>
 				Load More
 			</Button.Content>
 		</Button>
+	
+
+
+
 	</Grid>
 	<Page.BottomAppBar>
 		<CommandBar VerticalAlignment="Bottom">
 			<CommandBar.PrimaryCommands>
 				<AppBarButton Click="MultiSelectCommandButtonClicked"
 							  Icon="{Binding MultiSelectButtonIcon}"
-							  Label="Multi-Select"/>
+							  Label="Multi-Select"
+							  Command="{Binding ChangeSelectionMode}"/>
 				<AppBarButton Label="Search" Icon="Find">
 					<AppBarButton.Flyout>
 						<Flyout x:Name="SearchFlyout">

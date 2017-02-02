@@ -39,7 +39,7 @@ namespace Booru_Viewer
 
 		private void GridView_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-
+			Debug.Write("blah");
 		}
 
 		private void SearchClicked(object sender, RoutedEventArgs e)
@@ -84,12 +84,12 @@ namespace Booru_Viewer
 
 		private void GridView_Tapped(object sender, TappedRoutedEventArgs e)
 		{
-
+			Debug.Write("blah");
 		}
 
 		private void MultiSelectCommandButtonClicked(object sender, RoutedEventArgs e)
 		{
-			ImageGridView.SelectionMode = ListViewSelectionMode.Multiple;
+			
 		}
 	}
 }
