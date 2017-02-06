@@ -17,9 +17,10 @@
 			<DataTemplate x:Name="ImageTemplate">
 				<controls:ImageEx Name="Image"
 								  Source="{Binding Path=PreviewURL}"
-								  MaxHeight="{Binding ElementName=ImageGridView, Path=ActualHeight}">
-					<!--MaxWidth="250"
-								  MaxHeight="250"-->
+								 
+								  MaxWidth="250"
+								  MaxHeight="250">
+					
 					<controls:ImageEx.ContextFlyout>
 						<MenuFlyout>
 							<MenuFlyoutItem Text="Save Image"
@@ -67,7 +68,8 @@
 						ScrollViewer.VerticalScrollMode="Enabled"
 						ScrollViewer.ZoomMode="Disabled"
 						ScrollViewer.IsVerticalRailEnabled="True"
-					SelectionChanged="GridView_SelectionChanged">
+					SelectionChanged="GridView_SelectionChanged"
+					ItemClick="ImageClicked">
 
 
 		</GridView>
@@ -122,11 +124,20 @@
 										  ItemTemplate="{StaticResource Tag}"
 										  MinHeight="20"
 										  SelectionMode="None"/>
+								<StackPanel Orientation="Horizontal"
+											FlowDirection="RightToLeft">
+									<Button
+											Content="Search Your Favourites" Margin="8"
+											Command="{Binding SearchFavourites}"
+											Visibility="{Binding IsFavButtonVisible}"></Button>
+									<Button Content="Save Search"/>
+								</StackPanel>
 								<Button MinWidth="350" HorizontalAlignment="Center"
 										Background="{ThemeResource SystemAccentColor}" 
 										Foreground="White"
 										Click="SearchClicked"
-										Command="{Binding StartSearch}">
+										Command="{Binding StartSearch}"
+										Name="SearchButton">
 									<Button.Content>
 										<SymbolIcon>Find</SymbolIcon>
 									</Button.Content>
@@ -159,6 +170,7 @@
 										 IsEnabled="True" InputScope="Text" IsSpellCheckEnabled="False"
 										 Name="APIKeyTextBox"
 										 TextChanged="APIKeyTextBox_TextChanged"/>
+								
 								<Button Width="280" HorizontalAlignment="Center"
 										Background="{ThemeResource SystemAccentColor}"
 										Foreground="White"

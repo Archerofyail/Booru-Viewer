@@ -103,7 +103,9 @@
     <Compile Include="Types\GlobalInfo.cs" />
     <Compile Include="Models\ImageModel.cs" />
     <Compile Include="Types\ImageSaver.cs" />
+    <Compile Include="ViewModels\FullImageViewModel.cs" />
     <Compile Include="ViewModels\MainPageViewModel.cs" />
+    <Compile Include="ViewModels\SwipViewViewModel.cs" />
     <Compile Include="ViewModels\TagViewModel.cs" />
     <Compile Include="ViewModels\ThumbnailViewModel.cs" />
     <Compile Include="Views\SwipeView.xaml.cs">

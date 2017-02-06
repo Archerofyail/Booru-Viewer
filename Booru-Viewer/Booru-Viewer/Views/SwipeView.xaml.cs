@@ -25,6 +25,9 @@ namespace Booru_Viewer.Views
 		public SwipeView()
 		{
 			this.InitializeComponent();
+		
 		}
 	}
+
+
 }

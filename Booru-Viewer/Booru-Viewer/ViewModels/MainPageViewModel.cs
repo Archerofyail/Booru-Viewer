@@ -48,6 +48,8 @@ namespace Booru_Viewer.ViewModels
 
 			}
 
+			StartSearchExecute();
+
 		}
 
 
@@ -146,6 +148,11 @@ namespace Booru_Viewer.ViewModels
 				isMultiSelectOn = value == new SymbolIcon(Symbol.Cancel);
 				RaisePropertyChanged();
 			}
+		}
+
+		public Visibility IsFavButtonVisible
+		{
+			get { return Username != "" && APIKey != "" ? Visibility.Visible : Visibility.Collapsed; }
 		}
 
 
@@ -254,6 +261,17 @@ namespace Booru_Viewer.ViewModels
 			RaisePropertyChanged("Thumbnails");
 		}
 
+		void SearchFavouritesExecute()
+		{
+			foreach (var tag in CurrentTags)
+			{
+				RemoveTag(tag);
+			}
+			CurrentTag = "ordfav:" +Username;
+			AddTagExecute();
+			StartSearchExecute();
+		}
+
 		bool StartSearchCanExecute()
 		{
 			return true;
@@ -291,5 +309,6 @@ namespace Booru_Viewer.ViewModels
 		public ICommand StartSearch { get { return new RelayCommand(StartSearchExecute, StartSearchCanExecute); } }
 		public ICommand LoadNextPage { get { return new RelayCommand(LoadNextPageExecute, LoadNextPageCanExecute); } }
 		public ICommand ChangeSelectionMode => new RelayCommand(ChangeSelectionModeExecute, ChangeSelectionModeCanExecute);
+		public ICommand SearchFavourites { get { return new RelayCommand(SearchFavouritesExecute, SearchCanExecute);} }
 	}
 }

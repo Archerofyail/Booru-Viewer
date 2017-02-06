@@ -16,6 +16,7 @@ using Booru_Viewer.Types;
 using Windows.Storage;
 using Windows.System.Profile;
 using System.Diagnostics;
+using Booru_Viewer.Views;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -29,17 +30,39 @@ namespace Booru_Viewer
 		public MainPage()
 		{
 			InitializeComponent();
-			
+			SearchClicked(null, null);
+			if (SearchButton != null)
+			{
+				var command = SearchButton.Command;
+				if (command != null)
+				{
+					command.Execute(SearchButton);
+				}
+				else
+				{
+					Debug.WriteLine("search command returned null");
+				}
+			}
 		}
 
 		private void ImageClicked(object sender, ItemClickEventArgs e)
 		{
-			throw new NotImplementedException();
+			var grid = sender as GridView;
+			if (grid != null)
+			{
+				GlobalInfo.SelectedImage = grid.SelectedIndex;
+			}
+			
 		}
 
 		private void GridView_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			Debug.Write("blah");
+			var grid = sender as GridView;
+			if (grid != null)
+			{
+				GlobalInfo.SelectedImage = grid.SelectedIndex;
+			}
+			Frame.Navigate(typeof(SwipeView));
 		}
 
 		private void SearchClicked(object sender, RoutedEventArgs e)
@@ -91,5 +114,13 @@ namespace Booru_Viewer
 		{
 			
 		}
+
+		protected override void OnNavigatedTo(NavigationEventArgs e)
+		{
+			
+			base.OnNavigatedTo(e);
+		}
+
+
 	}
 }
