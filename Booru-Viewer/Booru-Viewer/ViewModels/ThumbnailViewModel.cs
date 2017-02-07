@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.UI.Xaml.Controls;
+using Booru_Viewer.Types;
 
 namespace Booru_Viewer.ViewModels
 {
@@ -24,23 +25,17 @@ namespace Booru_Viewer.ViewModels
 		public string FullURL { get; set; }
 		void SaveImageExecute()
 		{
-
+			ImageSaver.SaveImage(FullURL);
 		}
-		bool SaveImageCanExecute()
-		{
-			return true;
-		}
+		
 
 		void EnableMultiSelectExecute()
 		{
 			parentVM.ImageSelectionMode = ListViewSelectionMode.Multiple;
 		}
-		bool EnableMultiSelectCanExecute()
-		{
-			return true;
-		}
+		
 
-		public ICommand SaveImage { get { return new RelayCommand(SaveImageExecute, SaveImageCanExecute); } }
-		public ICommand EnableMultiSelect { get { return new RelayCommand(EnableMultiSelectExecute, EnableMultiSelectCanExecute); } }
+		public ICommand SaveImage { get { return new RelayCommand(SaveImageExecute); } }
+		public ICommand EnableMultiSelect { get { return new RelayCommand(EnableMultiSelectExecute); } }
 	}
 }

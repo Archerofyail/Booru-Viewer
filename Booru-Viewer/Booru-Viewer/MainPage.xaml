@@ -59,12 +59,17 @@
 					<StackPanel.BorderBrush>
 						<SolidColorBrush Color="{ThemeResource SystemBaseLowColor}"/>
 					</StackPanel.BorderBrush>
-					<Button Content="{Binding Path=Search}" Foreground="White" 
+					<Button Foreground="White" 
 						    MinWidth="20" 
-							   Margin="10,0" 
+							    
 							   HorizontalAlignment="Center" 
 							   VerticalAlignment="Center"
-							Command="{Binding Path=StartSearch}"/>
+							Command="{Binding Path=StartSearch}">
+						<Button.Content>
+							<TextBlock Text="{Binding Path=Search}" MaxLines="2"
+									   TextWrapping="WrapWholeWords"/>
+						</Button.Content>
+					</Button>
 					<Button Command="{Binding Path=DeleteSearch}"
 							Background="#FF7C7C7C">
 						<Button.Content>
