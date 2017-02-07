@@ -20,7 +20,7 @@
 								 
 								  MaxWidth="250"
 								  MaxHeight="250">
-					
+
 					<controls:ImageEx.ContextFlyout>
 						<MenuFlyout>
 							<MenuFlyoutItem Text="Save Image"
@@ -52,10 +52,31 @@
 					</Button>
 				</StackPanel>
 			</DataTemplate>
+			<DataTemplate x:Key="SavedSearch">
+				<StackPanel Orientation="Horizontal"
+							BorderThickness="1" Margin="0,0,0,-5"
+							Background="{ThemeResource SystemAccentColor}">
+					<StackPanel.BorderBrush>
+						<SolidColorBrush Color="{ThemeResource SystemBaseLowColor}"/>
+					</StackPanel.BorderBrush>
+					<Button Content="{Binding Path=Search}" Foreground="White" 
+						    MinWidth="20" 
+							   Margin="10,0" 
+							   HorizontalAlignment="Center" 
+							   VerticalAlignment="Center"
+							Command="{Binding Path=StartSearch}"/>
+					<Button Command="{Binding Path=DeleteSearch}"
+							Background="#FF7C7C7C">
+						<Button.Content>
+							<SymbolIcon Symbol="Delete"/>
+						</Button.Content>
+					</Button>
+				</StackPanel>
+			</DataTemplate>
 		</ResourceDictionary>
 	</Page.Resources>
 	<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-	
+
 		<GridView   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
 			ItemTemplate="{StaticResource ImageTemplate}"
 			ItemsSource="{Binding Path=Thumbnails}"
@@ -69,7 +90,7 @@
 						ScrollViewer.ZoomMode="Disabled"
 						ScrollViewer.IsVerticalRailEnabled="True"
 					SelectionChanged="GridView_SelectionChanged"
-					ItemClick="ImageClicked">
+					>
 
 
 		</GridView>
@@ -83,7 +104,7 @@
 				Load More
 			</Button.Content>
 		</Button>
-	
+
 
 
 
@@ -98,50 +119,63 @@
 				<AppBarButton Label="Search" Icon="Find">
 					<AppBarButton.Flyout>
 						<Flyout x:Name="SearchFlyout">
-							<StackPanel Orientation="Vertical" MaxWidth="350">
-								<TextBlock Text="Add tags"></TextBlock>
-								<StackPanel Orientation="Horizontal">
-									<TextBox PlaceholderText="Tag"
+							<StackPanel Orientation="Horizontal">
+								<StackPanel Margin="0, 0, 12, 0">
+									<TextBlock Text="Saved Searches"/>
+									<ListView ItemsSource="{Binding SavedSearches}"
+										  ItemTemplate="{StaticResource SavedSearch}"
+											  SelectionChanged="SavedSearchSelection"
+											  SelectedIndex="{Binding SelectedSavedSearch, Mode=TwoWay}"
+											  Name="SavedSearches"
+											  />
+								</StackPanel>
+								<StackPanel Orientation="Vertical" MaxWidth="350">
+									<TextBlock Text="Add tags"></TextBlock>
+									<StackPanel Orientation="Horizontal">
+										<TextBox PlaceholderText="Tag"
 											 Name="TagTextBox"
-											 MinWidth="300"
+											 MinWidth="250"
 											 Text="{Binding CurrentTag, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
 											 TextChanged="TagTextBox_TextChanged"
 											 AllowFocusOnInteraction="True"
 											 KeyUp="TagTextBox_KeyUp"/>
-									<Button Name="AddTagButton" 
+										<Button Name="AddTagButton" 
 											Margin="5, 0, 0, 0"
 											Background="{ThemeResource SystemAccentColor}" 
 											Foreground="White"
 											Click="AddTagClicked"
 											Command="{Binding AddTag}">
-										<Button.Content>
-											<SymbolIcon>Add</SymbolIcon>
-										</Button.Content>
-									</Button>
+											<Button.Content>
+												<SymbolIcon>Add</SymbolIcon>
+											</Button.Content>
+										</Button>
 
-								</StackPanel>
-								<ListView ItemsSource="{Binding CurrentTags, Mode=TwoWay}"
+									</StackPanel>
+									<ListView ItemsSource="{Binding CurrentTags, Mode=TwoWay}"
 										  ItemTemplate="{StaticResource Tag}"
 										  MinHeight="20"
 										  SelectionMode="None"/>
-								<StackPanel Orientation="Horizontal"
+									<StackPanel Orientation="Horizontal"
 											FlowDirection="RightToLeft">
-									<Button
+										<Button
 											Content="Search Your Favourites" Margin="8"
 											Command="{Binding SearchFavourites}"
 											Visibility="{Binding IsFavButtonVisible}"></Button>
-									<Button Content="Save Search"/>
-								</StackPanel>
-								<Button MinWidth="350" HorizontalAlignment="Center"
+										<Button Content="Save Search"
+												Command="{Binding SaveSearch}"
+												Name="SaveSearchButton"/>
+									</StackPanel>
+									<Button MinWidth="290" HorizontalAlignment="Center"
 										Background="{ThemeResource SystemAccentColor}" 
 										Foreground="White"
 										Click="SearchClicked"
 										Command="{Binding StartSearch}"
 										Name="SearchButton">
-									<Button.Content>
-										<SymbolIcon>Find</SymbolIcon>
-									</Button.Content>
-								</Button>
+										<Button.Content>
+											<SymbolIcon>Find</SymbolIcon>
+										</Button.Content>
+									</Button>
+								</StackPanel>
 							</StackPanel>
 						</Flyout>
 					</AppBarButton.Flyout>
@@ -170,7 +204,7 @@
 										 IsEnabled="True" InputScope="Text" IsSpellCheckEnabled="False"
 										 Name="APIKeyTextBox"
 										 TextChanged="APIKeyTextBox_TextChanged"/>
-								
+
 								<Button Width="280" HorizontalAlignment="Center"
 										Background="{ThemeResource SystemAccentColor}"
 										Foreground="White"

@@ -49,20 +49,27 @@ namespace Booru_Viewer.ViewModels
 			}
 
 			StartSearchExecute();
+			Debug.WriteLine("Count for saved Searches is " + SavedSearches.Count);
 
 		}
 
+		private ObservableCollection<SavedSearchViewModel> savedSearches = new ObservableCollection<SavedSearchViewModel>();
 
-		//private bool shouldClearFocus = false;
-		//public bool ShouldClearFocus
-		//{
-		//	get { return shouldClearFocus; }
-		//	set
-		//	{
-		//		shouldClearFocus = value;
-		//		RaisePropertyChanged();
-		//	}
-		//}
+		public ObservableCollection<SavedSearchViewModel> SavedSearches
+		{
+			get
+			{
+				if (savedSearches.Count == 0)
+				{
+					foreach (var search in GlobalInfo.SavedSearches)
+					{
+						savedSearches.Add(new SavedSearchViewModel(search, this));
+					}
+				}
+				return savedSearches;
+			}
+		}
+
 		private ObservableCollection<ThumbnailViewModel> thumbnails = new ObservableCollection<ThumbnailViewModel>();
 		public ObservableCollection<ThumbnailViewModel> Thumbnails { get { return thumbnails; } }
 
@@ -135,7 +142,7 @@ namespace Booru_Viewer.ViewModels
 			get { return isMultiSelectOn ? ListViewSelectionMode.Multiple : ListViewSelectionMode.Single; }
 			set
 			{
-				isMultiSelectOn =  value == ListViewSelectionMode.Multiple;
+				isMultiSelectOn = value == ListViewSelectionMode.Multiple;
 				MultiSelectButtonIcon = new SymbolIcon(Symbol.Cancel);
 				RaisePropertyChanged();
 			}
@@ -155,6 +162,22 @@ namespace Booru_Viewer.ViewModels
 			get { return Username != "" && APIKey != "" ? Visibility.Visible : Visibility.Collapsed; }
 		}
 
+		private int selectedSavedSearch = 0;
+
+		public int SelectedSavedSearch
+		{
+			get { return selectedSavedSearch; }
+			set
+			{
+				selectedSavedSearch = value;
+				RaisePropertyChanged();
+			}
+		}
+
+		public void DeleteSavedSearch(SavedSearchViewModel search)
+		{
+			SavedSearches.Remove(search);
+		}
 
 		public void RemoveTag(TagViewModel tag)
 		{
@@ -184,11 +207,14 @@ namespace Booru_Viewer.ViewModels
 
 		void SaveLoginDataExecute()
 		{
-			RaisePropertyChanged("APIKey");
+			
+
 			BooruAPI.SetLogin(username, apiKey);
 
 			ApplicationData.Current.RoamingSettings.Values["Username"] = BooruAPI.Username;
 			ApplicationData.Current.RoamingSettings.Values["APIKey"] = BooruAPI.APIKey;
+			RaisePropertyChanged("APIKey");
+			RaisePropertyChanged("IsFavButtonVisible");
 		}
 
 		bool SaveLoginDataCanExecute()
@@ -267,15 +293,12 @@ namespace Booru_Viewer.ViewModels
 			{
 				RemoveTag(tag);
 			}
-			CurrentTag = "ordfav:" +Username;
+			CurrentTag = "ordfav:" + Username;
 			AddTagExecute();
 			StartSearchExecute();
 		}
 
-		bool StartSearchCanExecute()
-		{
-			return true;
-		}
+
 
 		async void LoadNextPageExecute()
 		{
@@ -286,10 +309,6 @@ namespace Booru_Viewer.ViewModels
 				AddThumbnails(result.Item2);
 			}
 		}
-		bool LoadNextPageCanExecute()
-		{
-			return true;
-		}
 
 		void ChangeSelectionModeExecute()
 		{
@@ -299,16 +318,45 @@ namespace Booru_Viewer.ViewModels
 			RaisePropertyChanged("MultiSelectButtonIcon");
 		}
 
-		bool ChangeSelectionModeCanExecute()
+		void SaveSearchExecute()
 		{
-			return true;
+			string[] tags = new string[CurrentTags.Count];
+			if (CurrentTags.Count > 0)
+			{
+				for (int i = 0; i < tags.Length; i++)
+				{
+					tags[i] = CurrentTags[i].Tag;
+				}
+				var count = SavedSearches.Count;
+				GlobalInfo.SavedSearches.Add(tags);
+				if (count != 0)
+				{
+					SavedSearches.Add(new SavedSearchViewModel(tags, this));
+				}
+				RaisePropertyChanged("SavedSearches");
+			}
+			GlobalInfo.SaveSearches();
 		}
+
+		public void StartSavedSearch(string[] tags)
+		{
+			CurrentTags.Clear();
+			
+			foreach (var tag in tags)
+			{
+				CurrentTags.Add(new TagViewModel(tag, this));
+			}
+			RaisePropertyChanged("CurrentTags");
+			StartSearchExecute();
+		}
+
 		public ICommand AddTag { get { return new RelayCommand(AddTagExecute, AddTagCanExecute); } }
 
 		public ICommand SaveLoginData { get { return new RelayCommand(SaveLoginDataExecute, SaveLoginDataCanExecute); } }
-		public ICommand StartSearch { get { return new RelayCommand(StartSearchExecute, StartSearchCanExecute); } }
-		public ICommand LoadNextPage { get { return new RelayCommand(LoadNextPageExecute, LoadNextPageCanExecute); } }
-		public ICommand ChangeSelectionMode => new RelayCommand(ChangeSelectionModeExecute, ChangeSelectionModeCanExecute);
-		public ICommand SearchFavourites { get { return new RelayCommand(SearchFavouritesExecute, SearchCanExecute);} }
+		public ICommand StartSearch { get { return new RelayCommand(StartSearchExecute); } }
+		public ICommand LoadNextPage { get { return new RelayCommand(LoadNextPageExecute); } }
+		public ICommand ChangeSelectionMode => new RelayCommand(ChangeSelectionModeExecute);
+		public ICommand SearchFavourites { get { return new RelayCommand(SearchFavouritesExecute, SearchCanExecute); } }
+		public ICommand SaveSearch { get { return new RelayCommand(SaveSearchExecute); } }
 	}
 }

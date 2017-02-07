@@ -22,6 +22,7 @@ using Booru_Viewer.Views;
 
 namespace Booru_Viewer
 {
+	//TODO:Add navigation pane so you can have multiple searches at the same time Going to need to use code to duplicate the views I think
 	/// <summary>
 	/// An empty page that can be used on its own or navigated to within a Frame.
 	/// </summary>
@@ -42,24 +43,21 @@ namespace Booru_Viewer
 				{
 					Debug.WriteLine("search command returned null");
 				}
+
 			}
+			//SavedSearches.Loaded += (sender, args) =>
+			//{
+			//	SavedSearches.GetBindingExpression(ListView.ItemsSourceProperty).UpdateSource();
+			//};
 		}
 
-		private void ImageClicked(object sender, ItemClickEventArgs e)
-		{
-			var grid = sender as GridView;
-			if (grid != null)
-			{
-				GlobalInfo.SelectedImage = grid.SelectedIndex;
-			}
-			
-		}
 
 		private void GridView_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			var grid = sender as GridView;
 			if (grid != null)
 			{
+
 				GlobalInfo.SelectedImage = grid.SelectedIndex;
 			}
 			Frame.Navigate(typeof(SwipeView));
@@ -122,5 +120,19 @@ namespace Booru_Viewer
 		}
 
 
+		private void SavedSearchTapped(object sender, TappedRoutedEventArgs e)
+		{
+			var savedSearch = sender as TextBlock;
+			if (savedSearch != null)
+			{
+				
+			}
+		}
+
+		private void SavedSearchSelection(object sender, SelectionChangedEventArgs e)
+		{
+			var list = sender as ListView;
+
+		}
 	}
 }

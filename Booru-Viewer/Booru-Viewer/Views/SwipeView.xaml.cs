@@ -12,6 +12,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Booru_Viewer.Types;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -25,7 +26,12 @@ namespace Booru_Viewer.Views
 		public SwipeView()
 		{
 			this.InitializeComponent();
-		
+
+			FlipView.Loaded += (sender, args) =>
+			{
+				FlipView.SelectedIndex = GlobalInfo.SelectedImage;
+			};
+
 		}
 	}
 

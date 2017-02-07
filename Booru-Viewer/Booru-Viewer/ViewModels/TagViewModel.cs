@@ -13,10 +13,6 @@ namespace Booru_Viewer.ViewModels
 	public class TagViewModel : ViewModelBase
 	{
 		private MainPageViewModel parentVM;
-		public TagViewModel(string tag)
-		{
-			this.tag = tag;
-		}
 
 		public TagViewModel(string tag, MainPageViewModel pageVM)
 		{

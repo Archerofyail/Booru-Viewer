@@ -85,6 +85,7 @@ namespace Booru_Viewer
 			}
 			Windows.UI.Core.SystemNavigationManager.GetForCurrentView().BackRequested +=
 				App_BackRequested;
+			
 		}
 
 		/// <summary>

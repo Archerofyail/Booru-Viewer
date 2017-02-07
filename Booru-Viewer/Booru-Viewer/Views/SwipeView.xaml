@@ -14,7 +14,8 @@
 	<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 		<FlipView
 			ItemsSource="{Binding Images}"
-			SelectedIndex="{Binding Index}">
+			SelectedIndex="{Binding Index}"
+			Name="FlipView">
 			<FlipView.ItemTemplate>
 				<DataTemplate>
 					<controls:ImageEx
