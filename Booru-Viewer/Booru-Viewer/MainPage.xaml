@@ -117,10 +117,7 @@
 	<Page.BottomAppBar>
 		<CommandBar VerticalAlignment="Bottom">
 			<CommandBar.PrimaryCommands>
-				<AppBarButton Click="MultiSelectCommandButtonClicked"
-							  Icon="{Binding MultiSelectButtonIcon}"
-							  Label="Multi-Select"
-							  Command="{Binding ChangeSelectionMode}"/>
+				
 				<AppBarButton Label="Search" Icon="Find">
 					<AppBarButton.Flyout>
 						<Flyout x:Name="SearchFlyout">

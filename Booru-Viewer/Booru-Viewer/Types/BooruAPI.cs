@@ -16,6 +16,7 @@ namespace Booru_Viewer.Types
 		public static string PostsURL = "/posts.json";
 		public static string Username { get; private set; } = "";
 		public static string APIKey { get; private set; } = "";
+		public static int Page { get; set; } = 1;
 		private static HttpClient booruClient = new HttpClient();
 
 

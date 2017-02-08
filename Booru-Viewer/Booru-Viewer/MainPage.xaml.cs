@@ -92,7 +92,7 @@ namespace Booru_Viewer
 
 		private void TagTextBox_KeyUp(object sender, KeyRoutedEventArgs e)
 		{
-			Debug.WriteLine("Form is " + AnalyticsInfo.DeviceForm + "And Family is " + AnalyticsInfo.VersionInfo.DeviceFamily);
+			
 			if (e.Key == Windows.System.VirtualKey.Enter && e.KeyStatus.IsKeyReleased)
 			{
 				if (AddTagButton.Command.CanExecute(AddTagButton))

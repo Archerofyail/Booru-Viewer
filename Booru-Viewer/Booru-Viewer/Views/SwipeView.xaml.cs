@@ -13,6 +13,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Booru_Viewer.Types;
+using Windows.UI.Core;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -31,7 +32,31 @@ namespace Booru_Viewer.Views
 			{
 				FlipView.SelectedIndex = GlobalInfo.SelectedImage;
 			};
+			FlipView.SelectionChanged += (sender, args) =>
+			{
+				if (FlipView.Items.Count - FlipView.SelectedIndex < 2)
+				{
+					
+				}
+			};
+			
+		}
 
+		protected override void OnNavigatedTo(NavigationEventArgs e)
+		{
+			Frame rootFrame = Window.Current.Content as Frame;
+			if (rootFrame.CanGoBack)
+			{
+				// Show UI in title bar if opted-in and in-app backstack is not empty.
+				SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility =
+					AppViewBackButtonVisibility.Visible;
+			}
+			else
+			{
+				// Remove the UI from the title bar if in-app back stack is empty.
+				SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility =
+					AppViewBackButtonVisibility.Collapsed;
+			}
 		}
 	}
 

@@ -22,7 +22,7 @@ namespace Booru_Viewer.ViewModels
 {
 	public class MainPageViewModel : ViewModelBase
 	{
-		private int page = 1;
+		
 		public MainPageViewModel()
 		{
 
@@ -47,7 +47,7 @@ namespace Booru_Viewer.ViewModels
 				}
 
 			}
-
+			BooruAPI.Page = 1;
 			StartSearchExecute();
 			Debug.WriteLine("Count for saved Searches is " + SavedSearches.Count);
 
@@ -234,7 +234,7 @@ namespace Booru_Viewer.ViewModels
 			GlobalInfo.CurrentSearch.Clear();
 			ResyncThumbnails();
 			var tags = await PrepTags();
-			var result = await BooruAPI.SearchPosts(tags, 0);
+			var result = await BooruAPI.SearchPosts(tags, BooruAPI.Page);
 			if (result.Item2.Count > 0)
 			{
 				HaveImages = true;
@@ -243,6 +243,7 @@ namespace Booru_Viewer.ViewModels
 			{
 				HaveImages = false;
 				NoImagesText = "No Images Found with those tags, try a different combination";
+				RaisePropertyChanged("NoImagesText");
 			}
 			if (result.Item3 == HttpStatusCode.Ok)
 			{
@@ -309,8 +310,8 @@ namespace Booru_Viewer.ViewModels
 
 		async void LoadNextPageExecute()
 		{
-			page++;
-			var result = await BooruAPI.SearchPosts(await PrepTags(), page, false);
+			BooruAPI.Page++;
+			var result = await BooruAPI.SearchPosts(await PrepTags(), BooruAPI.Page, false);
 			if (result.Item3 == HttpStatusCode.Ok)
 			{
 				AddThumbnails(result.Item2);

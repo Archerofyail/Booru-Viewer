@@ -14,15 +14,25 @@
 	<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 		<FlipView
 			ItemsSource="{Binding Images}"
-			SelectedIndex="{Binding Index}"
+			SelectedIndex="{Binding Index, Mode=TwoWay}"
 			Name="FlipView">
 			<FlipView.ItemTemplate>
 				<DataTemplate>
 					<controls:ImageEx
-						Source="{Binding FullImage}"></controls:ImageEx>
+						Source="{Binding FullImage}">
+						
+					</controls:ImageEx>
 				</DataTemplate>
 			</FlipView.ItemTemplate>
 			
 		</FlipView>
 	</Grid>
+	<Page.BottomAppBar>
+		<CommandBar>
+			<AppBarButton Label="Save Image"
+						  Icon="Save"
+						  Command="{Binding SaveImage}"/>
+		</CommandBar>
+	</Page.BottomAppBar>
 </Page>
+

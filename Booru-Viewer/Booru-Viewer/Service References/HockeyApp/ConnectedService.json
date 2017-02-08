@@ -1,0 +1,7 @@
+﻿{
+  "ProviderId": "Microsoft.ApplicationInsights.HockeyApp.WizardProvider",
+  "Version": "7.17.119.9",
+  "GettingStartedDocument": {
+    "Uri": "https://go.microsoft.com/fwlink/?LinkID=799739"
+  }
+}
