@@ -124,15 +124,18 @@
 				<AppBarButton Label="Search" Icon="Find">
 					<AppBarButton.Flyout>
 						<Flyout x:Name="SearchFlyout">
-							<StackPanel Orientation="Horizontal">
+							<StackPanel Orientation="Vertical">
 								<StackPanel Margin="0, 0, 12, 0">
 									<TextBlock Text="Saved Searches"/>
 									<ListView ItemsSource="{Binding SavedSearches}"
 										  ItemTemplate="{StaticResource SavedSearch}"
 											  SelectionChanged="SavedSearchSelection"
 											  SelectedIndex="{Binding SelectedSavedSearch, Mode=TwoWay}"
-											  Name="SavedSearches"
+											  Name="SavedSearchesList"
 											  />
+									<TextBlock Text="You save no saved searches"
+											   FontSize="12"
+											   Visibility="{Binding HaveSavedSearches}"/>
 								</StackPanel>
 								<StackPanel Orientation="Vertical" MaxWidth="350">
 									<TextBlock Text="Add tags"></TextBlock>

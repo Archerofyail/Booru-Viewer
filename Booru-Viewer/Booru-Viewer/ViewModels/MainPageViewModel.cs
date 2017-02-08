@@ -65,6 +65,7 @@ namespace Booru_Viewer.ViewModels
 					{
 						savedSearches.Add(new SavedSearchViewModel(search, this));
 					}
+					RaisePropertyChanged("HaveSavedSearches");
 				}
 				return savedSearches;
 			}
@@ -162,6 +163,11 @@ namespace Booru_Viewer.ViewModels
 			get { return Username != "" && APIKey != "" ? Visibility.Visible : Visibility.Collapsed; }
 		}
 
+		public Visibility HaveSavedSearches
+		{
+			get { return SavedSearches.Count > 0 ? Visibility.Collapsed : Visibility.Visible; }
+		}
+
 		private int selectedSavedSearch = 0;
 
 		public int SelectedSavedSearch
@@ -177,6 +183,7 @@ namespace Booru_Viewer.ViewModels
 		public void DeleteSavedSearch(SavedSearchViewModel search)
 		{
 			SavedSearches.Remove(search);
+			RaisePropertyChanged("HaveSavedSearches");
 		}
 
 		public void RemoveTag(TagViewModel tag)
@@ -334,6 +341,7 @@ namespace Booru_Viewer.ViewModels
 					SavedSearches.Add(new SavedSearchViewModel(tags, this));
 				}
 				RaisePropertyChanged("SavedSearches");
+				RaisePropertyChanged("HaveSavedSearches");
 			}
 			GlobalInfo.SaveSearches();
 		}
