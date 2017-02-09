@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Windows.ApplicationModel.DataTransfer;
 
 namespace Booru_Viewer.ViewModels
 {
@@ -38,6 +39,15 @@ namespace Booru_Viewer.ViewModels
 		{
 			return true;
 		}
+		void CopyTagExec(string value)
+		{
+			DataPackage dp = new DataPackage();
+			dp.RequestedOperation = DataPackageOperation.Copy;
+			dp.SetText(value);
+			Clipboard.SetContent(dp);
+
+		}
+		public ICommand CopyTag => new RelayCommand<string>(CopyTagExec);
 		public ICommand RemoveTag => new RelayCommand(RemoveTagExecute, RemoveTagCanExecute);
 	}
 }

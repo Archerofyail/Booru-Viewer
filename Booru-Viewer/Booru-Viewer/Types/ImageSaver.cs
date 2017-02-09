@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -14,11 +15,11 @@ namespace Booru_Viewer.Types
 		public static StorageFolder imageFolder;
 		static ImageSaver()
 		{
-			
-			
+
+
 		}
 
-		public static async Task GetFolder()
+		private static async Task GetFolder()
 		{
 			var item = await KnownFolders.PicturesLibrary.TryGetItemAsync("Booru-Viewer");
 			if (item != null)
@@ -30,22 +31,49 @@ namespace Booru_Viewer.Types
 			{
 				imageFolder = await KnownFolders.PicturesLibrary.CreateFolderAsync("Booru-Viewer");
 			}
-			
+
 		}
-		public static async void SaveImage(string ImageURL)
+		public static async Task<string> SaveImage(string ImageURL)
 		{
+			var baseURLLength = (BooruAPI.BaseURL + "/data/").Length;
 			if (imageFolder == null)
 			{
-				await GetFolder();
+				try
+				{
+					await GetFolder();
+				}
+				catch (Exception e)
+				{
+					Debug.WriteLine(e);
+					return "Could not open Booru Viewer Folder";
+					throw;
+				}
+				
 			}
-			var response = await client.GetAsync(ImageURL);
-			if (response.IsSuccessStatusCode)
+			var imageName = ImageURL.Substring(baseURLLength) + ".png";
+			var imageItem = await imageFolder.TryGetItemAsync(imageName);
+			if (imageItem != null)
 			{
-
-				StorageFile file = await imageFolder.CreateFileAsync("Image " + (await imageFolder.GetFilesAsync()).Count + ".png");
-				var bytes = await response.Content.ReadAsByteArrayAsync();
-				await FileIO.WriteBytesAsync(file, bytes);
+				return "Already saved image";
 			}
+			try
+			{
+				var response = await client.GetAsync(ImageURL);
+				if (response.IsSuccessStatusCode)
+				{
+					StorageFile file = await imageFolder.CreateFileAsync(imageName);
+					var bytes = await response.Content.ReadAsByteArrayAsync();
+					await FileIO.WriteBytesAsync(file, bytes);
+				}
+				return "Image Saved";
+			}
+			catch (Exception e)
+			{
+				Debug.WriteLine(e);
+				throw;
+			}
+			
+			
 		}
 	}
 }

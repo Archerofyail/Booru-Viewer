@@ -22,8 +22,8 @@ namespace Booru_Viewer.ViewModels
 				var tags = Tag_String.Split(' ');
 				for (var i = 0; i < tags.Length; i++)
 				{
-					var tag = tags[i];
-					tag = tag.Replace("_", " ");
+					
+					tags[i] = tags[i].Replace('_', ' ');
 				}
 
 				return tags;

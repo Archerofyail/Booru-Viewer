@@ -123,16 +123,9 @@ namespace Booru_Viewer.ViewModels
 			ImageSaver.SaveImage(images[Index].FullImage);
 		}
 
-		void CopyTagExec(string value)
-		{
-			DataPackage dp = new DataPackage();
-			dp.RequestedOperation = DataPackageOperation.Copy;
-			dp.SetText(value);
-			Clipboard.SetContent(dp);
-
-		}
+		
 		
 		public ICommand SaveImage => new RelayCommand(SaveImageExec);
-		public ICommand CopyTag => new RelayCommand<string>(CopyTagExec);
+		
 	}
 }

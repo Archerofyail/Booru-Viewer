@@ -145,7 +145,7 @@
 											 Text="{Binding CurrentTag, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
 											 TextChanged="TagTextBox_TextChanged"
 											 AllowFocusOnInteraction="True"
-											 KeyUp="TagTextBox_KeyUp"/>
+											 KeyUp="TagTextBox_KeyUp"></TextBox>
 										<Button Name="AddTagButton" 
 											Margin="5, 0, 0, 0"
 											Background="{ThemeResource SystemAccentColor}" 
