@@ -61,6 +61,7 @@ namespace Booru_Viewer.ViewModels
 			{
 				if (savedSearches.Count == 0)
 				{
+					
 					foreach (var search in GlobalInfo.SavedSearches)
 					{
 						savedSearches.Add(new SavedSearchViewModel(search, this));
@@ -189,7 +190,6 @@ namespace Booru_Viewer.ViewModels
 		public void RemoveTag(TagViewModel tag)
 		{
 			CurrentTags.Remove(tag);
-			GlobalInfo.CurrentTags.Remove(tag);
 			RaisePropertyChanged("CurrentTags");
 		}
 
@@ -235,20 +235,31 @@ namespace Booru_Viewer.ViewModels
 			ResyncThumbnails();
 			var tags = await PrepTags();
 			var result = await BooruAPI.SearchPosts(tags, BooruAPI.Page);
-			if (result.Item2.Count > 0)
+			if (result.Item2 != null)
 			{
-				HaveImages = true;
+				if (result.Item2.Count > 0)
+				{
+					HaveImages = true;
+				}
+				else
+				{
+					HaveImages = false;
+					NoImagesText = "No Images Found with those tags, try a different combination";
+					RaisePropertyChanged("NoImagesText");
+				}
+				if (result.Item3 == HttpStatusCode.Ok.ToString())
+				{
+					AddThumbnails(result.Item2);
+
+				}
 			}
 			else
 			{
 				HaveImages = false;
-				NoImagesText = "No Images Found with those tags, try a different combination";
+				NoImagesText = "Failed to grab images: " + result.Item3;
 				RaisePropertyChanged("NoImagesText");
 			}
-			if (result.Item3 == HttpStatusCode.Ok)
-			{
-				AddThumbnails(result.Item2);
-			}
+
 		}
 
 		void AddThumbnails(List<ImageModel> thumbnails)
@@ -297,11 +308,9 @@ namespace Booru_Viewer.ViewModels
 
 		void SearchFavouritesExecute()
 		{
-			foreach (var tag in CurrentTags)
-			{
-				RemoveTag(tag);
-			}
+			CurrentTags.Clear();
 			CurrentTag = "ordfav:" + Username;
+			RaisePropertyChanged("CurrentTags");
 			AddTagExecute();
 			StartSearchExecute();
 		}
@@ -312,7 +321,7 @@ namespace Booru_Viewer.ViewModels
 		{
 			BooruAPI.Page++;
 			var result = await BooruAPI.SearchPosts(await PrepTags(), BooruAPI.Page, false);
-			if (result.Item3 == HttpStatusCode.Ok)
+			if (result.Item3 == HttpStatusCode.Ok.ToString())
 			{
 				AddThumbnails(result.Item2);
 			}

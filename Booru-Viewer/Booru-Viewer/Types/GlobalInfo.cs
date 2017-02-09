@@ -25,7 +25,7 @@ namespace Booru_Viewer.Types
 					savedSearches = new ObservableCollection<string[]>();
 					LoadSavedSearches();
 				}
-				
+
 				return savedSearches;
 			}
 		}
@@ -56,7 +56,7 @@ namespace Booru_Viewer.Types
 
 		public static async void LoadSavedSearches()
 		{
-
+			savedSearches.Clear();
 			var item = await ApplicationData.Current.RoamingFolder.TryGetItemAsync("SavedSearches.json");
 			if (item == null)
 			{
@@ -65,9 +65,12 @@ namespace Booru_Viewer.Types
 			SearchesFile = await ApplicationData.Current.RoamingFolder.GetFileAsync("SavedSearches.json");
 			var json = await FileIO.ReadTextAsync(SearchesFile);
 			var searchList = JsonConvert.DeserializeObject<List<string[]>>(json);
-			foreach (var search in searchList)
+			if (searchList != null)
 			{
-				SavedSearches.Add(search);
+				foreach (var search in searchList)
+				{
+					savedSearches.Add(search);
+				}
 			}
 		}
 	}

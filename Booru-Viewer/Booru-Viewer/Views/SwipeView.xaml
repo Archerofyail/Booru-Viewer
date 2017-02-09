@@ -8,9 +8,38 @@
 	mc:Ignorable="d"
 	xmlns:vm="using:Booru_Viewer.ViewModels"
 	xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls">
-<Page.DataContext>
-	<vm:SwipViewViewModel/>
-</Page.DataContext>
+	<Page.DataContext>
+		<vm:SwipViewViewModel/>
+	</Page.DataContext>
+	<Page.Resources>
+		<DataTemplate x:Name="Tag">
+			<StackPanel Orientation="Horizontal"
+							Background="{ThemeResource SystemAccentColor}"
+							BorderThickness="1" Margin="0,0,0,-5"
+							>
+
+				<StackPanel.BorderBrush>
+					<SolidColorBrush Color="{ThemeResource SystemBaseLowColor}"/>
+				</StackPanel.BorderBrush>
+				<TextBlock Name="Tag"
+							     Text="{Binding Path=Tag, Mode=TwoWay}" 
+							   MinWidth="20" 
+							   Margin="10" 
+							   HorizontalAlignment="Center" 
+							   VerticalAlignment="Center"
+							   Foreground="White"/>
+				<Button
+					Command="{Binding CopyTag}"
+					CommandParameter="{Binding ElementName=Tag, Path=Text}"
+					Background="#FF7C7C7C" VerticalAlignment="Stretch">
+					<Button.Content>
+						<SymbolIcon Symbol="Copy"/>
+					</Button.Content>
+				</Button>
+
+			</StackPanel>
+		</DataTemplate>
+	</Page.Resources>
 	<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 		<FlipView
 			ItemsSource="{Binding Images}"
@@ -20,11 +49,11 @@
 				<DataTemplate>
 					<controls:ImageEx
 						Source="{Binding FullImage}">
-						
+
 					</controls:ImageEx>
 				</DataTemplate>
 			</FlipView.ItemTemplate>
-			
+
 		</FlipView>
 	</Grid>
 	<Page.BottomAppBar>
@@ -32,6 +61,15 @@
 			<AppBarButton Label="Save Image"
 						  Icon="Save"
 						  Command="{Binding SaveImage}"/>
+			<AppBarButton Label="View Tags"
+						  Icon="List">
+				<AppBarButton.Flyout>
+					<Flyout>
+						<ListView ItemsSource="{Binding Tags}"
+								  ItemTemplate="{StaticResource Tag}"/>
+					</Flyout>
+				</AppBarButton.Flyout>
+			</AppBarButton>
 		</CommandBar>
 	</Page.BottomAppBar>
 </Page>

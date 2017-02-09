@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.Web.Http;
 using Booru_Viewer.Types;
 using GalaSoft.MvvmLight;
@@ -28,6 +29,12 @@ namespace Booru_Viewer.ViewModels
 					{
 						images.Add(new FullImageViewModel(BooruAPI.BaseURL + image.Large_File_Url));
 					}
+					var tags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].Tags;
+					Tags.Clear();
+					foreach (var tag in tags)
+					{
+						Tags.Add(new TagViewModel(tag));
+					}
 				}
 				return images;
 			}
@@ -46,17 +53,32 @@ namespace Booru_Viewer.ViewModels
 				GlobalInfo.SelectedImage = value;
 				if (GlobalInfo.CurrentSearch.Count - value < 2)
 				{
+
 					LoadMoreImages();
+				}
+				var tags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].Tags;
+				Tags.Clear();
+				foreach (var tag in tags)
+				{
+					Tags.Add(new TagViewModel(tag));
 				}
 				RaisePropertyChanged();
 			}
+		}
+
+		private ObservableCollection<TagViewModel> tags = new ObservableCollection<TagViewModel>();
+
+		public ObservableCollection<TagViewModel> Tags
+		{
+			get { return tags; }
+			set { tags = value; }
 		}
 
 		async void LoadMoreImages()
 		{
 			BooruAPI.Page++;
 			var result = await BooruAPI.SearchPosts(await PrepTags(), BooruAPI.Page, false);
-			if (result.Item3 == HttpStatusCode.Ok)
+			if (result.Item3 == HttpStatusCode.Ok.ToString())
 			{
 				AddImages(result.Item2);
 			}
@@ -100,6 +122,17 @@ namespace Booru_Viewer.ViewModels
 		{
 			ImageSaver.SaveImage(images[Index].FullImage);
 		}
+
+		void CopyTagExec(string value)
+		{
+			DataPackage dp = new DataPackage();
+			dp.RequestedOperation = DataPackageOperation.Copy;
+			dp.SetText(value);
+			Clipboard.SetContent(dp);
+
+		}
+		
 		public ICommand SaveImage => new RelayCommand(SaveImageExec);
+		public ICommand CopyTag => new RelayCommand<string>(CopyTagExec);
 	}
 }
