@@ -50,7 +50,50 @@ namespace Booru_Viewer.ViewModels
 			BooruAPI.Page = 1;
 			StartSearchExecute();
 			Debug.WriteLine("Count for saved Searches is " + SavedSearches.Count);
+			BooruAPI.TagSearchCompletedHandler += (sender, tuple) =>
+			{
+				if (tuple.Item1)
+				{
+					suggestedTags.Clear();
+					foreach (var tag in tuple.Item2)
+					{
+						suggestedTags.Add(new TagViewModel
+						{
+							Tag = tag.Name
+						});
+					}
+					RaisePropertyChanged("SuggestedTags");
+				}
+			};
 
+		}
+
+		private ObservableCollection<TagViewModel> suggestedTags = new ObservableCollection<TagViewModel>();
+
+		public ObservableCollection<TagViewModel> SuggestedTags
+		{
+			get { return suggestedTags; }
+			set
+			{
+				suggestedTags = value;
+				RaisePropertyChanged();
+			}
+		}
+
+		private int suggestedTagIndex = -1;
+
+		public int SuggestedTagIndex
+		{
+			get { return suggestedTagIndex; }
+			set
+			{
+				if (suggestedTagIndex < suggestedTags.Count)
+				{
+					suggestedTagIndex = value;
+					CurrentTag = suggestedTags[suggestedTagIndex].Tag;
+					RaisePropertyChanged();
+				}
+			}
 		}
 
 		private ObservableCollection<SavedSearchViewModel> savedSearches = new ObservableCollection<SavedSearchViewModel>();
@@ -88,7 +131,15 @@ namespace Booru_Viewer.ViewModels
 			{
 				return currentTag;
 			}
-			set { currentTag = value; RaisePropertyChanged(); }
+			set
+			{
+				currentTag = value;
+				RaisePropertyChanged();
+				if (!string.IsNullOrEmpty(value))
+				{
+					BooruAPI.SearchTags(value.Replace(" ", "_"));
+				}
+			}
 		}
 
 		private string username;

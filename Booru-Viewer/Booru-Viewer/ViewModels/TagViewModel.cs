@@ -25,6 +25,11 @@ namespace Booru_Viewer.ViewModels
 		{
 			this.tag = tag;
 		}
+
+		public TagViewModel()
+		{
+		}
+
 		private string tag;
 		public string Tag { get { return tag; } set { tag = value; RaisePropertyChanged(); } }
 

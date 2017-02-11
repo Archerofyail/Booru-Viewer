@@ -45,6 +45,7 @@ namespace Booru_Viewer
 				}
 
 			}
+			this.NavigationCacheMode = NavigationCacheMode.Enabled;
 			//SavedSearches.Loaded += (sender, args) =>
 			//{
 			//	SavedSearches.GetBindingExpression(ListView.ItemsSourceProperty).UpdateSource();
@@ -82,7 +83,7 @@ namespace Booru_Viewer
 
 		private void TagTextBox_TextChanged(object sender, TextChangedEventArgs e)
 		{
-			TagTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+			//TagTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
 		}
 
 		private void APIKeyTextBox_TextChanged(object sender, TextChangedEventArgs e)
