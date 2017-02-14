@@ -15,7 +15,7 @@ namespace Booru_Viewer.ViewModels
 {
 	class SwipViewViewModel : ViewModelBase
 	{
-	
+
 
 		private ObservableCollection<FullImageViewModel> images = new ObservableCollection<FullImageViewModel>();
 
@@ -29,16 +29,20 @@ namespace Booru_Viewer.ViewModels
 					{
 						images.Add(new FullImageViewModel(BooruAPI.BaseURL + image.Large_File_Url));
 					}
-					var tags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].Tags;
-					Tags.Clear();
-					foreach (var tag in tags)
+					if (GlobalInfo.SelectedImage < GlobalInfo.CurrentSearch.Count && GlobalInfo.SelectedImage >= 0)
 					{
-						Tags.Add(new TagViewModel(tag));
+						var tags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].Tags;
+
+						Tags.Clear();
+						foreach (var tag in tags)
+						{
+							Tags.Add(new TagViewModel(tag));
+						}
 					}
 				}
 				return images;
 			}
-			
+
 		}
 
 		public int Index
@@ -123,9 +127,9 @@ namespace Booru_Viewer.ViewModels
 			ImageSaver.SaveImage(images[Index].FullImage);
 		}
 
-		
-		
+
+
 		public ICommand SaveImage => new RelayCommand(SaveImageExec);
-		
+
 	}
 }

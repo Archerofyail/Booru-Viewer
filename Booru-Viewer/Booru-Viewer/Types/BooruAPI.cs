@@ -64,6 +64,7 @@ namespace Booru_Viewer.Types
 			if (restartSearch)
 			{
 				GlobalInfo.CurrentSearch.Clear();
+				Page = 1;
 			}
 
 			foreach (var img in imageLinks)

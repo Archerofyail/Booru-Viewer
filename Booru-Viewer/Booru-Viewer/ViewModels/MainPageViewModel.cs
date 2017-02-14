@@ -87,7 +87,7 @@ namespace Booru_Viewer.ViewModels
 			get { return suggestedTagIndex; }
 			set
 			{
-				if (suggestedTagIndex < suggestedTags.Count)
+				if (suggestedTagIndex < suggestedTags.Count && suggestedTagIndex >= 0)
 				{
 					suggestedTagIndex = value;
 					CurrentTag = suggestedTags[suggestedTagIndex].Tag;
@@ -249,6 +249,10 @@ namespace Booru_Viewer.ViewModels
 
 			CurrentTags.Add(new TagViewModel(CurrentTag, this));
 			CurrentTag = "";
+			SuggestedTagIndex = -1;
+			RaisePropertyChanged("SuggestedTagIndex");
+			SuggestedTags.Clear();
+			RaisePropertyChanged("SuggestedTags");
 			RaisePropertyChanged("CurrentTags");
 		}
 
