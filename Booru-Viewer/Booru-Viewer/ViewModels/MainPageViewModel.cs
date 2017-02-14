@@ -13,6 +13,7 @@ using Microsoft.Toolkit.Uwp.UI.Controls;
 using Windows.UI.Xaml;
 using Windows.Storage;
 using System.Diagnostics;
+using Windows.UI.Core;
 using GalaSoft.MvvmLight;
 using Windows.Web.Http;
 using Windows.UI.Xaml.Controls;
@@ -48,7 +49,7 @@ namespace Booru_Viewer.ViewModels
 
 			}
 			BooruAPI.Page = 1;
-			StartSearchExecute();
+			StartSearchExecute(null);
 			Debug.WriteLine("Count for saved Searches is " + SavedSearches.Count);
 			BooruAPI.TagSearchCompletedHandler += (sender, tuple) =>
 			{
@@ -65,7 +66,17 @@ namespace Booru_Viewer.ViewModels
 					RaisePropertyChanged("SuggestedTags");
 				}
 			};
-
+			GlobalInfo.SavedSearchesLoadedEventHandler += (sender, e) =>
+			{
+				if (GlobalInfo.SavedSearches.Count > 0)
+				{
+					foreach (var search in GlobalInfo.SavedSearches)
+					{
+						savedSearches.Add(new SavedSearchViewModel(search, this));
+					}
+					RaisePropertyChanged("SavedSearches");
+				}
+			};
 		}
 
 		private ObservableCollection<TagViewModel> suggestedTags = new ObservableCollection<TagViewModel>();
@@ -87,7 +98,7 @@ namespace Booru_Viewer.ViewModels
 			get { return suggestedTagIndex; }
 			set
 			{
-				if (suggestedTagIndex < suggestedTags.Count && suggestedTagIndex >= 0)
+				if (value < suggestedTags.Count && value >= 0)
 				{
 					suggestedTagIndex = value;
 					CurrentTag = suggestedTags[suggestedTagIndex].Tag;
@@ -137,7 +148,7 @@ namespace Booru_Viewer.ViewModels
 				RaisePropertyChanged();
 				if (!string.IsNullOrEmpty(value))
 				{
-					BooruAPI.SearchTags(value.Replace(" ", "_"));
+					BooruAPI.SearchTags(value.Replace(" ", "_"), 6);
 				}
 			}
 		}
@@ -232,6 +243,8 @@ namespace Booru_Viewer.ViewModels
 			}
 		}
 
+		
+
 		public void DeleteSavedSearch(SavedSearchViewModel search)
 		{
 			SavedSearches.Remove(search);
@@ -284,10 +297,15 @@ namespace Booru_Viewer.ViewModels
 			return true;
 		}
 
-		async void StartSearchExecute()
+		async void StartSearchExecute(Button button)
 		{
+			
 			GlobalInfo.CurrentSearch.Clear();
 			ResyncThumbnails();
+			if (button != null)
+			{
+				button.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => { button.Flyout.Hide(); });
+			}
 			var tags = await PrepTags();
 			var result = await BooruAPI.SearchPosts(tags, BooruAPI.Page);
 			if (result.Item2 != null)
@@ -314,7 +332,7 @@ namespace Booru_Viewer.ViewModels
 				NoImagesText = "Failed to grab images: " + result.Item3;
 				RaisePropertyChanged("NoImagesText");
 			}
-
+			
 		}
 
 		void AddThumbnails(List<ImageModel> thumbnails)
@@ -361,13 +379,13 @@ namespace Booru_Viewer.ViewModels
 			RaisePropertyChanged("Thumbnails");
 		}
 
-		void SearchFavouritesExecute()
+		void SearchFavouritesExecute(Button button)
 		{
 			CurrentTags.Clear();
 			CurrentTag = "ordfav:" + Username;
 			RaisePropertyChanged("CurrentTags");
 			AddTagExecute();
-			StartSearchExecute();
+			StartSearchExecute(button);
 		}
 
 
@@ -420,16 +438,16 @@ namespace Booru_Viewer.ViewModels
 				CurrentTags.Add(new TagViewModel(tag, this));
 			}
 			RaisePropertyChanged("CurrentTags");
-			StartSearchExecute();
+			StartSearchExecute(null);
 		}
 
 		public ICommand AddTag { get { return new RelayCommand(AddTagExecute, AddTagCanExecute); } }
 
 		public ICommand SaveLoginData { get { return new RelayCommand(SaveLoginDataExecute, SaveLoginDataCanExecute); } }
-		public ICommand StartSearch { get { return new RelayCommand(StartSearchExecute); } }
+		public ICommand StartSearch { get { return new RelayCommand<Button>(StartSearchExecute); } }
 		public ICommand LoadNextPage { get { return new RelayCommand(LoadNextPageExecute); } }
 		public ICommand ChangeSelectionMode => new RelayCommand(ChangeSelectionModeExecute);
-		public ICommand SearchFavourites { get { return new RelayCommand(SearchFavouritesExecute, SearchCanExecute); } }
+		public ICommand SearchFavourites { get { return new RelayCommand<Button>(SearchFavouritesExecute); } }
 		public ICommand SaveSearch { get { return new RelayCommand(SaveSearchExecute); } }
 	}
 }

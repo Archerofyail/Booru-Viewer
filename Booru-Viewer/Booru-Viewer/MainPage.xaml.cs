@@ -46,6 +46,8 @@ namespace Booru_Viewer
 
 			}
 			this.NavigationCacheMode = NavigationCacheMode.Enabled;
+			SearchButton.Loaded += (sender, args) => { SearchButton.CommandParameter = SearchAppBarButton; };
+			SearchFavouritesButton.Loaded += (sender, args) => { SearchButton.CommandParameter = SearchAppBarButton; };
 			//SavedSearches.Loaded += (sender, args) =>
 			//{
 			//	SavedSearches.GetBindingExpression(ListView.ItemsSourceProperty).UpdateSource();
@@ -66,7 +68,7 @@ namespace Booru_Viewer
 
 		private void SearchClicked(object sender, RoutedEventArgs e)
 		{
-			SearchFlyout.Hide();
+			//SearchFlyout.Hide();
 		}
 
 		private void AddTagClicked(object sender, RoutedEventArgs e)

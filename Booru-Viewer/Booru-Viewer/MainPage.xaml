@@ -130,7 +130,8 @@
 		<CommandBar VerticalAlignment="Bottom">
 			<CommandBar.PrimaryCommands>
 
-				<AppBarButton Label="Search" Icon="Find">
+				<AppBarButton Label="Search" Icon="Find"
+							  Name="SearchAppBarButton">
 					<AppBarButton.Flyout>
 						<Flyout x:Name="SearchFlyout">
 							<StackPanel Orientation="Vertical">
@@ -184,9 +185,11 @@
 											Content="Search Your Favourites"
 											Command="{Binding SearchFavourites}"
 											Visibility="{Binding IsFavButtonVisible}"
+											Name="SearchFavouritesButton"
 											Margin="8, 0"></Button>
 										<Button Content="Save Search"
 												Command="{Binding SaveSearch}"
+												
 												Name="SaveSearchButton"/>
 									</StackPanel>
 									<Button MinWidth="290" HorizontalAlignment="Center"
@@ -195,6 +198,7 @@
 										Click="SearchClicked"
 										Command="{Binding StartSearch}"
 										Name="SearchButton">
+
 										<Button.Content>
 											<SymbolIcon>Find</SymbolIcon>
 										</Button.Content>

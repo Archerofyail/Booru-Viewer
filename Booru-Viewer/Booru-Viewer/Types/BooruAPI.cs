@@ -6,6 +6,7 @@ using Windows.Web.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Appointments.DataProvider;
+using Windows.Media.Audio;
 using Booru_Viewer.ViewModels;
 using Newtonsoft.Json;
 using Booru_Viewer.Models;
@@ -74,7 +75,7 @@ namespace Booru_Viewer.Types
 			return new Tuple<bool, List<ImageModel>, string>(true, imageLinks, response.StatusCode.ToString());
 		}
 
-		public static async Task<Tuple<bool, List<Tag>, string>>  SearchTags(string search)
+		public static async Task<Tuple<bool, List<Tag>, string>>  SearchTags(string search, int limit = -1)
 		{
 			var tags = new List<Tag>();
 			var requestURI = BaseURL + TagsURL + "?search[name_matches]=" + search + "*";
@@ -99,8 +100,19 @@ namespace Booru_Viewer.Types
 				return data;
 			}
 			var json = await response.Content.ReadAsStringAsync();
-			tags = JsonConvert.DeserializeObject<List<Tag>>(json);
-
+			List<Tag> allTags = JsonConvert.DeserializeObject<List<Tag>>(json);
+			
+			if (limit != -1)
+			{
+				for (int i = 0; i < limit && i < allTags.Count; i++)
+				{
+					tags.Add(allTags[i]);
+				}
+			}
+			else
+			{
+				tags = allTags;
+			}
 			TagSearchCompletedHandler?.Invoke(typeof(BooruAPI), new Tuple<bool, List<Tag>, string>(true, tags, response.ReasonPhrase));
 			return new Tuple<bool, List<Tag>, string>(true, tags, response.ReasonPhrase);
 		}
