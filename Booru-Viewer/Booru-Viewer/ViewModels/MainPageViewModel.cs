@@ -357,7 +357,7 @@ namespace Booru_Viewer.ViewModels
 				button.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => { button.Flyout.Hide(); });
 			}
 			var tags = await PrepTags();
-			var result = await BooruAPI.SearchPosts(tags, BooruAPI.Page);
+			var result = await BooruAPI.SearchPosts(tags, BooruAPI.Page, PerPage);
 			if (result.Item2 != null)
 			{
 				if (result.Item2.Count > 0)
@@ -443,7 +443,7 @@ namespace Booru_Viewer.ViewModels
 		async void LoadNextPageExecute()
 		{
 			BooruAPI.Page++;
-			var result = await BooruAPI.SearchPosts(await PrepTags(), BooruAPI.Page, false);
+			var result = await BooruAPI.SearchPosts(await PrepTags(), BooruAPI.Page, PerPage, false);
 			if (result.Item3 == HttpStatusCode.Ok.ToString())
 			{
 				AddThumbnails(result.Item2);

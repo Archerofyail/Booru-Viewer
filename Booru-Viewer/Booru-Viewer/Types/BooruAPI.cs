@@ -25,7 +25,7 @@ namespace Booru_Viewer.Types
 		public static EventHandler<Tuple<bool, List<Tag>, string>> TagSearchCompletedHandler;
 
 		//Tags must have a space added to them when they are passed to this function. This returns a null list if failed
-		public static async Task<Tuple<bool, List<ImageModel>, string>> SearchPosts(string[] tags, int page, bool restartSearch = true)
+		public static async Task<Tuple<bool, List<ImageModel>, string>> SearchPosts(string[] tags, int page, int limit, bool restartSearch = true)
 		{
 			List<ImageModel> imageLinks = new List<ImageModel>();
 			HttpResponseMessage response = null;
@@ -36,7 +36,7 @@ namespace Booru_Viewer.Types
 			}
 
 			var requestURI =
-				new Uri(BaseURL + PostsURL + "?limit=20&page=" + page + "&tags=" + tagsAsOne +
+				new Uri(BaseURL + PostsURL + "?limit=" + limit + "&page=" + page + "&tags=" + tagsAsOne +
 						(APIKey != "" && Username != "" ? "&login=" + Username + "&api_key=" + APIKey : ""));
 			try
 			{

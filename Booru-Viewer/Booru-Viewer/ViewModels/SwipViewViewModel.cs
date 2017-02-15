@@ -10,12 +10,25 @@ using Windows.Web.Http;
 using Booru_Viewer.Types;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using Windows.Storage;
 
 namespace Booru_Viewer.ViewModels
 {
 	class SwipViewViewModel : ViewModelBase
 	{
 
+		private int perPage = 20;
+
+		public SwipViewViewModel()
+		{
+			var settings = ApplicationData.Current.RoamingSettings.Values;
+			var pPage = settings["PerPage"] as string;
+			var result = 0;
+			if (int.TryParse(pPage, out result))
+			{
+				perPage = result;
+			}
+		}
 
 		private ObservableCollection<FullImageViewModel> images = new ObservableCollection<FullImageViewModel>();
 
@@ -81,7 +94,7 @@ namespace Booru_Viewer.ViewModels
 		async void LoadMoreImages()
 		{
 			BooruAPI.Page++;
-			var result = await BooruAPI.SearchPosts(await PrepTags(), BooruAPI.Page, false);
+			var result = await BooruAPI.SearchPosts(await PrepTags(), BooruAPI.Page, perPage, false);
 			if (result.Item3 == HttpStatusCode.Ok.ToString())
 			{
 				AddImages(result.Item2);
