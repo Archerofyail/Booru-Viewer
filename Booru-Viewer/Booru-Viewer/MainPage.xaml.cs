@@ -18,6 +18,7 @@ using Windows.System.Profile;
 using System.Diagnostics;
 using Booru_Viewer.Views;
 
+
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace Booru_Viewer
@@ -48,6 +49,7 @@ namespace Booru_Viewer
 			this.NavigationCacheMode = NavigationCacheMode.Enabled;
 			SearchButton.Loaded += (sender, args) => { SearchButton.CommandParameter = SearchAppBarButton; };
 			SearchFavouritesButton.Loaded += (sender, args) => { SearchButton.CommandParameter = SearchAppBarButton; };
+			
 			//SavedSearches.Loaded += (sender, args) =>
 			//{
 			//	SavedSearches.GetBindingExpression(ListView.ItemsSourceProperty).UpdateSource();
@@ -95,7 +97,7 @@ namespace Booru_Viewer
 
 		private void TagTextBox_KeyUp(object sender, KeyRoutedEventArgs e)
 		{
-			
+
 			if (e.Key == Windows.System.VirtualKey.Enter && e.KeyStatus.IsKeyReleased)
 			{
 				if (AddTagButton.Command.CanExecute(AddTagButton))
@@ -113,12 +115,14 @@ namespace Booru_Viewer
 
 		private void MultiSelectCommandButtonClicked(object sender, RoutedEventArgs e)
 		{
-			
+
 		}
 
 		protected override void OnNavigatedTo(NavigationEventArgs e)
 		{
-			
+
+			ImageGridView.GetBindingExpression(GridView.ItemsSourceProperty).UpdateSource();
+
 			base.OnNavigatedTo(e);
 		}
 
@@ -128,7 +132,7 @@ namespace Booru_Viewer
 			var savedSearch = sender as TextBlock;
 			if (savedSearch != null)
 			{
-				
+
 			}
 		}
 
@@ -136,6 +140,13 @@ namespace Booru_Viewer
 		{
 			var list = sender as ListView;
 
+		}
+
+		private void SettingsTapped(object sender, TappedRoutedEventArgs e)
+		{
+			Debug.WriteLine("ActualHeight of Grid is: " + RootGrid.ActualHeight + " and page is :" + Page.ActualHeight);
+			Debug.Write("Max for slider is " + ImageHeightSlider.Maximum);
+			
 		}
 	}
 }

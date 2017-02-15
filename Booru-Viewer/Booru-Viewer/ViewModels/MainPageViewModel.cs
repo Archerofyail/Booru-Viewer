@@ -30,6 +30,18 @@ namespace Booru_Viewer.ViewModels
 			var appSettings = ApplicationData.Current.RoamingSettings.Values;
 			var savedUN = appSettings["Username"] as string;
 			var savedAPIKey = appSettings["APIKey"] as string;
+			var savedPerPage = appSettings["PerPage"] as string;
+			var imageSize = appSettings["ImageSize"] as string;
+			var result = 0;
+			if (int.TryParse(savedPerPage, out result))
+			{
+				perPage = result;
+			}
+			if (int.TryParse(imageSize, out result))
+			{
+				this.imageSize = result;
+			}
+			
 			if (!string.IsNullOrEmpty(savedUN))
 			{
 				Debug.WriteLine("username not empty it's " + appSettings["Username"] + ". APIKey is " + appSettings["APIKey"]);
@@ -48,7 +60,7 @@ namespace Booru_Viewer.ViewModels
 				}
 
 			}
-			BooruAPI.Page = 1;
+			
 			StartSearchExecute(null);
 			Debug.WriteLine("Count for saved Searches is " + SavedSearches.Count);
 			BooruAPI.TagSearchCompletedHandler += (sender, tuple) =>
@@ -79,6 +91,29 @@ namespace Booru_Viewer.ViewModels
 			};
 		}
 
+		private int perPage = 20;
+
+		public int PerPage
+		{
+			get { return perPage; }
+			set
+			{
+				perPage = value;
+				ApplicationData.Current.RoamingSettings.Values["PerPage"] = value;
+			}
+		}
+
+		private int imageSize = 250;
+
+		public int ImageSize
+		{
+			get { return imageSize; }
+			set
+			{
+				imageSize = value;
+				ApplicationData.Current.RoamingSettings.Values["ImageSize"] = value;
+			}
+		}
 		private ObservableCollection<TagViewModel> suggestedTags = new ObservableCollection<TagViewModel>();
 
 		public ObservableCollection<TagViewModel> SuggestedTags
@@ -127,7 +162,22 @@ namespace Booru_Viewer.ViewModels
 		}
 
 		private ObservableCollection<ThumbnailViewModel> thumbnails = new ObservableCollection<ThumbnailViewModel>();
-		public ObservableCollection<ThumbnailViewModel> Thumbnails { get { return thumbnails; } }
+
+		public ObservableCollection<ThumbnailViewModel> Thumbnails
+		{
+			get
+			{
+				
+				return thumbnails;
+			}
+			set
+			{
+				if (thumbnails.Count != GlobalInfo.CurrentSearch.Count)
+				{
+					ResyncThumbnails();
+				}
+			}
+		}
 
 		public ObservableCollection<TagViewModel> CurrentTags
 		{
@@ -262,7 +312,7 @@ namespace Booru_Viewer.ViewModels
 
 			CurrentTags.Add(new TagViewModel(CurrentTag, this));
 			CurrentTag = "";
-			SuggestedTagIndex = -1;
+			suggestedTagIndex = -1;
 			RaisePropertyChanged("SuggestedTagIndex");
 			SuggestedTags.Clear();
 			RaisePropertyChanged("SuggestedTags");
@@ -323,7 +373,7 @@ namespace Booru_Viewer.ViewModels
 				if (result.Item3 == HttpStatusCode.Ok.ToString())
 				{
 					AddThumbnails(result.Item2);
-
+					
 				}
 			}
 			else
@@ -335,12 +385,12 @@ namespace Booru_Viewer.ViewModels
 			
 		}
 
-		void AddThumbnails(List<ImageModel> thumbnails)
+		void AddThumbnails(List<ImageModel> tn)
 		{
 
-			foreach (var post in thumbnails)
+			foreach (var post in tn)
 			{
-				Thumbnails.Add(new ThumbnailViewModel(BooruAPI.BaseURL + post.Large_File_Url, BooruAPI.BaseURL + post.Large_File_Url, this));
+				thumbnails.Add(new ThumbnailViewModel(BooruAPI.BaseURL + post.Large_File_Url, BooruAPI.BaseURL + post.Large_File_Url, this));
 			}
 
 
@@ -370,10 +420,10 @@ namespace Booru_Viewer.ViewModels
 
 		void ResyncThumbnails()
 		{
-			Thumbnails.Clear();
+			thumbnails.Clear();
 			foreach (var post in GlobalInfo.CurrentSearch)
 			{
-				Thumbnails.Add(new ThumbnailViewModel(BooruAPI.BaseURL + post.Large_File_Url, BooruAPI.BaseURL + post.Large_File_Url, this));
+				thumbnails.Add(new ThumbnailViewModel(BooruAPI.BaseURL + post.Large_File_Url, BooruAPI.BaseURL + post.Large_File_Url, this));
 			}
 
 			RaisePropertyChanged("Thumbnails");
@@ -398,6 +448,7 @@ namespace Booru_Viewer.ViewModels
 			{
 				AddThumbnails(result.Item2);
 			}
+			
 		}
 
 		void ChangeSelectionModeExecute()

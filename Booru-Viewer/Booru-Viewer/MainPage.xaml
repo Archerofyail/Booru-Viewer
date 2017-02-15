@@ -7,19 +7,22 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:vm1="using:Booru_Viewer.ViewModels"
 	xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+	xmlns:mvvml="using:GalaSoft.MvvmLight"
 	mc:Ignorable="d"
-	RequestedTheme="Default">
+	RequestedTheme="Default"
+	Name="Page">
+	
 	<Page.DataContext>
 		<vm1:MainPageViewModel></vm1:MainPageViewModel>
 	</Page.DataContext>
+	
 	<Page.Resources>
 		<ResourceDictionary>
 			<DataTemplate x:Name="ImageTemplate">
 				<controls:ImageEx Name="Image"
 								  Source="{Binding Path=PreviewURL}"
-								 
-								  MaxWidth="250"
-								  MaxHeight="250">
+								  MaxWidth="{Binding ElementName=ImageHeightSlider, Path=Value}"
+								  MaxHeight="{Binding ElementName=ImageHeightSlider, Path=Value}">
 
 					<controls:ImageEx.ContextFlyout>
 						<MenuFlyout>
@@ -80,7 +83,7 @@
 			</DataTemplate>
 			<DataTemplate x:Key="SuggestedTag">
 				<StackPanel Orientation="Horizontal"
-							BorderThickness="1" Margin="-4"
+							BorderThickness="1" Margin="0, -4"
 							Background="{ThemeResource SystemAccentColor}"
 							>
 					<StackPanel.BorderBrush>
@@ -92,11 +95,12 @@
 			</DataTemplate>
 		</ResourceDictionary>
 	</Page.Resources>
-	<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+	<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+		  Name="RootGrid">
 
 		<GridView   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
 			ItemTemplate="{StaticResource ImageTemplate}"
-			ItemsSource="{Binding Path=Thumbnails}"
+			ItemsSource="{Binding Path=Thumbnails, Mode=TwoWay}"
 			SelectionMode="{Binding ImageSelectionMode}"
 			AllowFocusOnInteraction="True"
 			IsEnabled="True"
@@ -136,7 +140,7 @@
 						<Flyout x:Name="SearchFlyout">
 							<StackPanel Orientation="Vertical">
 								<StackPanel Margin="0, 0, 12, 0"
-											MaxHeight="250"
+											MaxHeight="220"
 											  MinHeight="80">
 									<TextBlock Text="Saved Searches"/>
 									<ListView ItemsSource="{Binding SavedSearches}"
@@ -155,7 +159,8 @@
 										<TextBox PlaceholderText="Tag"
 											 Name="TagTextBox"
 											 MinWidth="250"
-											 Text="{Binding CurrentTag, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+											 Text="{Binding CurrentTag, Mode=TwoWay, 
+													UpdateSourceTrigger=PropertyChanged}"
 											 TextChanged="TagTextBox_TextChanged"
 											 AllowFocusOnInteraction="True"
 											 KeyUp="TagTextBox_KeyUp"></TextBox>
@@ -208,7 +213,8 @@
 						</Flyout>
 					</AppBarButton.Flyout>
 				</AppBarButton>
-				<AppBarButton Label="Settings" Icon="Setting">
+				<AppBarButton Label="Settings" Icon="Setting"
+							  Tapped="SettingsTapped">
 					<AppBarButton.Flyout>
 						<Flyout>
 							<Flyout.FlyoutPresenterStyle>
@@ -218,6 +224,22 @@
 								</Style>
 							</Flyout.FlyoutPresenterStyle>
 							<StackPanel Orientation="Vertical" MinWidth="300">
+								<TextBlock Text="Images Per Page"/>
+								
+								<Slider 
+									Maximum="100"
+									Value="{Binding PerPage, Mode=TwoWay}"
+									Minimum="10"
+									StepFrequency="1"
+									SnapsTo="StepValues"
+									/>
+								<TextBlock Text="Thumbnail Size"/>
+								<Slider Minimum="200" Maximum="900"
+										SnapsTo="StepValues"
+										StepFrequency="15"
+										Value="{Binding ImageSize, Mode=TwoWay}"
+										Name="ImageHeightSlider"
+										IsThumbToolTipEnabled="False"/>
 								<TextBlock Text="Login Details"
 										   Margin="0, 0, 0, 5"/>
 								<TextBox PlaceholderText="Username"
