@@ -49,14 +49,13 @@ namespace Booru_Viewer
 			this.NavigationCacheMode = NavigationCacheMode.Enabled;
 			SearchButton.Loaded += (sender, args) => { SearchButton.CommandParameter = SearchAppBarButton; };
 			SearchFavouritesButton.Loaded += (sender, args) => { SearchButton.CommandParameter = SearchAppBarButton; };
-			
+
 			//SavedSearches.Loaded += (sender, args) =>
 			//{
 			//	SavedSearches.GetBindingExpression(ListView.ItemsSourceProperty).UpdateSource();
 			//};
 		}
-
-
+		
 		private void GridView_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			var grid = sender as GridView;
@@ -70,7 +69,7 @@ namespace Booru_Viewer
 
 		private void SearchClicked(object sender, RoutedEventArgs e)
 		{
-			//SearchFlyout.Hide();
+
 		}
 
 		private void AddTagClicked(object sender, RoutedEventArgs e)
@@ -146,7 +145,7 @@ namespace Booru_Viewer
 		{
 			Debug.WriteLine("ActualHeight of Grid is: " + RootGrid.ActualHeight + " and page is :" + Page.ActualHeight);
 			Debug.Write("Max for slider is " + ImageHeightSlider.Maximum);
-			
+
 		}
 	}
 }

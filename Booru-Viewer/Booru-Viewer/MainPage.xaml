@@ -11,18 +11,21 @@
 	mc:Ignorable="d"
 	RequestedTheme="Default"
 	Name="Page">
-	
+
 	<Page.DataContext>
 		<vm1:MainPageViewModel></vm1:MainPageViewModel>
 	</Page.DataContext>
-	
+
 	<Page.Resources>
 		<ResourceDictionary>
 			<DataTemplate x:Name="ImageTemplate">
 				<controls:ImageEx Name="Image"
 								  Source="{Binding Path=PreviewURL}"
-								  MaxWidth="{Binding ElementName=ImageHeightSlider, Path=Value}"
-								  MaxHeight="{Binding ElementName=ImageHeightSlider, Path=Value}">
+								  MaxWidth="{Binding ElementName=Page, Path=DataContext.ImageSize, Mode=OneWay}"
+								  MaxHeight="{Binding ElementName=Page, Path=DataContext.ImageSize, Mode=OneWay}"
+								  Height="{Binding ElementName=Page, Path=DataContext.ImageSize, Mode=OneWay}"
+								  Width="{Binding ElementName=Page, Path=DataContext.ImageSize, Mode=OneWay}"
+								  Stretch="Uniform">
 
 					<controls:ImageEx.ContextFlyout>
 						<MenuFlyout>
@@ -37,8 +40,7 @@
 			<DataTemplate x:Name="Tag">
 				<StackPanel Orientation="Horizontal"
 							Background="{ThemeResource SystemAccentColor}"
-							BorderThickness="1" Margin="0,0,0,-5"
-							>
+							BorderThickness="1">
 					<StackPanel.BorderBrush>
 						<SolidColorBrush Color="{ThemeResource SystemBaseLowColor}"/>
 					</StackPanel.BorderBrush>
@@ -55,18 +57,18 @@
 					</Button>
 				</StackPanel>
 			</DataTemplate>
-			<DataTemplate x:Key="SavedSearch">
+			<DataTemplate x:Key="SavedSearch"
+						  >
 				<StackPanel Orientation="Horizontal"
-							BorderThickness="1" Margin="0,0,0,-5"
+							BorderThickness="1" 
 							Background="{ThemeResource SystemAccentColor}">
 					<StackPanel.BorderBrush>
 						<SolidColorBrush Color="{ThemeResource SystemBaseLowColor}"/>
 					</StackPanel.BorderBrush>
 					<Button Foreground="White" 
 						    MinWidth="20" 
-							    
-							   HorizontalAlignment="Center" 
-							   VerticalAlignment="Center"
+							HorizontalAlignment="Center" 
+							VerticalAlignment="Center"
 							Command="{Binding Path=StartSearch}">
 						<Button.Content>
 							<TextBlock Text="{Binding Path=Search}" MaxLines="2"
@@ -83,7 +85,7 @@
 			</DataTemplate>
 			<DataTemplate x:Key="SuggestedTag">
 				<StackPanel Orientation="Horizontal"
-							BorderThickness="1" Margin="0, -4"
+							BorderThickness="1" Margin="2, -2"
 							Background="{ThemeResource SystemAccentColor}"
 							>
 					<StackPanel.BorderBrush>
@@ -93,6 +95,9 @@
 							   Margin="8"/>
 				</StackPanel>
 			</DataTemplate>
+			<Style x:Key="TagStyleNoMargin" TargetType="SelectorItem">
+				<Setter Property="Margin" Value="0, -4"></Setter>
+			</Style>
 		</ResourceDictionary>
 	</Page.Resources>
 	<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
@@ -105,7 +110,7 @@
 			AllowFocusOnInteraction="True"
 			IsEnabled="True"
 			Margin="0, 25, 0, 0" 
-			Name="ImageGridView"
+			x:Name="ImageGridView"
 						VerticalAlignment="Stretch"
 						ScrollViewer.VerticalScrollMode="Enabled"
 						ScrollViewer.ZoomMode="Disabled"
@@ -140,7 +145,7 @@
 						<Flyout x:Name="SearchFlyout">
 							<StackPanel Orientation="Vertical">
 								<StackPanel Margin="0, 0, 12, 0"
-											MaxHeight="220"
+											MaxHeight="250"
 											  MinHeight="80">
 									<TextBlock Text="Saved Searches"/>
 									<ListView ItemsSource="{Binding SavedSearches}"
@@ -148,7 +153,8 @@
 											  SelectionChanged="SavedSearchSelection"
 											  SelectedIndex="{Binding SelectedSavedSearch, Mode=TwoWay}"
 											  Name="SavedSearchesList"
-											  MaxHeight="250"/>
+											  MaxHeight="220"
+											  ItemContainerStyle="{StaticResource TagStyleNoMargin}"/>
 									<TextBlock Text="You save no saved searches"
 											   FontSize="12"
 											   Visibility="{Binding HaveSavedSearches}"/>
@@ -176,13 +182,18 @@
 										</Button>
 
 									</StackPanel>
-									<GridView ItemsSource="{Binding SuggestedTags}"
+									<controls:AdaptiveGridView ItemsSource="{Binding SuggestedTags}"
 											  ItemTemplate="{StaticResource SuggestedTag}"
-											  SelectedIndex="{Binding SuggestedTagIndex, Mode=TwoWay}"/>
-									<ListView ItemsSource="{Binding CurrentTags, Mode=TwoWay}"
-										  ItemTemplate="{StaticResource Tag}"
-										  MinHeight="20"
-										  SelectionMode="None"/>
+											  SelectedIndex="{Binding SuggestedTagIndex, Mode=TwoWay}"
+											  ItemContainerStyle="{StaticResource TagStyleNoMargin}"/>
+									<ListView
+											  ItemsSource="{Binding CurrentTags, Mode=TwoWay}"
+											  ItemTemplate="{StaticResource Tag}"
+											  MinHeight="20"
+											  SelectionMode="None"
+											  ItemContainerStyle="{StaticResource TagStyleNoMargin}"
+											  HorizontalContentAlignment="Left"/>
+									<!--<GridView/>-->
 									<StackPanel Orientation="Horizontal"
 											FlowDirection="RightToLeft"
 												 Margin="8">
@@ -200,7 +211,6 @@
 									<Button MinWidth="290" HorizontalAlignment="Center"
 										Background="{ThemeResource SystemAccentColor}" 
 										Foreground="White"
-										Click="SearchClicked"
 										Command="{Binding StartSearch}"
 										Name="SearchButton">
 
@@ -225,7 +235,7 @@
 							</Flyout.FlyoutPresenterStyle>
 							<StackPanel Orientation="Vertical" MinWidth="300">
 								<TextBlock Text="Images Per Page"/>
-								
+
 								<Slider 
 									Maximum="100"
 									Value="{Binding PerPage, Mode=TwoWay}"
@@ -234,7 +244,7 @@
 									SnapsTo="StepValues"
 									/>
 								<TextBlock Text="Thumbnail Size"/>
-								<Slider Minimum="200" Maximum="900"
+								<Slider Minimum="100" Maximum="900"
 										SnapsTo="StepValues"
 										StepFrequency="15"
 										Value="{Binding ImageSize, Mode=TwoWay}"

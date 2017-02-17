@@ -30,17 +30,8 @@ namespace Booru_Viewer.ViewModels
 			var appSettings = ApplicationData.Current.RoamingSettings.Values;
 			var savedUN = appSettings["Username"] as string;
 			var savedAPIKey = appSettings["APIKey"] as string;
-			var savedPerPage = appSettings["PerPage"] as string;
-			var imageSize = appSettings["ImageSize"] as string;
-			var result = 0;
-			if (int.TryParse(savedPerPage, out result))
-			{
-				perPage = result;
-			}
-			if (int.TryParse(imageSize, out result))
-			{
-				this.imageSize = result;
-			}
+			perPage = (int)appSettings["PerPage"];
+			imageSize = (int)appSettings["ImageSize"];
 			
 			if (!string.IsNullOrEmpty(savedUN))
 			{
@@ -87,6 +78,7 @@ namespace Booru_Viewer.ViewModels
 						savedSearches.Add(new SavedSearchViewModel(search, this));
 					}
 					RaisePropertyChanged("SavedSearches");
+					RaisePropertyChanged("HaveSavedSearches");
 				}
 			};
 		}
@@ -100,6 +92,7 @@ namespace Booru_Viewer.ViewModels
 			{
 				perPage = value;
 				ApplicationData.Current.RoamingSettings.Values["PerPage"] = value;
+				RaisePropertyChanged();
 			}
 		}
 
@@ -112,6 +105,7 @@ namespace Booru_Viewer.ViewModels
 			{
 				imageSize = value;
 				ApplicationData.Current.RoamingSettings.Values["ImageSize"] = value;
+				RaisePropertyChanged();
 			}
 		}
 		private ObservableCollection<TagViewModel> suggestedTags = new ObservableCollection<TagViewModel>();
@@ -338,6 +332,8 @@ namespace Booru_Viewer.ViewModels
 
 			ApplicationData.Current.RoamingSettings.Values["Username"] = BooruAPI.Username;
 			ApplicationData.Current.RoamingSettings.Values["APIKey"] = BooruAPI.APIKey;
+			ApplicationData.Current.RoamingSettings.Values["PerPage"] = PerPage;
+			ApplicationData.Current.RoamingSettings.Values["ImageSize"] = ImageSize;
 			RaisePropertyChanged("APIKey");
 			RaisePropertyChanged("IsFavButtonVisible");
 		}
@@ -352,10 +348,7 @@ namespace Booru_Viewer.ViewModels
 			
 			GlobalInfo.CurrentSearch.Clear();
 			ResyncThumbnails();
-			if (button != null)
-			{
-				button.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => { button.Flyout.Hide(); });
-			}
+			
 			var tags = await PrepTags();
 			var result = await BooruAPI.SearchPosts(tags, BooruAPI.Page, PerPage);
 			if (result.Item2 != null)
@@ -382,7 +375,11 @@ namespace Booru_Viewer.ViewModels
 				NoImagesText = "Failed to grab images: " + result.Item3;
 				RaisePropertyChanged("NoImagesText");
 			}
-			
+			if (button != null)
+			{
+				button.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => { button.Flyout.Hide(); });
+			}
+
 		}
 
 		void AddThumbnails(List<ImageModel> tn)

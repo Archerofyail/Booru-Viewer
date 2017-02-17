@@ -60,6 +60,7 @@ namespace Booru_Viewer.ViewModels
 				return true;
 			});
 			parentVM.DeleteSavedSearch(this);
+			GlobalInfo.SaveSearches();
 		}
 
 		void StartSearchExecute()

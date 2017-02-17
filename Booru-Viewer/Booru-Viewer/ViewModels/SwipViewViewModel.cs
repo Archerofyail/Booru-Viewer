@@ -22,12 +22,7 @@ namespace Booru_Viewer.ViewModels
 		public SwipViewViewModel()
 		{
 			var settings = ApplicationData.Current.RoamingSettings.Values;
-			var pPage = settings["PerPage"] as string;
-			var result = 0;
-			if (int.TryParse(pPage, out result))
-			{
-				perPage = result;
-			}
+			perPage = (int)settings["PerPage"];
 		}
 
 		private ObservableCollection<FullImageViewModel> images = new ObservableCollection<FullImageViewModel>();
