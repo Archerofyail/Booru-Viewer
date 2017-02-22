@@ -32,12 +32,23 @@ namespace Booru_Viewer.Types
 			string tagsAsOne = "";
 			foreach (var tag in tags)
 			{
-				tagsAsOne += tag.Replace(" ", "%20");
+				tagsAsOne += tag;
 			}
-
+			var variables = new List<KeyValuePair<string, string>>
+			{
+				new KeyValuePair<string, string>("limit", limit.ToString()),
+				new KeyValuePair<string, string>("page", page.ToString()),
+				new KeyValuePair<string, string>("tags", tagsAsOne)
+			};
+			
+			if (APIKey != "" && Username != "")
+			{
+			 variables.Add(new KeyValuePair<string, string>("login", Username));
+				variables.Add(new KeyValuePair<string, string>("api_key", APIKey));
+			}
+			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(variables);
 			var requestURI =
-				new Uri(BaseURL + PostsURL + "?limit=" + limit + "&page=" + page + "&tags=" + tagsAsOne +
-						(APIKey != "" && Username != "" ? "&login=" + Username + "&api_key=" + APIKey : ""));
+				new Uri(BaseURL + PostsURL + "?" + content.ToString());
 			try
 			{
 
@@ -46,7 +57,7 @@ namespace Booru_Viewer.Types
 			}
 			catch (Exception e)
 			{
-
+				Debug.WriteLine(e.Message);
 			}
 			if (response == null)
 			{
@@ -54,7 +65,7 @@ namespace Booru_Viewer.Types
 			}
 			if (response.StatusCode != HttpStatusCode.Ok)
 			{
-				
+
 				return new Tuple<bool, List<ImageModel>, string>(false, null, response.StatusCode.ToString());
 			}
 
@@ -75,10 +86,11 @@ namespace Booru_Viewer.Types
 			return new Tuple<bool, List<ImageModel>, string>(true, imageLinks, response.StatusCode.ToString());
 		}
 
-		public static async Task<Tuple<bool, List<Tag>, string>>  SearchTags(string search, int limit = -1)
+		public static async Task<Tuple<bool, List<Tag>, string>> SearchTags(string search, int limit = -1)
 		{
 			var tags = new List<Tag>();
-			var requestURI = BaseURL + TagsURL + "?search[name_matches]=" + search + "*";
+			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(new []{new KeyValuePair<string, string>("search[name_matches]", search + "*") });
+			var requestURI = BaseURL + TagsURL + "?" + content.ToString();
 			HttpResponseMessage response;
 			try
 			{
@@ -101,7 +113,7 @@ namespace Booru_Viewer.Types
 			}
 			var json = await response.Content.ReadAsStringAsync();
 			List<Tag> allTags = JsonConvert.DeserializeObject<List<Tag>>(json);
-			
+
 			if (limit != -1)
 			{
 				for (int i = 0; i < limit && i < allTags.Count; i++)

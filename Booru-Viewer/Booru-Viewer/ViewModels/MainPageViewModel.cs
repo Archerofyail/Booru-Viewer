@@ -90,9 +90,38 @@ namespace Booru_Viewer.ViewModels
 			get { return perPage; }
 			set
 			{
+				if (value > perPage)
+				{
+					//Load enough images to fit the full page of the higher value. Then do the same as above.
+					//Find pages that will fit, then find number of times load next page needs to be called
+					var imagesNeeded = value - GlobalInfo.CurrentSearch.Count;
+					var timesToCall = (int)Math.Ceiling((double)imagesNeeded / perPage);
+					for (int i = 0; i < timesToCall; i++)
+					{
+						LoadNextPageExecute();
+					}
+					
+					
+				}
+
+
+
+				double newPageNum = ((double)(BooruAPI.Page * perPage)) / value;
+				int newPage = (int)Math.Floor(newPageNum);
+				BooruAPI.Page = newPage == 0 ? 1 : newPage;
+				int picsToRemove = (int)((newPageNum - newPage) * value);
+				int picsToKeep = newPage * value;
+				for (int i = Thumbnails.Count - 1; i > picsToKeep; i--)
+				{
+					Thumbnails.RemoveAt(i);
+					GlobalInfo.CurrentSearch.RemoveAt(i);
+				}
+				RaisePropertyChanged("Thumbnails");
 				perPage = value;
 				ApplicationData.Current.RoamingSettings.Values["PerPage"] = value;
 				RaisePropertyChanged();
+				
+
 			}
 		}
 
