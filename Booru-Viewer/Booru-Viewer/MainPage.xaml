@@ -18,6 +18,10 @@
 
 	<Page.Resources>
 		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="Assets/ColorDict.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+			
 			<DataTemplate x:Name="ImageTemplate">
 				<controls:ImageEx Name="Image"
 								  Source="{Binding Path=PreviewURL}"
@@ -39,7 +43,7 @@
 			</DataTemplate>
 			<DataTemplate x:Name="Tag">
 				<StackPanel Orientation="Horizontal"
-							Background="{ThemeResource SystemAccentColor}"
+							Background="{StaticResource ThemeBrush}"
 							BorderThickness="1">
 					<StackPanel.BorderBrush>
 						<SolidColorBrush Color="{ThemeResource SystemBaseLowColor}"/>
@@ -51,7 +55,7 @@
 							   HorizontalAlignment="Center" 
 							   VerticalAlignment="Center"
 							   />
-					<Button Command="{Binding Path=RemoveTag, Mode=TwoWay}"
+					<Button Command="{Binding RemoveTag, Mode=TwoWay}"
 							Background="#FF7C7C7C">
 						<SymbolIcon Symbol="Cancel"/>
 					</Button>
@@ -61,7 +65,7 @@
 						  >
 				<StackPanel Orientation="Horizontal"
 							BorderThickness="1" 
-							Background="{ThemeResource SystemAccentColor}">
+							Background="{StaticResource ThemeBrush}">
 					<StackPanel.BorderBrush>
 						<SolidColorBrush Color="{ThemeResource SystemBaseLowColor}"/>
 					</StackPanel.BorderBrush>
@@ -86,7 +90,7 @@
 			<DataTemplate x:Key="SuggestedTag">
 				<StackPanel Orientation="Horizontal"
 							BorderThickness="1" Margin="2, -2"
-							Background="{ThemeResource SystemAccentColor}"
+							Background="{StaticResource ThemeBrush}"
 							>
 					<StackPanel.BorderBrush>
 						<SolidColorBrush Color="{ThemeResource SystemBaseLowColor}"/>
@@ -103,7 +107,7 @@
 	<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
 		  Name="RootGrid">
 
-		<GridView   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+		<GridView   Background="{StaticResource BackgroundThemeBrush}"
 			ItemTemplate="{StaticResource ImageTemplate}"
 			ItemsSource="{Binding Path=Thumbnails, Mode=TwoWay}"
 			SelectionMode="{Binding ImageSelectionMode}"
@@ -169,10 +173,10 @@
 													UpdateSourceTrigger=PropertyChanged}"
 											 TextChanged="TagTextBox_TextChanged"
 											 AllowFocusOnInteraction="True"
-											 KeyUp="TagTextBox_KeyUp"></TextBox>
+											 KeyUp="TagTextBox_KeyUp"/>
 										<Button Name="AddTagButton" 
-											Margin="5, 0, 0, 0"
-											Background="{ThemeResource SystemAccentColor}" 
+											Margin="4, 0, 0, 0"
+											Background="{StaticResource ThemeBrush}" 
 											Foreground="White"
 											Click="AddTagClicked"
 											Command="{Binding AddTag}">
@@ -180,8 +184,13 @@
 												<SymbolIcon>Add</SymbolIcon>
 											</Button.Content>
 										</Button>
-
+										
 									</StackPanel>
+									<TextBox Text="{Binding PageNum, Mode=TwoWay}"
+											 HorizontalAlignment="Left"
+											 Margin="0, 4"
+											 PlaceholderText="Page"/>
+
 									<controls:AdaptiveGridView ItemsSource="{Binding SuggestedTags}"
 											  ItemTemplate="{StaticResource SuggestedTag}"
 											  SelectedIndex="{Binding SuggestedTagIndex, Mode=TwoWay}"
@@ -209,7 +218,7 @@
 												Name="SaveSearchButton"/>
 									</StackPanel>
 									<Button MinWidth="290" HorizontalAlignment="Center"
-										Background="{ThemeResource SystemAccentColor}" 
+										Background="{StaticResource ThemeBrush}" 
 										Foreground="White"
 										Command="{Binding StartSearch}"
 										Name="SearchButton">
@@ -266,7 +275,7 @@
 										 TextChanged="APIKeyTextBox_TextChanged"/>
 
 								<Button Width="280" HorizontalAlignment="Center"
-										Background="{ThemeResource SystemAccentColor}"
+										Background="{StaticResource ThemeBrush}"
 										Foreground="White"
 										Command="{Binding SaveLoginData}"
 										Tapped="SaveLoginDataButtonTapped">

@@ -27,6 +27,12 @@ namespace Booru_Viewer.Types
 		//Tags must have a space added to them when they are passed to this function. This returns a null list if failed
 		public static async Task<Tuple<bool, List<ImageModel>, string>> SearchPosts(string[] tags, int page, int limit, bool restartSearch = true)
 		{
+
+			if (restartSearch)
+			{
+				GlobalInfo.CurrentSearch.Clear();
+				Page = page;
+			}
 			List<ImageModel> imageLinks = new List<ImageModel>();
 			HttpResponseMessage response = null;
 			string tagsAsOne = "";
@@ -73,11 +79,7 @@ namespace Booru_Viewer.Types
 
 			Debug.WriteLine("Got Json:\n" + json);
 			imageLinks = JsonConvert.DeserializeObject<List<ImageModel>>(json);
-			if (restartSearch)
-			{
-				GlobalInfo.CurrentSearch.Clear();
-				Page = 1;
-			}
+		
 
 			foreach (var img in imageLinks)
 			{

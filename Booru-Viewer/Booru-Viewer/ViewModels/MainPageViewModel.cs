@@ -83,6 +83,19 @@ namespace Booru_Viewer.ViewModels
 			};
 		}
 
+		private int startingPage = 1;
+		public string PageNum
+		{
+			get { return startingPage.ToString(); }
+			set
+			{
+				if (int.TryParse(value, out int result))
+				{
+					startingPage = result;
+				}
+			}
+		}
+
 		private int perPage = 20;
 
 		public int PerPage
@@ -204,7 +217,7 @@ namespace Booru_Viewer.ViewModels
 
 		public ObservableCollection<TagViewModel> CurrentTags
 		{
-			get { RaisePropertyChanged(); return GlobalInfo.CurrentTags; }
+			get { return GlobalInfo.CurrentTags; }
 		}
 
 		private string currentTag = "";
@@ -347,12 +360,6 @@ namespace Booru_Viewer.ViewModels
 			return true;
 		}
 
-		bool SearchCanExecute()
-		{
-			return true;
-		}
-
-
 		void SaveLoginDataExecute()
 		{
 			
@@ -379,7 +386,8 @@ namespace Booru_Viewer.ViewModels
 			ResyncThumbnails();
 			
 			var tags = await PrepTags();
-			var result = await BooruAPI.SearchPosts(tags, BooruAPI.Page, PerPage);
+			GlobalInfo.CurrentSearchTags = tags;
+			var result = await BooruAPI.SearchPosts(tags, startingPage, PerPage);
 			if (result.Item2 != null)
 			{
 				if (result.Item2.Count > 0)
@@ -469,7 +477,7 @@ namespace Booru_Viewer.ViewModels
 		async void LoadNextPageExecute()
 		{
 			BooruAPI.Page++;
-			var result = await BooruAPI.SearchPosts(await PrepTags(), BooruAPI.Page, PerPage, false);
+			var result = await BooruAPI.SearchPosts(GlobalInfo.CurrentSearchTags, BooruAPI.Page, PerPage, false);
 			if (result.Item3 == HttpStatusCode.Ok.ToString())
 			{
 				AddThumbnails(result.Item2);

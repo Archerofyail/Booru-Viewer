@@ -14,6 +14,7 @@ namespace Booru_Viewer.Types
 	{
 		public static ObservableCollection<ImageModel> CurrentSearch { get; set; } = new ObservableCollection<ImageModel>();
 		public static ObservableCollection<TagViewModel> CurrentTags { get; set; } = new ObservableCollection<TagViewModel>();
+		public static string[] CurrentSearchTags { get; set; }
 		private static ObservableCollection<string[]> savedSearches;
 		public static EventHandler SavedSearchesLoadedEventHandler;
 		public static ObservableCollection<string[]> SavedSearches
