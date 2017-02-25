@@ -147,5 +147,10 @@ namespace Booru_Viewer
 			Debug.Write("Max for slider is " + ImageHeightSlider.Maximum);
 
 		}
+
+		private void SearchButton_OnTapped(object sender, TappedRoutedEventArgs e)
+		{
+			StartPageTextBox.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
+		}
 	}
 }

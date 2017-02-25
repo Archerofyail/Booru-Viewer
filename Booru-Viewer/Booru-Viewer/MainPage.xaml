@@ -189,7 +189,10 @@
 									<TextBox Text="{Binding PageNum, Mode=TwoWay}"
 											 HorizontalAlignment="Left"
 											 Margin="0, 4"
-											 PlaceholderText="Page"/>
+											 PlaceholderText="Page"
+											 AllowFocusOnInteraction="True"
+											 Name="StartPageTextBox"
+											 InputScope="Number"/>
 
 									<controls:AdaptiveGridView ItemsSource="{Binding SuggestedTags}"
 											  ItemTemplate="{StaticResource SuggestedTag}"
@@ -221,7 +224,8 @@
 										Background="{StaticResource ThemeBrush}" 
 										Foreground="White"
 										Command="{Binding StartSearch}"
-										Name="SearchButton">
+										Name="SearchButton"
+											Tapped="SearchButton_OnTapped">
 
 										<Button.Content>
 											<SymbolIcon>Find</SymbolIcon>
