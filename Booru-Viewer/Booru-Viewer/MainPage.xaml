@@ -10,7 +10,8 @@
 	xmlns:mvvml="using:GalaSoft.MvvmLight"
 	mc:Ignorable="d"
 	RequestedTheme="Default"
-	Name="Page">
+	Name="Page"
+	xmlns:winrttk="using:WinRTXamlToolkit.Controls">
 
 	<Page.DataContext>
 		<vm1:MainPageViewModel></vm1:MainPageViewModel>
@@ -194,17 +195,33 @@
 											 Name="StartPageTextBox"
 											 InputScope="Number"/>
 
-									<controls:AdaptiveGridView ItemsSource="{Binding SuggestedTags}"
+									<ListView ItemsSource="{Binding SuggestedTags}"
 											  ItemTemplate="{StaticResource SuggestedTag}"
 											  SelectedIndex="{Binding SuggestedTagIndex, Mode=TwoWay}"
-											  ItemContainerStyle="{StaticResource TagStyleNoMargin}"/>
+											  ItemContainerStyle="{StaticResource TagStyleNoMargin}">
+										<ListView.ItemsPanel>
+											<ItemsPanelTemplate>
+												<winrttk:WrapPanel Orientation="Horizontal"
+																	   />
+											</ItemsPanelTemplate>
+										</ListView.ItemsPanel>
+									</ListView>
 									<ListView
 											  ItemsSource="{Binding CurrentTags, Mode=TwoWay}"
 											  ItemTemplate="{StaticResource Tag}"
 											  MinHeight="20"
 											  SelectionMode="None"
 											  ItemContainerStyle="{StaticResource TagStyleNoMargin}"
-											  HorizontalContentAlignment="Left"/>
+											  HorizontalContentAlignment="Left"
+										MaxWidth="{Binding ElementName=RootGrid, Path=ActualWidth}"
+										Name="CurrentTagsList">
+										<ListView.ItemsPanel>
+											<ItemsPanelTemplate>
+												<winrttk:WrapPanel Orientation="Horizontal"
+																	   />
+											</ItemsPanelTemplate>
+										</ListView.ItemsPanel>
+									</ListView>
 									<!--<GridView/>-->
 									<StackPanel Orientation="Horizontal"
 											FlowDirection="RightToLeft"

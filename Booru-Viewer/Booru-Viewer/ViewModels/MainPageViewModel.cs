@@ -349,8 +349,10 @@ namespace Booru_Viewer.ViewModels
 			CurrentTags.Add(new TagViewModel(CurrentTag, this));
 			CurrentTag = "";
 			suggestedTagIndex = -1;
-			RaisePropertyChanged("SuggestedTagIndex");
 			SuggestedTags.Clear();
+			RaisePropertyChanged("CurrentTag");
+			RaisePropertyChanged("SuggestedTagIndex");
+			
 			RaisePropertyChanged("SuggestedTags");
 			RaisePropertyChanged("CurrentTags");
 		}
@@ -412,10 +414,10 @@ namespace Booru_Viewer.ViewModels
 				NoImagesText = "Failed to grab images: " + result.Item3;
 				RaisePropertyChanged("NoImagesText");
 			}
-			if (button != null)
-			{
-				button.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => { button.Flyout.Hide(); });
-			}
+			//if (button != null)
+			//{
+			//	button.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => { button.Flyout.Hide(); });
+			//}
 
 		}
 
