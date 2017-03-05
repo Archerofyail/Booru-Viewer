@@ -1,22 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Xaml;
+﻿using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Booru_Viewer.Types;
-using Windows.Storage;
-using Windows.System.Profile;
 using System.Diagnostics;
+using System.Linq;
 using Booru_Viewer.Views;
+using Microsoft.Toolkit.Uwp.UI.Controls;
 
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
@@ -59,7 +49,7 @@ namespace Booru_Viewer
 		private void GridView_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			var grid = sender as GridView;
-			if (grid != null)
+			if (grid != null && grid.SelectionMode == ListViewSelectionMode.Single)
 			{
 
 				GlobalInfo.SelectedImage = grid.SelectedIndex;
@@ -67,9 +57,25 @@ namespace Booru_Viewer
 			Frame.Navigate(typeof(SwipeView));
 		}
 
+		private void ImageGridView_OnItemClick(object sender, ItemClickEventArgs e)
+		{
+			var grid = sender as GridView;
+			if (grid != null)
+			{
+				var index = grid.Items.IndexOf(e.ClickedItem);
+				Debug.WriteLine("Index is " + index);
+				GlobalInfo.SelectedImage = index;
+				Frame.Navigate(typeof(SwipeView));
+			}
+			
+
+			
+
+		}
+
 		private void SearchClicked(object sender, RoutedEventArgs e)
 		{
-
+			
 		}
 
 		private void AddTagClicked(object sender, RoutedEventArgs e)
@@ -151,6 +157,15 @@ namespace Booru_Viewer
 		private void SearchButton_OnTapped(object sender, TappedRoutedEventArgs e)
 		{
 			StartPageTextBox.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
+		}
+
+
+		private void BackToTopTapped(object sender, TappedRoutedEventArgs e)
+		{
+			if (ImageGridView.Items.Count > 0)
+			{
+				ImageGridView.ScrollIntoView(ImageGridView.Items[0]);
+			}
 		}
 	}
 }

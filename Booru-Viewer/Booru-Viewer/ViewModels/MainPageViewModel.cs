@@ -1,29 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Booru_Viewer.Types;
 using GalaSoft.MvvmLight.Command;
-using Microsoft.Toolkit.Uwp.UI.Controls;
 using Windows.UI.Xaml;
 using Windows.Storage;
 using System.Diagnostics;
-using Windows.UI.Core;
 using GalaSoft.MvvmLight;
 using Windows.Web.Http;
 using Windows.UI.Xaml.Controls;
+using Microsoft.Toolkit.Uwp.UI.Controls;
 
 //TODO: Saved Searches (should be somewhat straightforward)
 namespace Booru_Viewer.ViewModels
 {
 	public class MainPageViewModel : ViewModelBase
 	{
-		
+
 		public MainPageViewModel()
 		{
 
@@ -32,7 +27,7 @@ namespace Booru_Viewer.ViewModels
 			var savedAPIKey = appSettings["APIKey"] as string;
 			perPage = (int)appSettings["PerPage"];
 			imageSize = (int)appSettings["ImageSize"];
-			
+
 			if (!string.IsNullOrEmpty(savedUN))
 			{
 				Debug.WriteLine("username not empty it's " + appSettings["Username"] + ". APIKey is " + appSettings["APIKey"]);
@@ -51,7 +46,7 @@ namespace Booru_Viewer.ViewModels
 				}
 
 			}
-			
+
 			StartSearchExecute(null);
 			Debug.WriteLine("Count for saved Searches is " + SavedSearches.Count);
 			BooruAPI.TagSearchCompletedHandler += (sender, tuple) =>
@@ -81,6 +76,8 @@ namespace Booru_Viewer.ViewModels
 					RaisePropertyChanged("HaveSavedSearches");
 				}
 			};
+
+			thumbnails.CollectionChanged += (sender, args) => RaisePropertyChanged("Thumbnails");
 		}
 
 		private int startingPage = 1;
@@ -111,10 +108,10 @@ namespace Booru_Viewer.ViewModels
 					var timesToCall = (int)Math.Ceiling((double)imagesNeeded / perPage);
 					for (int i = 0; i < timesToCall; i++)
 					{
-						LoadNextPageExecute();
+						LoadNextPageExecute(0);
 					}
-					
-					
+
+
 				}
 
 
@@ -133,7 +130,7 @@ namespace Booru_Viewer.ViewModels
 				perPage = value;
 				ApplicationData.Current.RoamingSettings.Values["PerPage"] = value;
 				RaisePropertyChanged();
-				
+
 
 			}
 		}
@@ -186,7 +183,7 @@ namespace Booru_Viewer.ViewModels
 			{
 				if (savedSearches.Count == 0)
 				{
-					
+
 					foreach (var search in GlobalInfo.SavedSearches)
 					{
 						savedSearches.Add(new SavedSearchViewModel(search, this));
@@ -197,13 +194,17 @@ namespace Booru_Viewer.ViewModels
 			}
 		}
 
-		private ObservableCollection<ThumbnailViewModel> thumbnails = new ObservableCollection<ThumbnailViewModel>();
+		private PaginatedThumbnailList thumbnails = new PaginatedThumbnailList();
 
-		public ObservableCollection<ThumbnailViewModel> Thumbnails
+		public PaginatedThumbnailList Thumbnails
 		{
 			get
 			{
-				
+				if (thumbnails.LoadMoreItemsDelegate == null)
+				{
+					thumbnails.load = LoadNextPageExecute;
+
+				}
 				return thumbnails;
 			}
 			set
@@ -215,10 +216,7 @@ namespace Booru_Viewer.ViewModels
 			}
 		}
 
-		public ObservableCollection<TagViewModel> CurrentTags
-		{
-			get { return GlobalInfo.CurrentTags; }
-		}
+		public ObservableCollection<TagViewModel> CurrentTags => GlobalInfo.CurrentTags;
 
 		private string currentTag = "";
 
@@ -293,7 +291,7 @@ namespace Booru_Viewer.ViewModels
 			set
 			{
 				isMultiSelectOn = value == ListViewSelectionMode.Multiple;
-				MultiSelectButtonIcon = new SymbolIcon(Symbol.Cancel);
+				RaisePropertyChanged("MultiSelectButtonIcon");
 				RaisePropertyChanged();
 			}
 		}
@@ -307,15 +305,9 @@ namespace Booru_Viewer.ViewModels
 			}
 		}
 
-		public Visibility IsFavButtonVisible
-		{
-			get { return Username != "" && APIKey != "" ? Visibility.Visible : Visibility.Collapsed; }
-		}
+		public Visibility IsFavButtonVisible => Username != "" && APIKey != "" ? Visibility.Visible : Visibility.Collapsed;
 
-		public Visibility HaveSavedSearches
-		{
-			get { return SavedSearches.Count > 0 ? Visibility.Collapsed : Visibility.Visible; }
-		}
+		public Visibility HaveSavedSearches => SavedSearches.Count > 0 ? Visibility.Collapsed : Visibility.Visible;
 
 		private int selectedSavedSearch = 0;
 
@@ -329,7 +321,7 @@ namespace Booru_Viewer.ViewModels
 			}
 		}
 
-		
+
 
 		public void DeleteSavedSearch(SavedSearchViewModel search)
 		{
@@ -352,7 +344,7 @@ namespace Booru_Viewer.ViewModels
 			SuggestedTags.Clear();
 			RaisePropertyChanged("CurrentTag");
 			RaisePropertyChanged("SuggestedTagIndex");
-			
+
 			RaisePropertyChanged("SuggestedTags");
 			RaisePropertyChanged("CurrentTags");
 		}
@@ -364,7 +356,7 @@ namespace Booru_Viewer.ViewModels
 
 		void SaveLoginDataExecute()
 		{
-			
+
 
 			BooruAPI.SetLogin(username, apiKey);
 
@@ -383,10 +375,10 @@ namespace Booru_Viewer.ViewModels
 
 		async void StartSearchExecute(Button button)
 		{
-			
+
 			GlobalInfo.CurrentSearch.Clear();
 			ResyncThumbnails();
-			
+
 			var tags = await PrepTags();
 			GlobalInfo.CurrentSearchTags = tags;
 			var result = await BooruAPI.SearchPosts(tags, startingPage, PerPage);
@@ -405,7 +397,7 @@ namespace Booru_Viewer.ViewModels
 				if (result.Item3 == HttpStatusCode.Ok.ToString())
 				{
 					AddThumbnails(result.Item2);
-					
+
 				}
 			}
 			else
@@ -421,12 +413,12 @@ namespace Booru_Viewer.ViewModels
 
 		}
 
-		void AddThumbnails(List<ImageModel> tn)
+		void AddThumbnails(IEnumerable<ImageModel> tn)
 		{
 
 			foreach (var post in tn)
 			{
-				thumbnails.Add(new ThumbnailViewModel(BooruAPI.BaseURL + post.Large_File_Url, BooruAPI.BaseURL + post.Large_File_Url, this));
+				thumbnails.Add(new ThumbnailViewModel(BooruAPI.BaseURL + post.Large_File_Url, BooruAPI.BaseURL + post.Large_File_Url));
 			}
 
 
@@ -459,7 +451,7 @@ namespace Booru_Viewer.ViewModels
 			thumbnails.Clear();
 			foreach (var post in GlobalInfo.CurrentSearch)
 			{
-				thumbnails.Add(new ThumbnailViewModel(BooruAPI.BaseURL + post.Large_File_Url, BooruAPI.BaseURL + post.Large_File_Url, this));
+				thumbnails.Add(new ThumbnailViewModel(BooruAPI.BaseURL + post.Large_File_Url, BooruAPI.BaseURL + post.Large_File_Url));
 			}
 
 			RaisePropertyChanged("Thumbnails");
@@ -476,16 +468,22 @@ namespace Booru_Viewer.ViewModels
 
 
 
-		async void LoadNextPageExecute()
+		async Task<IEnumerable<ImageModel>> LoadNextPageExecute(uint count)
 		{
 			BooruAPI.Page++;
 			var result = await BooruAPI.SearchPosts(GlobalInfo.CurrentSearchTags, BooruAPI.Page, PerPage, false);
 			if (result.Item3 == HttpStatusCode.Ok.ToString())
 			{
-				AddThumbnails(result.Item2);
+				//
 			}
-			
+			return result.Item2;
 		}
+
+		async void LoadNextPageE()
+		{
+			AddThumbnails(await LoadNextPageExecute(0));
+		}
+
 
 		void ChangeSelectionModeExecute()
 		{
@@ -519,7 +517,7 @@ namespace Booru_Viewer.ViewModels
 		public void StartSavedSearch(string[] tags)
 		{
 			CurrentTags.Clear();
-			
+
 			foreach (var tag in tags)
 			{
 				CurrentTags.Add(new TagViewModel(tag, this));
@@ -528,13 +526,13 @@ namespace Booru_Viewer.ViewModels
 			StartSearchExecute(null);
 		}
 
-		public ICommand AddTag { get { return new RelayCommand(AddTagExecute, AddTagCanExecute); } }
+		public ICommand AddTag => new RelayCommand(AddTagExecute, AddTagCanExecute);
 
-		public ICommand SaveLoginData { get { return new RelayCommand(SaveLoginDataExecute, SaveLoginDataCanExecute); } }
-		public ICommand StartSearch { get { return new RelayCommand<Button>(StartSearchExecute); } }
-		public ICommand LoadNextPage { get { return new RelayCommand(LoadNextPageExecute); } }
+		public ICommand SaveLoginData => new RelayCommand(SaveLoginDataExecute, SaveLoginDataCanExecute);
+		public ICommand StartSearch => new RelayCommand<Button>(StartSearchExecute);
+		public ICommand LoadNextPage => new RelayCommand(LoadNextPageE);
 		public ICommand ChangeSelectionMode => new RelayCommand(ChangeSelectionModeExecute);
-		public ICommand SearchFavourites { get { return new RelayCommand<Button>(SearchFavouritesExecute); } }
-		public ICommand SaveSearch { get { return new RelayCommand(SaveSearchExecute); } }
+		public ICommand SearchFavourites => new RelayCommand<Button>(SearchFavouritesExecute);
+		public ICommand SaveSearch => new RelayCommand(SaveSearchExecute);
 	}
 }

@@ -7,11 +7,11 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:vm1="using:Booru_Viewer.ViewModels"
 	xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+	xmlns:wrapPanel="using:Microsoft.Toolkit.Uwp.UI.Controls.WrapPanel"
 	xmlns:mvvml="using:GalaSoft.MvvmLight"
 	mc:Ignorable="d"
 	RequestedTheme="Default"
-	Name="Page"
-	xmlns:winrttk="using:WinRTXamlToolkit.Controls">
+	Name="Page">
 
 	<Page.DataContext>
 		<vm1:MainPageViewModel></vm1:MainPageViewModel>
@@ -31,6 +31,7 @@
 								  Height="{Binding ElementName=Page, Path=DataContext.ImageSize, Mode=OneWay}"
 								  Width="{Binding ElementName=Page, Path=DataContext.ImageSize, Mode=OneWay}"
 								  Stretch="Uniform">
+
 
 					<controls:ImageEx.ContextFlyout>
 						<MenuFlyout>
@@ -103,36 +104,69 @@
 			<Style x:Key="TagStyleNoMargin" TargetType="SelectorItem">
 				<Setter Property="Margin" Value="0, -4"></Setter>
 			</Style>
+
+			<Style TargetType="Button" x:Key="CircularButton">
+
+				<Setter Property="Template">
+					<Setter.Value>
+						<ControlTemplate TargetType="Button">
+							<Border CornerRadius="90" 
+									Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" >
+								<ContentPresenter x:Name="contentPresenter"
+												  ContentTemplate="{TemplateBinding ContentTemplate}"
+												  Content="{TemplateBinding Content}" 
+												  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+												  Margin="{TemplateBinding Padding}" 
+												  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+							</Border>
+						</ControlTemplate>
+					</Setter.Value>
+				</Setter>
+			</Style>
 		</ResourceDictionary>
 	</Page.Resources>
 	<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
 		  Name="RootGrid">
 
 		<GridView   Background="{StaticResource BackgroundThemeBrush}"
-			ItemTemplate="{StaticResource ImageTemplate}"
-			ItemsSource="{Binding Path=Thumbnails, Mode=TwoWay}"
-			SelectionMode="{Binding ImageSelectionMode}"
-			AllowFocusOnInteraction="True"
-			IsEnabled="True"
-			Margin="0, 25, 0, 0" 
-			x:Name="ImageGridView"
-						VerticalAlignment="Stretch"
-						ScrollViewer.VerticalScrollMode="Enabled"
-						ScrollViewer.ZoomMode="Disabled"
-						ScrollViewer.IsVerticalRailEnabled="True"
+					ItemTemplate="{StaticResource ImageTemplate}"
+					ItemsSource="{Binding Path=Thumbnails, Mode=TwoWay}"
+					SelectionMode="None"
+					Margin="0, 25, 0, 0" 
+					x:Name="ImageGridView"
+					AllowFocusOnInteraction="True"
+					IncrementalLoadingThreshold="1"
+					IncrementalLoadingTrigger="Edge"
 					SelectionChanged="GridView_SelectionChanged"
-					>
-
+					IsItemClickEnabled="True"
+					ItemClick="ImageGridView_OnItemClick">
 
 		</GridView>
+		<Button VerticalAlignment="Bottom" HorizontalAlignment="Right" 
+				Height="44" Margin="0,0,32,12" Width="44"
+				Padding="4"
+				BorderThickness="3" Style="{StaticResource CircularButton}"
+				HorizontalContentAlignment="Center"
+				VerticalContentAlignment="Center"
+				Tapped="BackToTopTapped">
 
-		<!--<TextBlock Visibility="{Binding HaveImages, Mode=TwoWay}"
-				   Text="{Binding NoImagesText}"/>-->
-		<Button VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="35" Margin="0,0,0,10" Width="117"
-				Command="{Binding LoadNextPage}"
-				Visibility="{Binding HaveImages}">
+			<Button.Background>
+				<SolidColorBrush Opacity="0.6"
+								 Color="Gray"/>
+			</Button.Background>
+
+				<Button.Foreground>
+				<SolidColorBrush Color="{ThemeResource SystemAccentColor}">
+					
+				</SolidColorBrush>
+			</Button.Foreground>
+			<Button.BorderBrush>
+				<SolidColorBrush Color="{ThemeResource SystemAccentColor}"/>
+			</Button.BorderBrush>
 			<Button.Content>
-				Load More
+				<StackPanel>
+					<SymbolIcon Symbol="Up"></SymbolIcon>
+				</StackPanel>
 			</Button.Content>
 		</Button>
 
@@ -185,7 +219,7 @@
 												<SymbolIcon>Add</SymbolIcon>
 											</Button.Content>
 										</Button>
-										
+
 									</StackPanel>
 									<TextBox Text="{Binding PageNum, Mode=TwoWay}"
 											 HorizontalAlignment="Left"
@@ -201,7 +235,7 @@
 											  ItemContainerStyle="{StaticResource TagStyleNoMargin}">
 										<ListView.ItemsPanel>
 											<ItemsPanelTemplate>
-												<winrttk:WrapPanel Orientation="Horizontal"
+												<wrapPanel:WrapPanel Orientation="Horizontal"
 																	   />
 											</ItemsPanelTemplate>
 										</ListView.ItemsPanel>
@@ -217,7 +251,7 @@
 										Name="CurrentTagsList">
 										<ListView.ItemsPanel>
 											<ItemsPanelTemplate>
-												<winrttk:WrapPanel Orientation="Horizontal"
+												<wrapPanel:WrapPanel Orientation="Horizontal"
 																	   />
 											</ItemsPanelTemplate>
 										</ListView.ItemsPanel>
@@ -313,3 +347,4 @@
 		</CommandBar>
 	</Page.BottomAppBar>
 </Page>
+

@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using Windows.Web.Http;
-using System.Text;
 using System.Threading.Tasks;
-using Windows.ApplicationModel.Appointments.DataProvider;
-using Windows.Media.Audio;
 using Booru_Viewer.ViewModels;
 using Newtonsoft.Json;
 using Booru_Viewer.Models;

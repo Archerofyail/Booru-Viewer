@@ -12,9 +12,11 @@
 		<vm:SwipViewViewModel/>
 	</Page.DataContext>
 	<Page.Resources>
+		<SolidColorBrush Color="{ThemeResource SystemAccentColor}"
+						 x:Key="AccentColorBrush"></SolidColorBrush>
 		<DataTemplate x:Name="Tag">
 			<StackPanel Orientation="Horizontal"
-							Background="{ThemeResource SystemAccentColor}"
+							Background="{ThemeResource AccentColorBrush}"
 							BorderThickness="1" Margin="0,0,0,-5"
 							>
 
