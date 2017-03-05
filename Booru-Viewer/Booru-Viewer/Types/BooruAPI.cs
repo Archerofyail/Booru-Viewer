@@ -79,6 +79,9 @@ namespace Booru_Viewer.Types
 
 			foreach (var img in imageLinks)
 			{
+				img.File_Url = img.File_Url.Insert(0, BaseURL);
+				img.Preview_File_Url = img.Preview_File_Url.Insert(0, BaseURL);
+				img.Large_File_Url = img.Large_File_Url.Insert(0, BaseURL);
 				GlobalInfo.CurrentSearch.Add(img);
 			}
 			return new Tuple<bool, List<ImageModel>, string>(true, imageLinks, response.StatusCode.ToString());
@@ -116,6 +119,7 @@ namespace Booru_Viewer.Types
 			{
 				for (int i = 0; i < limit && i < allTags.Count; i++)
 				{
+					allTags[i].Name = allTags[i].Name.Replace("_", " ");
 					tags.Add(allTags[i]);
 				}
 			}

@@ -81,7 +81,7 @@ namespace Booru_Viewer
 		private void AddTagClicked(object sender, RoutedEventArgs e)
 		{
 			//AddTagButton.Focus(FocusState.Programmatic);
-			TagTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+			TagTextBox.GetBindingExpression(AutoSuggestBox.TextProperty).UpdateSource();
 		}
 
 		private void SaveLoginDataButtonTapped(object sender, TappedRoutedEventArgs e)
@@ -90,7 +90,7 @@ namespace Booru_Viewer
 			APIKeyTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
 		}
 
-		private void TagTextBox_TextChanged(object sender, TextChangedEventArgs e)
+		private void TagTextBox_TextChanged(AutoSuggestBox autoSuggestBox, AutoSuggestBoxTextChangedEventArgs args)
 		{
 			//TagTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
 		}
@@ -157,6 +157,8 @@ namespace Booru_Viewer
 		private void SearchButton_OnTapped(object sender, TappedRoutedEventArgs e)
 		{
 			StartPageTextBox.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
+			e.Handled = true;
+			SearchAppBarButton.Flyout?.Hide();
 		}
 
 
@@ -166,6 +168,12 @@ namespace Booru_Viewer
 			{
 				ImageGridView.ScrollIntoView(ImageGridView.Items[0]);
 			}
+		}
+
+		private void SavedSearchesList_OnItemClick(object sender, ItemClickEventArgs e)
+		{
+			
+			SavedSearchCommandInvoker.CommandParameter = e.ClickedItem;
 		}
 	}
 }

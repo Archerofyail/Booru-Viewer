@@ -56,10 +56,8 @@ namespace Booru_Viewer.ViewModels
 					suggestedTags.Clear();
 					foreach (var tag in tuple.Item2)
 					{
-						suggestedTags.Add(new TagViewModel
-						{
-							Tag = tag.Name
-						});
+						suggestedTags.Add(tag.Name);
+
 					}
 					RaisePropertyChanged("SuggestedTags");
 				}
@@ -147,9 +145,9 @@ namespace Booru_Viewer.ViewModels
 				RaisePropertyChanged();
 			}
 		}
-		private ObservableCollection<TagViewModel> suggestedTags = new ObservableCollection<TagViewModel>();
+		private ObservableCollection<string> suggestedTags = new ObservableCollection<string>();
 
-		public ObservableCollection<TagViewModel> SuggestedTags
+		public ObservableCollection<string> SuggestedTags
 		{
 			get { return suggestedTags; }
 			set
@@ -169,7 +167,7 @@ namespace Booru_Viewer.ViewModels
 				if (value < suggestedTags.Count && value >= 0)
 				{
 					suggestedTagIndex = value;
-					CurrentTag = suggestedTags[suggestedTagIndex].Tag;
+					CurrentTag = suggestedTags[suggestedTagIndex];
 					RaisePropertyChanged();
 				}
 			}
@@ -418,7 +416,7 @@ namespace Booru_Viewer.ViewModels
 
 			foreach (var post in tn)
 			{
-				thumbnails.Add(new ThumbnailViewModel(BooruAPI.BaseURL + post.Large_File_Url, BooruAPI.BaseURL + post.Large_File_Url));
+				thumbnails.Add(new ThumbnailViewModel( post.Large_File_Url, post.Large_File_Url));
 			}
 
 
@@ -451,7 +449,7 @@ namespace Booru_Viewer.ViewModels
 			thumbnails.Clear();
 			foreach (var post in GlobalInfo.CurrentSearch)
 			{
-				thumbnails.Add(new ThumbnailViewModel(BooruAPI.BaseURL + post.Large_File_Url, BooruAPI.BaseURL + post.Large_File_Url));
+				thumbnails.Add(new ThumbnailViewModel(post.Large_File_Url, post.Large_File_Url));
 			}
 
 			RaisePropertyChanged("Thumbnails");
@@ -534,5 +532,11 @@ namespace Booru_Viewer.ViewModels
 		public ICommand ChangeSelectionMode => new RelayCommand(ChangeSelectionModeExecute);
 		public ICommand SearchFavourites => new RelayCommand<Button>(SearchFavouritesExecute);
 		public ICommand SaveSearch => new RelayCommand(SaveSearchExecute);
+		public ICommand SavedSearchSelected => new RelayCommand<SavedSearchViewModel>(SavedSearchSelectedExec);
+		void SavedSearchSelectedExec(SavedSearchViewModel savedSearch)
+		{
+			Debug.WriteLine("Saved Search tapped in mainpageviewmodel");
+			StartSavedSearch(savedSearch.Tags);
+		}
 	}
 }

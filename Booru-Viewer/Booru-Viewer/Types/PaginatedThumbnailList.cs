@@ -38,7 +38,7 @@ namespace Booru_Viewer.Types
 			var items = await load(0);
 			foreach (var item in items)
 			{
-				Add(new ThumbnailViewModel(BooruAPI.BaseURL + item.Preview_File_Url, BooruAPI.BaseURL + item.Large_File_Url));
+				Add(new ThumbnailViewModel(item.Large_File_Url, item.Large_File_Url));
 			}
 
 			Debug.WriteLine("Finished loading images");

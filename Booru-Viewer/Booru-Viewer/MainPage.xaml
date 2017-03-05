@@ -11,7 +11,9 @@
 	xmlns:mvvml="using:GalaSoft.MvvmLight"
 	mc:Ignorable="d"
 	RequestedTheme="Default"
-	Name="Page">
+	Name="Page"
+	xmlns:i="using:Microsoft.Xaml.Interactivity"
+	xmlns:core="using:Microsoft.Xaml.Interactions.Core">
 
 	<Page.DataContext>
 		<vm1:MainPageViewModel></vm1:MainPageViewModel>
@@ -22,7 +24,7 @@
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary Source="Assets/ColorDict.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
-			
+
 			<DataTemplate x:Name="ImageTemplate">
 				<controls:ImageEx Name="Image"
 								  Source="{Binding Path=PreviewURL}"
@@ -46,14 +48,15 @@
 			<DataTemplate x:Name="Tag">
 				<StackPanel Orientation="Horizontal"
 							Background="{StaticResource ThemeBrush}"
-							BorderThickness="1">
+							BorderThickness="1"
+							Margin="0">
 					<StackPanel.BorderBrush>
 						<SolidColorBrush Color="{ThemeResource SystemBaseLowColor}"/>
 					</StackPanel.BorderBrush>
 					<TextBlock Name="Tag"
 							   Text="{Binding Path=Tag, Mode=TwoWay}" 
 							   MinWidth="20" 
-							   Margin="10,0" 
+							   Margin="8,0" 
 							   HorizontalAlignment="Center" 
 							   VerticalAlignment="Center"
 							   />
@@ -67,20 +70,20 @@
 						  >
 				<StackPanel Orientation="Horizontal"
 							BorderThickness="1" 
-							Background="{StaticResource ThemeBrush}">
+							Background="{StaticResource ThemeBrush}"
+							>
 					<StackPanel.BorderBrush>
 						<SolidColorBrush Color="{ThemeResource SystemBaseLowColor}"/>
 					</StackPanel.BorderBrush>
-					<Button Foreground="White" 
-						    MinWidth="20" 
-							HorizontalAlignment="Center" 
-							VerticalAlignment="Center"
-							Command="{Binding Path=StartSearch}">
-						<Button.Content>
-							<TextBlock Text="{Binding Path=Search}" MaxLines="2"
-									   TextWrapping="WrapWholeWords"/>
-						</Button.Content>
-					</Button>
+
+
+					<TextBlock 
+						Text="{Binding Path=Search}" MaxLines="2"
+						TextWrapping="WrapWholeWords"
+						Margin="8, 0"
+						VerticalAlignment="Center"
+						Foreground="White"/>
+
 					<Button Command="{Binding Path=DeleteSearch}"
 							Background="#FF7C7C7C">
 						<Button.Content>
@@ -102,7 +105,7 @@
 				</StackPanel>
 			</DataTemplate>
 			<Style x:Key="TagStyleNoMargin" TargetType="SelectorItem">
-				<Setter Property="Margin" Value="0, -4"></Setter>
+				<Setter Property="Margin" Value="-12, -4"></Setter>
 			</Style>
 
 			<Style TargetType="Button" x:Key="CircularButton">
@@ -151,13 +154,13 @@
 				Tapped="BackToTopTapped">
 
 			<Button.Background>
-				<SolidColorBrush Opacity="0.6"
+				<SolidColorBrush Opacity="0.4"
 								 Color="Gray"/>
 			</Button.Background>
 
-				<Button.Foreground>
+			<Button.Foreground>
 				<SolidColorBrush Color="{ThemeResource SystemAccentColor}">
-					
+
 				</SolidColorBrush>
 			</Button.Foreground>
 			<Button.BorderBrush>
@@ -188,12 +191,23 @@
 											  MinHeight="80">
 									<TextBlock Text="Saved Searches"/>
 									<ListView ItemsSource="{Binding SavedSearches}"
-										  ItemTemplate="{StaticResource SavedSearch}"
+											  ItemTemplate="{StaticResource SavedSearch}"
 											  SelectionChanged="SavedSearchSelection"
 											  SelectedIndex="{Binding SelectedSavedSearch, Mode=TwoWay}"
 											  Name="SavedSearchesList"
 											  MaxHeight="220"
-											  ItemContainerStyle="{StaticResource TagStyleNoMargin}"/>
+											  ItemContainerStyle="{StaticResource TagStyleNoMargin}"
+											  IsItemClickEnabled="True"
+											  SelectionMode="None"
+											  ItemClick="SavedSearchesList_OnItemClick">
+										<i:Interaction.Behaviors>
+											<core:EventTriggerBehavior EventName="ItemClick" >
+												<core:InvokeCommandAction Command="{Binding SavedSearchSelected}"
+																		  CommandParameter="{Binding ElementName=SavedSearchesList, Path=SelectedItem}"
+																		  x:Name="SavedSearchCommandInvoker"/>
+											</core:EventTriggerBehavior>
+										</i:Interaction.Behaviors>
+									</ListView>
 									<TextBlock Text="You save no saved searches"
 											   FontSize="12"
 											   Visibility="{Binding HaveSavedSearches}"/>
@@ -201,14 +215,16 @@
 								<StackPanel Orientation="Vertical" MaxWidth="350">
 									<TextBlock Text="Add tags"></TextBlock>
 									<StackPanel Orientation="Horizontal">
-										<TextBox PlaceholderText="Tag"
+										<AutoSuggestBox PlaceholderText="Tag"
 											 Name="TagTextBox"
 											 MinWidth="250"
 											 Text="{Binding CurrentTag, Mode=TwoWay, 
 													UpdateSourceTrigger=PropertyChanged}"
 											 TextChanged="TagTextBox_TextChanged"
 											 AllowFocusOnInteraction="True"
-											 KeyUp="TagTextBox_KeyUp"/>
+											 KeyUp="TagTextBox_KeyUp"
+														ItemsSource="{Binding SuggestedTags}"
+														UpdateTextOnSelect="True"/>
 										<Button Name="AddTagButton" 
 											Margin="4, 0, 0, 0"
 											Background="{StaticResource ThemeBrush}" 
@@ -229,26 +245,15 @@
 											 Name="StartPageTextBox"
 											 InputScope="Number"/>
 
-									<ListView ItemsSource="{Binding SuggestedTags}"
-											  ItemTemplate="{StaticResource SuggestedTag}"
-											  SelectedIndex="{Binding SuggestedTagIndex, Mode=TwoWay}"
-											  ItemContainerStyle="{StaticResource TagStyleNoMargin}">
-										<ListView.ItemsPanel>
-											<ItemsPanelTemplate>
-												<wrapPanel:WrapPanel Orientation="Horizontal"
-																	   />
-											</ItemsPanelTemplate>
-										</ListView.ItemsPanel>
-									</ListView>
 									<ListView
-											  ItemsSource="{Binding CurrentTags, Mode=TwoWay}"
-											  ItemTemplate="{StaticResource Tag}"
-											  MinHeight="20"
-											  SelectionMode="None"
-											  ItemContainerStyle="{StaticResource TagStyleNoMargin}"
-											  HorizontalContentAlignment="Left"
-										MaxWidth="{Binding ElementName=RootGrid, Path=ActualWidth}"
-										Name="CurrentTagsList">
+											ItemsSource="{Binding CurrentTags, Mode=TwoWay}"
+											ItemTemplate="{StaticResource Tag}"
+											MinHeight="20"
+											SelectionMode="None"
+											ItemContainerStyle="{StaticResource TagStyleNoMargin}"
+											HorizontalContentAlignment="Left"
+											MaxWidth="{Binding ElementName=RootGrid, Path=ActualWidth}"
+											Name="CurrentTagsList">
 										<ListView.ItemsPanel>
 											<ItemsPanelTemplate>
 												<wrapPanel:WrapPanel Orientation="Horizontal"
@@ -256,7 +261,7 @@
 											</ItemsPanelTemplate>
 										</ListView.ItemsPanel>
 									</ListView>
-									<!--<GridView/>-->
+
 									<StackPanel Orientation="Horizontal"
 											FlowDirection="RightToLeft"
 												 Margin="8">
