@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Windows.Web.Http;
 using System.Threading.Tasks;
 using Booru_Viewer.ViewModels;
@@ -21,7 +22,7 @@ namespace Booru_Viewer.Types
 		public static EventHandler<Tuple<bool, List<Tag>, string>> TagSearchCompletedHandler;
 
 		//Tags must have a space added to them when they are passed to this function. This returns a null list if failed
-		public static async Task<Tuple<bool, List<ImageModel>, string>> SearchPosts(string[] tags, int page, int limit, bool restartSearch = true)
+		public static async Task<Tuple<bool, List<ImageModel>, string>> SearchPosts(string[] tags, int page, int limit, bool[] ratingChecks = null, bool restartSearch = true)
 		{
 
 			if (restartSearch)
@@ -36,16 +37,56 @@ namespace Booru_Viewer.Types
 			{
 				tagsAsOne += tag;
 			}
+			tagsAsOne += GlobalInfo.CurrentOrdering;
+			var contentTags = new[] { "rating:s", "rating:q", "rating:e" };
+			if (ratingChecks != null)
+			{
+				//if all three are checked, no tags. If 2 are checked, minus one. if one is checked add that one
+				int trueCount = 0;
+				foreach (var b in ratingChecks)
+				{
+					if (b)
+					{
+						trueCount++;
+					}
+				}
+				switch (trueCount)
+				{
+					case 1:
+					{
+						for (int i = 0; i < ratingChecks.Length; i++)
+						{
+							if (ratingChecks[i])
+							{
+								tagsAsOne += contentTags[i];
+							}
+						}
+					}
+					break;
+
+					case 2:
+					{
+						for (int i = 0; i < ratingChecks.Length; i++)
+						{
+							if (!ratingChecks[i])
+							{
+								tagsAsOne += "-" + contentTags[i];
+							}
+						}
+					}
+						break;
+				}
+			}
 			var variables = new List<KeyValuePair<string, string>>
 			{
 				new KeyValuePair<string, string>("limit", limit.ToString()),
 				new KeyValuePair<string, string>("page", page.ToString()),
 				new KeyValuePair<string, string>("tags", tagsAsOne)
 			};
-			
+
 			if (APIKey != "" && Username != "")
 			{
-			 variables.Add(new KeyValuePair<string, string>("login", Username));
+				variables.Add(new KeyValuePair<string, string>("login", Username));
 				variables.Add(new KeyValuePair<string, string>("api_key", APIKey));
 			}
 			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(variables);
@@ -75,7 +116,7 @@ namespace Booru_Viewer.Types
 
 			Debug.WriteLine("Got Json:\n" + json);
 			imageLinks = JsonConvert.DeserializeObject<List<ImageModel>>(json);
-		
+
 
 			foreach (var img in imageLinks)
 			{
@@ -90,7 +131,7 @@ namespace Booru_Viewer.Types
 		public static async Task<Tuple<bool, List<Tag>, string>> SearchTags(string search, int limit = -1)
 		{
 			var tags = new List<Tag>();
-			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(new []{new KeyValuePair<string, string>("search[name_matches]", search + "*") });
+			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(new[] { new KeyValuePair<string, string>("search[name_matches]", search + "*") });
 			var requestURI = BaseURL + TagsURL + "?" + content.ToString();
 			HttpResponseMessage response;
 			try

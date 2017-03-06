@@ -85,7 +85,7 @@ namespace Booru_Viewer.ViewModels
 		async void LoadMoreImages()
 		{
 			BooruAPI.Page++;
-			var result = await BooruAPI.SearchPosts(await PrepTags(), BooruAPI.Page, perPage, false);
+			var result = await BooruAPI.SearchPosts(await PrepTags(), BooruAPI.Page, perPage, GlobalInfo.ContentCheck, false);
 			if (result.Item3 == HttpStatusCode.Ok.ToString())
 			{
 				AddImages(result.Item2);

@@ -40,10 +40,10 @@ namespace Booru_Viewer
 			SearchButton.Loaded += (sender, args) => { SearchButton.CommandParameter = SearchAppBarButton; };
 			SearchFavouritesButton.Loaded += (sender, args) => { SearchButton.CommandParameter = SearchAppBarButton; };
 
-			//SavedSearches.Loaded += (sender, args) =>
-			//{
-			//	SavedSearches.GetBindingExpression(ListView.ItemsSourceProperty).UpdateSource();
-			//};
+			SavedSearchesList.Loaded += (sender, args) =>
+			{
+				SavedSearchesList.GetBindingExpression(ListView.ItemsSourceProperty).UpdateSource();
+			};
 		}
 		
 		private void GridView_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -67,10 +67,6 @@ namespace Booru_Viewer
 				GlobalInfo.SelectedImage = index;
 				Frame.Navigate(typeof(SwipeView));
 			}
-			
-
-			
-
 		}
 
 		private void SearchClicked(object sender, RoutedEventArgs e)
@@ -86,7 +82,7 @@ namespace Booru_Viewer
 
 		private void SaveLoginDataButtonTapped(object sender, TappedRoutedEventArgs e)
 		{
-			UsernameTextBox.Focus(FocusState.Programmatic);
+			UsernameTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();	
 			APIKeyTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
 		}
 
@@ -113,32 +109,12 @@ namespace Booru_Viewer
 
 		}
 
-		private void GridView_Tapped(object sender, TappedRoutedEventArgs e)
-		{
-			Debug.Write("blah");
-		}
-
-		private void MultiSelectCommandButtonClicked(object sender, RoutedEventArgs e)
-		{
-
-		}
-
 		protected override void OnNavigatedTo(NavigationEventArgs e)
 		{
 
 			ImageGridView.GetBindingExpression(GridView.ItemsSourceProperty).UpdateSource();
 
 			base.OnNavigatedTo(e);
-		}
-
-
-		private void SavedSearchTapped(object sender, TappedRoutedEventArgs e)
-		{
-			var savedSearch = sender as TextBlock;
-			if (savedSearch != null)
-			{
-
-			}
 		}
 
 		private void SavedSearchSelection(object sender, SelectionChangedEventArgs e)

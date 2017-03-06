@@ -8,6 +8,7 @@ using GalaSoft.MvvmLight.Command;
 using Windows.UI.Xaml;
 using Windows.Storage;
 using System.Diagnostics;
+using Windows.Foundation.Collections;
 using GalaSoft.MvvmLight;
 using Windows.Web.Http;
 using Windows.UI.Xaml.Controls;
@@ -18,15 +19,41 @@ namespace Booru_Viewer.ViewModels
 {
 	public class MainPageViewModel : ViewModelBase
 	{
-
+		private IPropertySet appSettings;
 		public MainPageViewModel()
 		{
 
-			var appSettings = ApplicationData.Current.RoamingSettings.Values;
+			appSettings = ApplicationData.Current.RoamingSettings.Values;
 			var savedUN = appSettings["Username"] as string;
 			var savedAPIKey = appSettings["APIKey"] as string;
-			perPage = (int)appSettings["PerPage"];
-			imageSize = (int)appSettings["ImageSize"];
+			if (appSettings["PerPage"] != null)
+			{
+				perPage = (int)appSettings["PerPage"];
+			}
+			if (appSettings["ImageSize"] != null)
+			{
+				imageSize = (int)appSettings["ImageSize"];
+			}
+			if (appSettings["SafeChecked"] != null)
+			{
+				safeChecked = (bool)appSettings["SafeChecked"];
+			}
+			if (appSettings["QuestionableChecked"] != null)
+			{
+				questionableChecked = (bool)appSettings["QuestionableChecked"];
+			}
+			if (appSettings["ExplicitChecked"] != null)
+			{
+				explicitChecked = (bool)appSettings["ExplicitChecked"];
+			}
+
+			lastCheckedBool[0] = safeChecked;
+			lastCheckedBool[1] = questionableChecked;
+			lastCheckedBool[2] = explicitChecked;
+
+			GlobalInfo.ContentCheck[0] = safeChecked;
+			GlobalInfo.ContentCheck[1] = questionableChecked;
+			GlobalInfo.ContentCheck[2] = explicitChecked;
 
 			if (!string.IsNullOrEmpty(savedUN))
 			{
@@ -47,7 +74,7 @@ namespace Booru_Viewer.ViewModels
 
 			}
 
-			StartSearchExecute(null);
+			StartSearchExecute();
 			Debug.WriteLine("Count for saved Searches is " + SavedSearches.Count);
 			BooruAPI.TagSearchCompletedHandler += (sender, tuple) =>
 			{
@@ -78,16 +105,75 @@ namespace Booru_Viewer.ViewModels
 			thumbnails.CollectionChanged += (sender, args) => RaisePropertyChanged("Thumbnails");
 		}
 
-		private int startingPage = 1;
-		public string PageNum
+		private bool safeChecked = true;
+		private bool questionableChecked = true;
+		private bool explicitChecked = true;
+		private bool[] lastCheckedBool = new bool[3];
+		public bool SafeChecked
 		{
-			get { return startingPage.ToString(); }
+			get { return safeChecked; }
 			set
 			{
-				if (int.TryParse(value, out int result))
+				
+				//if (questionableChecked || explicitChecked || value)
 				{
-					startingPage = result;
+					lastCheckedBool[0] = safeChecked;
+					lastCheckedBool[1] = questionableChecked;
+					lastCheckedBool[2] = explicitChecked;
+					safeChecked = value;
+					GlobalInfo.ContentCheck[0] = value;
+
+					appSettings["SafeChecked"] = value;
 				}
+				RaisePropertyChanged();
+			}
+		}
+
+		public bool QuestionableChecked
+		{
+			get { return questionableChecked; }
+			set
+			{
+				//if (safeChecked || explicitChecked || value)
+				{
+					lastCheckedBool[0] = safeChecked;
+					lastCheckedBool[1] = questionableChecked;
+					lastCheckedBool[2] = explicitChecked;
+					questionableChecked = value;
+					GlobalInfo.ContentCheck[1] = value;
+
+					appSettings["QuestionableChecked"] = value;
+				}
+				RaisePropertyChanged();
+			}
+		}
+
+		public bool ExplicitChecked
+		{
+			get { return explicitChecked; }
+			set
+			{
+				//if (safeChecked || questionableChecked || value)
+				{
+					lastCheckedBool[0] = safeChecked;
+					lastCheckedBool[1] = questionableChecked;
+					lastCheckedBool[2] = explicitChecked;
+					explicitChecked = value;
+					GlobalInfo.ContentCheck[2] = value;
+					appSettings["ExplicitChecked"] = value;
+				}
+				RaisePropertyChanged();
+			}
+		}
+
+		private int startingPage = 1;
+		public int PageNum
+		{
+			get { return startingPage; }
+			set
+			{
+				startingPage = value;
+				RaisePropertyChanged();
 			}
 		}
 
@@ -214,6 +300,43 @@ namespace Booru_Viewer.ViewModels
 			}
 		}
 
+		public ObservableCollection<string> Prefixes => new ObservableCollection<string>(new[] { "none", "~", "-" });
+		private string orderPrefix = "order:";
+		public ObservableCollection<string> OrderOptions => new ObservableCollection<string>(new[]
+		{
+			"default", "id", "id_desc", "score", "score_asc", "favcount", "favcount_asc", "change", "change_asc", "comment",
+			"comment_asc", "note", "note_asc", "mpixels", "mpixels_asc", "portrait", "landscape", "filesize",
+			"filesize_asc", "rank", "random"
+		});
+
+		private int selectedPrefixIndex;
+
+		public int SelectedPrefixIndex
+		{
+			get
+			{
+				return selectedPrefixIndex;
+			}
+			set
+			{
+				selectedPrefixIndex = value;
+				RaisePropertyChanged();
+			}
+		}
+
+		private int selectedOrderIndex;
+
+		public int SelectedOrderIndex
+		{
+			get { return selectedOrderIndex; }
+			set
+			{
+				selectedOrderIndex = value;
+				RaisePropertyChanged();
+				GlobalInfo.CurrentOrdering = SelectedOrderIndex > 0 ? OrderOptions[SelectedOrderIndex] : "";
+			}
+		}
+
 		public ObservableCollection<TagViewModel> CurrentTags => GlobalInfo.CurrentTags;
 
 		private string currentTag = "";
@@ -335,8 +458,12 @@ namespace Booru_Viewer.ViewModels
 
 		void AddTagExecute()
 		{
-
-			CurrentTags.Add(new TagViewModel(CurrentTag, this));
+			var prefix = "";
+			if (selectedPrefixIndex > 0)
+			{
+				prefix = Prefixes[selectedPrefixIndex];
+			}
+			CurrentTags.Add(new TagViewModel(prefix + CurrentTag, this));
 			CurrentTag = "";
 			suggestedTagIndex = -1;
 			SuggestedTags.Clear();
@@ -371,15 +498,15 @@ namespace Booru_Viewer.ViewModels
 			return true;
 		}
 
-		async void StartSearchExecute(Button button)
+		async void StartSearchExecute()
 		{
 
 			GlobalInfo.CurrentSearch.Clear();
 			ResyncThumbnails();
-
+			GlobalInfo.CurrentSearchTags.Clear();
 			var tags = await PrepTags();
-			GlobalInfo.CurrentSearchTags = tags;
-			var result = await BooruAPI.SearchPosts(tags, startingPage, PerPage);
+			GlobalInfo.CurrentSearchTags.AddRange(tags);
+			var result = await BooruAPI.SearchPosts(tags, startingPage, PerPage, new []{safeChecked, questionableChecked, explicitChecked});
 			if (result.Item2 != null)
 			{
 				if (result.Item2.Count > 0)
@@ -404,11 +531,6 @@ namespace Booru_Viewer.ViewModels
 				NoImagesText = "Failed to grab images: " + result.Item3;
 				RaisePropertyChanged("NoImagesText");
 			}
-			//if (button != null)
-			//{
-			//	button.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => { button.Flyout.Hide(); });
-			//}
-
 		}
 
 		void AddThumbnails(IEnumerable<ImageModel> tn)
@@ -416,7 +538,7 @@ namespace Booru_Viewer.ViewModels
 
 			foreach (var post in tn)
 			{
-				thumbnails.Add(new ThumbnailViewModel( post.Large_File_Url, post.Large_File_Url));
+				thumbnails.Add(new ThumbnailViewModel(post.Large_File_Url, post.Large_File_Url));
 			}
 
 
@@ -428,18 +550,19 @@ namespace Booru_Viewer.ViewModels
 			string[] tags = new string[CurrentTags.Count];
 			var tagModels = new ObservableCollection<TagViewModel>(CurrentTags);
 			await Task.Run(() =>
-			 {
-				 var i = 0;
-				 foreach (var tag in tagModels)
-				 {
-					 if (!string.IsNullOrEmpty(tag.Tag))
-					 {
-						 tags[i] = tag.Tag.Replace(" ", "_") + " ";
-					 }
-					 i++;
-				 }
-			 });
-
+			{
+				var i = 0;
+				foreach (var tag in tagModels)
+				{
+					if (!string.IsNullOrEmpty(tag.Tag))
+					{
+						tags[i] = tag.Tag.Replace(" ", "_") + " ";
+					}
+					i++;
+				}
+			});
+			
+			
 
 			return tags;
 		}
@@ -455,13 +578,13 @@ namespace Booru_Viewer.ViewModels
 			RaisePropertyChanged("Thumbnails");
 		}
 
-		void SearchFavouritesExecute(Button button)
+		void SearchFavouritesExecute()
 		{
 			CurrentTags.Clear();
 			CurrentTag = "ordfav:" + Username;
 			RaisePropertyChanged("CurrentTags");
 			AddTagExecute();
-			StartSearchExecute(button);
+			StartSearchExecute();
 		}
 
 
@@ -469,7 +592,8 @@ namespace Booru_Viewer.ViewModels
 		async Task<IEnumerable<ImageModel>> LoadNextPageExecute(uint count)
 		{
 			BooruAPI.Page++;
-			var result = await BooruAPI.SearchPosts(GlobalInfo.CurrentSearchTags, BooruAPI.Page, PerPage, false);
+			var tags = new List<string>(GlobalInfo.CurrentSearchTags);
+			var result = await BooruAPI.SearchPosts(tags.ToArray(), BooruAPI.Page, PerPage, new []{safeChecked, questionableChecked, explicitChecked}, false);
 			if (result.Item3 == HttpStatusCode.Ok.ToString())
 			{
 				//
@@ -521,22 +645,58 @@ namespace Booru_Viewer.ViewModels
 				CurrentTags.Add(new TagViewModel(tag, this));
 			}
 			RaisePropertyChanged("CurrentTags");
-			StartSearchExecute(null);
+			StartSearchExecute();
 		}
 
 		public ICommand AddTag => new RelayCommand(AddTagExecute, AddTagCanExecute);
 
 		public ICommand SaveLoginData => new RelayCommand(SaveLoginDataExecute, SaveLoginDataCanExecute);
-		public ICommand StartSearch => new RelayCommand<Button>(StartSearchExecute);
+		public ICommand StartSearch => new RelayCommand(StartSearchExecute);
 		public ICommand LoadNextPage => new RelayCommand(LoadNextPageE);
 		public ICommand ChangeSelectionMode => new RelayCommand(ChangeSelectionModeExecute);
-		public ICommand SearchFavourites => new RelayCommand<Button>(SearchFavouritesExecute);
+		public ICommand SearchFavourites => new RelayCommand(SearchFavouritesExecute);
 		public ICommand SaveSearch => new RelayCommand(SaveSearchExecute);
 		public ICommand SavedSearchSelected => new RelayCommand<SavedSearchViewModel>(SavedSearchSelectedExec);
 		void SavedSearchSelectedExec(SavedSearchViewModel savedSearch)
 		{
 			Debug.WriteLine("Saved Search tapped in mainpageviewmodel");
 			StartSavedSearch(savedSearch.Tags);
+		}
+
+		public ICommand DecrementPage => new RelayCommand(DecrementPageEx);
+		void DecrementPageEx()
+		{
+			if (PageNum > 1)
+			{
+				PageNum -= 1;
+			}
+		}
+
+		public ICommand IncrementPage => new RelayCommand(IncrementPageEx);
+		void IncrementPageEx()
+		{
+			PageNum += 1;
+		}
+
+
+		public ICommand CheckBoxChanged => new RelayCommand<CheckBox>(CheckBoxChangedEx);
+		void CheckBoxChangedEx(CheckBox checkBox)
+		{
+			
+			int trueCount = 0;
+			var checkedBools = new[] {safeChecked, questionableChecked, explicitChecked};
+			foreach (var b in checkedBools)
+			{
+				if (b)
+				{
+					trueCount++;
+				}
+			}
+			if (!checkBox.IsChecked.Value && trueCount <= 0)
+			{
+				checkBox.IsChecked = true;
+			}
+			
 		}
 	}
 }

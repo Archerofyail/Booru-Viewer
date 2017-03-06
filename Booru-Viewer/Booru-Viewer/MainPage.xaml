@@ -215,16 +215,22 @@
 								<StackPanel Orientation="Vertical" MaxWidth="350">
 									<TextBlock Text="Add tags"></TextBlock>
 									<StackPanel Orientation="Horizontal">
+										<ComboBox SelectedIndex="{Binding SelectedPrefixIndex, Mode=TwoWay}"
+												  ItemsSource="{Binding Prefixes}"
+												  Margin="4, 0"
+												  AllowFocusOnInteraction="True"
+												  PlaceholderText="Prefix"/>
 										<AutoSuggestBox PlaceholderText="Tag"
 											 Name="TagTextBox"
-											 MinWidth="250"
+											 MinWidth="220"
 											 Text="{Binding CurrentTag, Mode=TwoWay, 
 													UpdateSourceTrigger=PropertyChanged}"
 											 TextChanged="TagTextBox_TextChanged"
 											 AllowFocusOnInteraction="True"
 											 KeyUp="TagTextBox_KeyUp"
 														ItemsSource="{Binding SuggestedTags}"
-														UpdateTextOnSelect="True"/>
+														UpdateTextOnSelect="True"
+														/>
 										<Button Name="AddTagButton" 
 											Margin="4, 0, 0, 0"
 											Background="{StaticResource ThemeBrush}" 
@@ -237,14 +243,37 @@
 										</Button>
 
 									</StackPanel>
-									<TextBox Text="{Binding PageNum, Mode=TwoWay}"
+
+									<StackPanel Orientation="Horizontal" Margin="0, 4">
+										<Button Command="{Binding DecrementPage}"
+												Margin="4, 0, 2, 0">
+											<Button.Content>
+												<StackPanel>
+													<SymbolIcon Symbol="Remove"/>
+												</StackPanel>
+											</Button.Content>
+										</Button>
+										<TextBox Text="{Binding PageNum, Mode=TwoWay}"
 											 HorizontalAlignment="Left"
-											 Margin="0, 4"
+											 Margin="4, 0"
 											 PlaceholderText="Page"
 											 AllowFocusOnInteraction="True"
 											 Name="StartPageTextBox"
 											 InputScope="Number"/>
 
+										<Button Command="{Binding IncrementPage}"
+												Margin="2, 0, 4, 0">
+											<Button.Content>
+												<StackPanel>
+													<SymbolIcon Symbol="Add"/>
+												</StackPanel>
+											</Button.Content>
+										</Button>
+										<ComboBox ItemsSource="{Binding OrderOptions}"
+												  SelectedIndex="{Binding SelectedOrderIndex, Mode=TwoWay}"
+												  AllowFocusOnInteraction="True"
+												  PlaceholderText="Order by"/>
+									</StackPanel>
 									<ListView
 											ItemsSource="{Binding CurrentTags, Mode=TwoWay}"
 											ItemTemplate="{StaticResource Tag}"
@@ -303,8 +332,30 @@
 								</Style>
 							</Flyout.FlyoutPresenterStyle>
 							<StackPanel Orientation="Vertical" MinWidth="300">
+								<StackPanel Orientation="Horizontal">
+									<CheckBox Content="Safe"
+											  MinWidth="42"
+											  Name="SafeCheckbox"
+											  IsChecked="{Binding SafeChecked, Mode=TwoWay}"
+											  Command="{Binding CheckBoxChanged}"
+											  Margin="4"
+											  CommandParameter="{Binding ElementName=SafeCheckbox}"/>
+									<CheckBox Content="Questionable"
+											  Name="QuestionableCheckbox"
+											  IsChecked="{Binding QuestionableChecked, Mode=TwoWay}"
+											  Command="{Binding CheckBoxChanged}"
+											  CommandParameter="{Binding ElementName=QuestionableCheckbox}"
+											  MinWidth="42"
+											  Margin="4"/>
+									<CheckBox Content="Explicit"
+											  Name="ExplicitCheckbox"
+											  IsChecked="{Binding ExplicitChecked, Mode=TwoWay}"
+											  Command="{Binding CheckBoxChanged}"
+											  CommandParameter="{Binding ElementName=ExplicitCheckbox}"
+											  MinWidth="42"
+											  Margin="4"/>
+								</StackPanel>
 								<TextBlock Text="Images Per Page"/>
-
 								<Slider 
 									Maximum="100"
 									Value="{Binding PerPage, Mode=TwoWay}"
@@ -347,9 +398,8 @@
 						</Flyout>
 					</AppBarButton.Flyout>
 				</AppBarButton>
-
 			</CommandBar.PrimaryCommands>
 		</CommandBar>
 	</Page.BottomAppBar>
 </Page>
-
+	
