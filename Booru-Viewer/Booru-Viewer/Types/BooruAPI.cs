@@ -25,6 +25,7 @@ namespace Booru_Viewer.Types
 		public static async Task<Tuple<bool, List<ImageModel>, string>> SearchPosts(string[] tags, int page, int limit, bool[] ratingChecks = null, bool restartSearch = true)
 		{
 
+
 			if (restartSearch)
 			{
 				GlobalInfo.CurrentSearch.Clear();
@@ -74,7 +75,7 @@ namespace Booru_Viewer.Types
 							}
 						}
 					}
-						break;
+					break;
 				}
 			}
 			var variables = new List<KeyValuePair<string, string>>
@@ -120,12 +121,18 @@ namespace Booru_Viewer.Types
 
 			foreach (var img in imageLinks)
 			{
-				img.File_Url = img.File_Url.Insert(0, BaseURL);
-				img.Preview_File_Url = img.Preview_File_Url.Insert(0, BaseURL);
-				img.Large_File_Url = img.Large_File_Url.Insert(0, BaseURL);
+				if (img.File_Url == null && img.Preview_File_Url == null && img.Large_File_Url == null)
+				{ continue; }
+				img.File_Url = img.File_Url?.Insert(0, BaseURL);
+				img.Preview_File_Url = img.Preview_File_Url?.Insert(0, BaseURL);
+				img.Large_File_Url = img.Large_File_Url?.Insert(0, BaseURL);
 				GlobalInfo.CurrentSearch.Add(img);
 			}
+
+			Debug.WriteLine("Finished Adding posts to global search list");
+
 			return new Tuple<bool, List<ImageModel>, string>(true, imageLinks, response.StatusCode.ToString());
+
 		}
 
 		public static async Task<Tuple<bool, List<Tag>, string>> SearchTags(string search, int limit = -1)

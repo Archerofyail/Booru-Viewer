@@ -8,6 +8,8 @@ using GalaSoft.MvvmLight.Command;
 using Windows.UI.Xaml;
 using Windows.Storage;
 using System.Diagnostics;
+using System.Linq;
+using Windows.ApplicationModel.Appointments.AppointmentsProvider;
 using Windows.Foundation.Collections;
 using GalaSoft.MvvmLight;
 using Windows.Web.Http;
@@ -30,7 +32,7 @@ namespace Booru_Viewer.ViewModels
 			{
 				perPage = (int)appSettings["PerPage"];
 			}
-			if (appSettings["ImageSize"] != null)
+			if (ApplicationData.Current.LocalSettings.Values["ImageSize"] != null)
 			{
 				imageSize = (int)appSettings["ImageSize"];
 			}
@@ -47,9 +49,7 @@ namespace Booru_Viewer.ViewModels
 				explicitChecked = (bool)appSettings["ExplicitChecked"];
 			}
 
-			lastCheckedBool[0] = safeChecked;
-			lastCheckedBool[1] = questionableChecked;
-			lastCheckedBool[2] = explicitChecked;
+
 
 			GlobalInfo.ContentCheck[0] = safeChecked;
 			GlobalInfo.ContentCheck[1] = questionableChecked;
@@ -105,27 +105,31 @@ namespace Booru_Viewer.ViewModels
 			thumbnails.CollectionChanged += (sender, args) => RaisePropertyChanged("Thumbnails");
 		}
 
+		private int totalTagCount
+		{
+			get { return CurrentTags.Count + (checkedList.All(x => x) || checkedList.All(x => !x) ? 0 : 1) + (selectedOrderIndex > 0 ? 1 : 0); }
+		}
+
+		public bool IsSignedOutWithMoreThan2Tags => totalTagCount > 2 && Username == "" && APIKey == "";
+
 		private bool safeChecked = true;
-		private bool questionableChecked = true;
-		private bool explicitChecked = true;
-		private bool[] lastCheckedBool = new bool[3];
+		private bool questionableChecked = false;
+		private bool explicitChecked = false;
+
+		private bool[] checkedList => new[] { safeChecked, questionableChecked, explicitChecked };
+
 		public bool SafeChecked
 		{
 			get { return safeChecked; }
 			set
 			{
-				
-				//if (questionableChecked || explicitChecked || value)
-				{
-					lastCheckedBool[0] = safeChecked;
-					lastCheckedBool[1] = questionableChecked;
-					lastCheckedBool[2] = explicitChecked;
-					safeChecked = value;
-					GlobalInfo.ContentCheck[0] = value;
+				safeChecked = value;
+				GlobalInfo.ContentCheck[0] = value;
 
-					appSettings["SafeChecked"] = value;
-				}
+				appSettings["SafeChecked"] = value;
+
 				RaisePropertyChanged();
+				StartSearchExecute();
 			}
 		}
 
@@ -134,17 +138,13 @@ namespace Booru_Viewer.ViewModels
 			get { return questionableChecked; }
 			set
 			{
-				//if (safeChecked || explicitChecked || value)
-				{
-					lastCheckedBool[0] = safeChecked;
-					lastCheckedBool[1] = questionableChecked;
-					lastCheckedBool[2] = explicitChecked;
-					questionableChecked = value;
-					GlobalInfo.ContentCheck[1] = value;
+				questionableChecked = value;
+				GlobalInfo.ContentCheck[1] = value;
 
-					appSettings["QuestionableChecked"] = value;
-				}
+				appSettings["QuestionableChecked"] = value;
+
 				RaisePropertyChanged();
+				StartSearchExecute();
 			}
 		}
 
@@ -153,16 +153,12 @@ namespace Booru_Viewer.ViewModels
 			get { return explicitChecked; }
 			set
 			{
-				//if (safeChecked || questionableChecked || value)
-				{
-					lastCheckedBool[0] = safeChecked;
-					lastCheckedBool[1] = questionableChecked;
-					lastCheckedBool[2] = explicitChecked;
-					explicitChecked = value;
-					GlobalInfo.ContentCheck[2] = value;
-					appSettings["ExplicitChecked"] = value;
-				}
+				explicitChecked = value;
+				GlobalInfo.ContentCheck[2] = value;
+				appSettings["ExplicitChecked"] = value;
+
 				RaisePropertyChanged();
+				StartSearchExecute();
 			}
 		}
 
@@ -195,7 +191,7 @@ namespace Booru_Viewer.ViewModels
 						LoadNextPageExecute(0);
 					}
 
-
+					return;
 				}
 
 
@@ -205,7 +201,7 @@ namespace Booru_Viewer.ViewModels
 				BooruAPI.Page = newPage == 0 ? 1 : newPage;
 				int picsToRemove = (int)((newPageNum - newPage) * value);
 				int picsToKeep = newPage * value;
-				for (int i = Thumbnails.Count - 1; i > picsToKeep; i--)
+				for (int i = Thumbnails.Count - 1; i > picsToKeep - 1; i--)
 				{
 					Thumbnails.RemoveAt(i);
 					GlobalInfo.CurrentSearch.RemoveAt(i);
@@ -227,7 +223,7 @@ namespace Booru_Viewer.ViewModels
 			set
 			{
 				imageSize = value;
-				ApplicationData.Current.RoamingSettings.Values["ImageSize"] = value;
+				ApplicationData.Current.LocalSettings.Values["ImageSize"] = value;
 				RaisePropertyChanged();
 			}
 		}
@@ -334,6 +330,7 @@ namespace Booru_Viewer.ViewModels
 				selectedOrderIndex = value;
 				RaisePropertyChanged();
 				GlobalInfo.CurrentOrdering = SelectedOrderIndex > 0 ? OrderOptions[SelectedOrderIndex] : "";
+				RaisePropertyChanged("IsSignedOutWithMoreThan2Tags");
 			}
 		}
 
@@ -365,6 +362,7 @@ namespace Booru_Viewer.ViewModels
 			set
 			{
 				username = value;
+				RaisePropertyChanged("IsSignedOutWithMoreThan2Tags");
 				RaisePropertyChanged();
 			}
 		}
@@ -377,18 +375,19 @@ namespace Booru_Viewer.ViewModels
 			{
 
 				apiKey = value;
+				RaisePropertyChanged("IsSignedOutWithMoreThan2Tags");
 				RaisePropertyChanged();
 			}
 		}
 
-		private bool haveImages = false;
+		private bool dontHaveImages = false;
 
-		public bool HaveImages
+		public bool DontHaveImages
 		{
-			get { return haveImages; }
+			get { return dontHaveImages; }
 			set
 			{
-				haveImages = value;
+				dontHaveImages = value;
 				RaisePropertyChanged();
 			}
 		}
@@ -467,6 +466,7 @@ namespace Booru_Viewer.ViewModels
 			CurrentTag = "";
 			suggestedTagIndex = -1;
 			SuggestedTags.Clear();
+			RaisePropertyChanged("IsSignedOutWithMoreThan2Tags");
 			RaisePropertyChanged("CurrentTag");
 			RaisePropertyChanged("SuggestedTagIndex");
 
@@ -500,36 +500,45 @@ namespace Booru_Viewer.ViewModels
 
 		async void StartSearchExecute()
 		{
-
-			GlobalInfo.CurrentSearch.Clear();
-			ResyncThumbnails();
-			GlobalInfo.CurrentSearchTags.Clear();
-			var tags = await PrepTags();
-			GlobalInfo.CurrentSearchTags.AddRange(tags);
-			var result = await BooruAPI.SearchPosts(tags, startingPage, PerPage, new []{safeChecked, questionableChecked, explicitChecked});
-			if (result.Item2 != null)
+			try
 			{
-				if (result.Item2.Count > 0)
+
+
+				var tags = await PrepTags();
+				GlobalInfo.CurrentSearch.Clear();
+				ResyncThumbnails();
+				GlobalInfo.CurrentSearchTags.Clear();
+
+				GlobalInfo.CurrentSearchTags.AddRange(tags);
+				var result = await BooruAPI.SearchPosts(tags, startingPage, PerPage, new[] { safeChecked, questionableChecked, explicitChecked });
+				if (result.Item2 != null)
 				{
-					HaveImages = true;
+
+					if (result.Item2.Count > 0 && result.Item3 == HttpStatusCode.Ok.ToString())
+					{
+						AddThumbnails(result.Item2);
+						DontHaveImages = false;
+
+					}
+					else if (result.Item3 == HttpStatusCode.NoContent.ToString() || result.Item2.Count == 0)
+					{
+						DontHaveImages = true;
+						NoImagesText = "No Images Found with those tags, try a different combination";
+						RaisePropertyChanged("NoImagesText");
+					}
+
 				}
 				else
 				{
-					HaveImages = false;
-					NoImagesText = "No Images Found with those tags, try a different combination";
+					DontHaveImages = true;
+					NoImagesText = "Failed to grab images: " + result.Item3;
 					RaisePropertyChanged("NoImagesText");
 				}
-				if (result.Item3 == HttpStatusCode.Ok.ToString())
-				{
-					AddThumbnails(result.Item2);
-
-				}
 			}
-			else
+			catch (Exception e)
 			{
-				HaveImages = false;
-				NoImagesText = "Failed to grab images: " + result.Item3;
-				RaisePropertyChanged("NoImagesText");
+				Debug.WriteLine(e.Message);
+				throw;
 			}
 		}
 
@@ -538,7 +547,7 @@ namespace Booru_Viewer.ViewModels
 
 			foreach (var post in tn)
 			{
-				thumbnails.Add(new ThumbnailViewModel(post.Large_File_Url, post.Large_File_Url));
+				thumbnails.Add(new ThumbnailViewModel(post.Large_File_Url == "" ? post.File_Url : post.Large_File_Url, post.Large_File_Url == "" ? post.File_Url : post.Large_File_Url));
 			}
 
 
@@ -561,8 +570,8 @@ namespace Booru_Viewer.ViewModels
 					i++;
 				}
 			});
-			
-			
+
+
 
 			return tags;
 		}
@@ -572,7 +581,7 @@ namespace Booru_Viewer.ViewModels
 			thumbnails.Clear();
 			foreach (var post in GlobalInfo.CurrentSearch)
 			{
-				thumbnails.Add(new ThumbnailViewModel(post.Large_File_Url, post.Large_File_Url));
+				thumbnails.Add(new ThumbnailViewModel(post.Large_File_Url == "" ? post.File_Url : post.Large_File_Url, post.Large_File_Url == "" ? post.File_Url : post.Large_File_Url));
 			}
 
 			RaisePropertyChanged("Thumbnails");
@@ -593,7 +602,7 @@ namespace Booru_Viewer.ViewModels
 		{
 			BooruAPI.Page++;
 			var tags = new List<string>(GlobalInfo.CurrentSearchTags);
-			var result = await BooruAPI.SearchPosts(tags.ToArray(), BooruAPI.Page, PerPage, new []{safeChecked, questionableChecked, explicitChecked}, false);
+			var result = await BooruAPI.SearchPosts(tags.ToArray(), BooruAPI.Page, PerPage, new[] { safeChecked, questionableChecked, explicitChecked }, false);
 			if (result.Item3 == HttpStatusCode.Ok.ToString())
 			{
 				//
@@ -682,9 +691,9 @@ namespace Booru_Viewer.ViewModels
 		public ICommand CheckBoxChanged => new RelayCommand<CheckBox>(CheckBoxChangedEx);
 		void CheckBoxChangedEx(CheckBox checkBox)
 		{
-			
+
 			int trueCount = 0;
-			var checkedBools = new[] {safeChecked, questionableChecked, explicitChecked};
+			var checkedBools = new[] { safeChecked, questionableChecked, explicitChecked };
 			foreach (var b in checkedBools)
 			{
 				if (b)
@@ -696,7 +705,7 @@ namespace Booru_Viewer.ViewModels
 			{
 				checkBox.IsChecked = true;
 			}
-			
+
 		}
 	}
 }

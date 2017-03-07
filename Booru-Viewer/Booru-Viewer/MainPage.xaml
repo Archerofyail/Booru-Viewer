@@ -39,8 +39,8 @@
 						<MenuFlyout>
 							<MenuFlyoutItem Text="Save Image"
 											Command="{Binding SaveImage}"/>
-							<MenuFlyoutItem Text="Select"
-											Command="{Binding EnableMultiSelect}"/>
+							<!--<MenuFlyoutItem Text="Select"
+											Command="{Binding EnableMultiSelect}"/>-->
 						</MenuFlyout>
 					</controls:ImageEx.ContextFlyout>
 				</controls:ImageEx>
@@ -129,13 +129,13 @@
 		</ResourceDictionary>
 	</Page.Resources>
 	<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
-		  Name="RootGrid">
+		  Name="RootGrid" MinHeight="250">
 
 		<GridView   Background="{StaticResource BackgroundThemeBrush}"
 					ItemTemplate="{StaticResource ImageTemplate}"
 					ItemsSource="{Binding Path=Thumbnails, Mode=TwoWay}"
 					SelectionMode="None"
-					Margin="0, 25, 0, 0" 
+					Margin="0, 24, 0, 0" 
 					x:Name="ImageGridView"
 					AllowFocusOnInteraction="True"
 					IncrementalLoadingThreshold="1"
@@ -145,6 +145,12 @@
 					ItemClick="ImageGridView_OnItemClick">
 
 		</GridView>
+		<TextBlock Text="{Binding NoImagesText}"
+				   Visibility="{Binding DontHaveImages}"
+				   Margin="20, 40"
+				   TextWrapping="WrapWholeWords"
+				   VerticalAlignment="Center"
+				   HorizontalAlignment="Center"/>
 		<Button VerticalAlignment="Bottom" HorizontalAlignment="Right" 
 				Height="44" Margin="0,0,32,12" Width="44"
 				Padding="4"
@@ -215,14 +221,27 @@
 								<StackPanel Orientation="Vertical" MaxWidth="350">
 									<TextBlock Text="Add tags"></TextBlock>
 									<StackPanel Orientation="Horizontal">
-										<ComboBox SelectedIndex="{Binding SelectedPrefixIndex, Mode=TwoWay}"
-												  ItemsSource="{Binding Prefixes}"
-												  Margin="4, 0"
-												  AllowFocusOnInteraction="True"
-												  PlaceholderText="Prefix"/>
+										<StackPanel VerticalAlignment="Top">
+											<TextBlock Text="Prefix"/>
+											<ListBox SelectedIndex="{Binding SelectedPrefixIndex, Mode=TwoWay}"
+												ItemsSource="{Binding Prefixes}"
+												Margin="4, 0"
+												AllowFocusOnInteraction="True">
+												<ListBox.ItemsPanel>
+													<ItemsPanelTemplate>
+														<StackPanel Orientation="Horizontal"></StackPanel>
+													</ItemsPanelTemplate>
+												</ListBox.ItemsPanel>
+												<ListBox.ItemContainerStyle>
+													<Style TargetType="ListBoxItem">
+														<Setter Property="Padding" Value="8"></Setter>
+													</Style>
+												</ListBox.ItemContainerStyle>
+											</ListBox>
+										</StackPanel>
 										<AutoSuggestBox PlaceholderText="Tag"
 											 Name="TagTextBox"
-											 MinWidth="220"
+											 MinWidth="200"
 											 Text="{Binding CurrentTag, Mode=TwoWay, 
 													UpdateSourceTrigger=PropertyChanged}"
 											 TextChanged="TagTextBox_TextChanged"
@@ -230,7 +249,7 @@
 											 KeyUp="TagTextBox_KeyUp"
 														ItemsSource="{Binding SuggestedTags}"
 														UpdateTextOnSelect="True"
-														/>
+														VerticalAlignment="Center"/>
 										<Button Name="AddTagButton" 
 											Margin="4, 0, 0, 0"
 											Background="{StaticResource ThemeBrush}" 
@@ -305,6 +324,10 @@
 												
 												Name="SaveSearchButton"/>
 									</StackPanel>
+									<TextBlock Text="This search will return empty because you
+											   have more than 2 tags and are not signed in" 
+											   TextWrapping="WrapWholeWords"
+											   Visibility="{Binding IsSignedOutWithMoreThan2Tags}"/>
 									<Button MinWidth="290" HorizontalAlignment="Center"
 										Background="{StaticResource ThemeBrush}" 
 										Foreground="White"
@@ -376,14 +399,16 @@
 										 Margin="0, 0, 0, 5"
 										 Text="{Binding Username, Mode=TwoWay}"
 										 AllowFocusOnInteraction="True"
-										 Name="UsernameTextBox"/>
+										 Name="UsernameTextBox"
+										 LostFocus="TextBox_OnLostFocus"/>
 								<TextBox PlaceholderText="API Key"
 										 Margin="0, 0, 0, 5"
 										 Text="{Binding APIKey, Mode=TwoWay}"
 										 AllowFocusOnInteraction="True"
 										 IsEnabled="True" InputScope="Text" IsSpellCheckEnabled="False"
 										 Name="APIKeyTextBox"
-										 TextChanged="APIKeyTextBox_TextChanged"/>
+										 TextChanged="APIKeyTextBox_TextChanged"
+										 LostFocus="TextBox_OnLostFocus"/>
 
 								<Button Width="280" HorizontalAlignment="Center"
 										Background="{StaticResource ThemeBrush}"

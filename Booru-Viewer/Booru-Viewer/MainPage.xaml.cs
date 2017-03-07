@@ -151,5 +151,11 @@ namespace Booru_Viewer
 			
 			SavedSearchCommandInvoker.CommandParameter = e.ClickedItem;
 		}
+
+		private void TextBox_OnLostFocus(object sender, RoutedEventArgs e)
+		{
+			var textbox = sender as TextBox;
+			textbox?.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
+		}
 	}
 }
