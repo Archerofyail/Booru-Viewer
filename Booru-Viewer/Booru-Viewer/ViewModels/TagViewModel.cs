@@ -30,8 +30,8 @@ namespace Booru_Viewer.ViewModels
 		void RemoveTagExecute()
 		{
 			
-				parentVM.RemoveTag(this);
-			
+				parentVM.RemoveTagExec(this);
+			parentVM.RaisePropertyChanged("IsSignedOutWithMoreThan2Tags");
 		}
 
 		bool RemoveTagCanExecute()

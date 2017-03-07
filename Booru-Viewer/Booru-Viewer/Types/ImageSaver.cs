@@ -48,6 +48,7 @@ namespace Booru_Viewer.Types
 				
 			}
 			var imageName = ImageURL.Substring(baseURLLength) + ".png";
+			imageName = imageName.Replace("/", "");
 			var imageItem = await imageFolder.TryGetItemAsync(imageName);
 			if (imageItem != null)
 			{

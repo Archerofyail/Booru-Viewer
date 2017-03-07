@@ -18,7 +18,33 @@ namespace Booru_Viewer.ViewModels
 		public SwipViewViewModel()
 		{
 			var settings = ApplicationData.Current.RoamingSettings.Values;
-			perPage = (int)settings["PerPage"];
+			if (settings["PerPage"] != null)
+			{
+				perPage = (int) settings["PerPage"];
+			}
+		}
+
+		private string saveImageFailureReason = "";
+
+		public string SaveImageFailureReason
+		{
+			get { return saveImageFailureReason; }
+			set
+			{
+				saveImageFailureReason = value;
+				RaisePropertyChanged();
+			}
+		}
+
+		private bool saving;
+		public bool Saving
+		{
+			get { return saving; }
+			set
+			{
+				saving = value;
+				RaisePropertyChanged();
+			}
 		}
 
 		private ObservableCollection<FullImageViewModel> images = new ObservableCollection<FullImageViewModel>();
@@ -126,9 +152,11 @@ namespace Booru_Viewer.ViewModels
 			RaisePropertyChanged("Images");
 		}
 
-		void SaveImageExec()
+		async void SaveImageExec()
 		{
-			ImageSaver.SaveImage(images[Index].FullImage);
+			Saving = true;
+			SaveImageFailureReason = await ImageSaver.SaveImage(images[Index].FullImage);
+			
 		}
 
 

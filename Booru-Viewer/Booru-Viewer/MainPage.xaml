@@ -389,7 +389,7 @@
 								<TextBlock Text="Thumbnail Size"/>
 								<Slider Minimum="100" Maximum="900"
 										SnapsTo="StepValues"
-										StepFrequency="15"
+										StepFrequency="5"
 										Value="{Binding ImageSize, Mode=TwoWay}"
 										Name="ImageHeightSlider"
 										IsThumbToolTipEnabled="False"/>

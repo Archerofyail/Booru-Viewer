@@ -34,7 +34,7 @@ namespace Booru_Viewer.ViewModels
 			}
 			if (ApplicationData.Current.LocalSettings.Values["ImageSize"] != null)
 			{
-				imageSize = (int)appSettings["ImageSize"];
+				ImageSize = (int)ApplicationData.Current.LocalSettings.Values["ImageSize"];
 			}
 			if (appSettings["SafeChecked"] != null)
 			{
@@ -449,7 +449,7 @@ namespace Booru_Viewer.ViewModels
 			RaisePropertyChanged("HaveSavedSearches");
 		}
 
-		public void RemoveTag(TagViewModel tag)
+		public void RemoveTagExec(TagViewModel tag)
 		{
 			CurrentTags.Remove(tag);
 			RaisePropertyChanged("CurrentTags");

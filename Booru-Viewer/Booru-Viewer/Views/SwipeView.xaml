@@ -49,10 +49,20 @@
 			Name="FlipView">
 			<FlipView.ItemTemplate>
 				<DataTemplate>
+					<ScrollViewer ZoomMode="Enabled"
+								MinZoomFactor="1"
+								MaxZoomFactor="15"
+								AllowFocusOnInteraction="True"
+								HorizontalScrollMode="Enabled"
+								VerticalScrollMode="Enabled"
+								  >
 					<controls:ImageEx
-						Source="{Binding FullImage}">
+						Source="{Binding FullImage}"
+						HorizontalAlignment="Stretch"
+						VerticalAlignment="Stretch">
 
 					</controls:ImageEx>
+					</ScrollViewer>
 				</DataTemplate>
 			</FlipView.ItemTemplate>
 
@@ -62,7 +72,12 @@
 		<CommandBar>
 			<AppBarButton Label="Save Image"
 						  Icon="Save"
-						  Command="{Binding SaveImage}"/>
+						  Command="{Binding SaveImage}">
+				<ToolTip
+						 IsOpen="{Binding Saving}">
+					<TextBlock Text="{Binding SaveImageFailureReason}"></TextBlock>
+				</ToolTip>
+			</AppBarButton>
 			<AppBarButton Label="View Tags"
 						  Icon="List">
 				<AppBarButton.Flyout>
