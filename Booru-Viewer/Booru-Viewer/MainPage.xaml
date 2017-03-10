@@ -240,16 +240,24 @@
 											</ListBox>
 										</StackPanel>
 										<AutoSuggestBox PlaceholderText="Tag"
-											 Name="TagTextBox"
-											 MinWidth="200"
-											 Text="{Binding CurrentTag, Mode=TwoWay, 
-													UpdateSourceTrigger=PropertyChanged}"
-											 TextChanged="TagTextBox_TextChanged"
-											 AllowFocusOnInteraction="True"
-											 KeyUp="TagTextBox_KeyUp"
-														ItemsSource="{Binding SuggestedTags}"
-														UpdateTextOnSelect="True"
-														VerticalAlignment="Center"/>
+													Name="TagTextBox"
+													MinWidth="200"
+													Text="{Binding CurrentTag, Mode=TwoWay, 
+														UpdateSourceTrigger=PropertyChanged}"
+													TextChanged="TagTextBox_TextChanged"
+													AllowFocusOnInteraction="True"
+													KeyUp="TagTextBox_KeyUp"
+													ItemsSource="{Binding SuggestedTags}"
+													UpdateTextOnSelect="True"
+													VerticalAlignment="Center"
+													>
+											<AutoSuggestBox.TextBoxStyle>
+												<Style TargetType="TextBox">
+													<Setter Property="IsTextPredictionEnabled" Value="False"/>
+												</Style>
+											</AutoSuggestBox.TextBoxStyle>
+										</AutoSuggestBox>
+										
 										<Button Name="AddTagButton" 
 											Margin="4, 0, 0, 0"
 											Background="{StaticResource ThemeBrush}" 

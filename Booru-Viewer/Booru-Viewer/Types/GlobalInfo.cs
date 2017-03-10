@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using Windows.Storage;
 using Newtonsoft.Json;
@@ -46,7 +47,7 @@ namespace Booru_Viewer.Types
 			CurrentTags.Remove(tag);
 		}
 
-		public async static void SaveSearches()
+		public static async void SaveSearches()
 		{
 
 			var item = await ApplicationData.Current.RoamingFolder.TryGetItemAsync("SavedSearches.json");
@@ -69,6 +70,7 @@ namespace Booru_Viewer.Types
 			var item = await ApplicationData.Current.RoamingFolder.TryGetItemAsync("SavedSearches.json");
 			if (item == null)
 			{
+				Debug.WriteLine("File was null");
 				return;
 			}
 			SearchesFile = await ApplicationData.Current.RoamingFolder.GetFileAsync("SavedSearches.json");
@@ -80,6 +82,10 @@ namespace Booru_Viewer.Types
 				{
 					savedSearches.Add(search);
 				}
+			}
+			else
+			{
+				Debug.WriteLine("SearchList was null");
 			}
 			SavedSearchesLoadedEventHandler?.Invoke(typeof(GlobalInfo), EventArgs.Empty);
 		}

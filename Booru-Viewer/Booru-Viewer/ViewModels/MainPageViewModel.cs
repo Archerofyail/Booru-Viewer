@@ -462,7 +462,7 @@ namespace Booru_Viewer.ViewModels
 			{
 				prefix = Prefixes[selectedPrefixIndex];
 			}
-			CurrentTags.Add(new TagViewModel(prefix + CurrentTag, this));
+			CurrentTags.Add(new TagViewModel(prefix + CurrentTag.Trim(), this));
 			CurrentTag = "";
 			suggestedTagIndex = -1;
 			SuggestedTags.Clear();
@@ -657,7 +657,7 @@ namespace Booru_Viewer.ViewModels
 			StartSearchExecute();
 		}
 
-		public ICommand AddTag => new RelayCommand(AddTagExecute, AddTagCanExecute);
+		public ICommand AddTag => new RelayCommand(AddTagExecute);
 
 		public ICommand SaveLoginData => new RelayCommand(SaveLoginDataExecute, SaveLoginDataCanExecute);
 		public ICommand StartSearch => new RelayCommand(StartSearchExecute);
