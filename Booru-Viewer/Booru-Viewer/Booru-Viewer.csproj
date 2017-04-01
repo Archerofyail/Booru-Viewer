@@ -137,6 +137,10 @@
     <Content Include="Assets\Booru Viewer Logo 1240x1240.png" />
     <Content Include="Assets\Booru Viewer Logo 310x310.png" />
     <Content Include="Assets\Booru Viewer Logo 310x310.scale-400.png" />
+    <Content Include="Assets\Placeholder.png" />
+    <Content Include="Assets\DropboxInfo.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\Square150x150Logo.scale-100.png" />
     <Content Include="Assets\Square150x150Logo.scale-400.png" />
     <Content Include="Assets\Square310x310Logo.scale-100.png" />

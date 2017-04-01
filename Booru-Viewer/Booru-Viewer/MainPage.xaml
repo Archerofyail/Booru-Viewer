@@ -32,7 +32,9 @@
 								  MaxHeight="{Binding ElementName=Page, Path=DataContext.ImageSize, Mode=OneWay}"
 								  Height="{Binding ElementName=Page, Path=DataContext.ImageSize, Mode=OneWay}"
 								  Width="{Binding ElementName=Page, Path=DataContext.ImageSize, Mode=OneWay}"
-								  Stretch="Uniform">
+								  Stretch="Uniform"
+								  ImageExOpened="ImageOpened"
+								  ImageExFailed="ImageEx_OnImageExFailed">
 
 
 					<controls:ImageEx.ContextFlyout>
@@ -427,6 +429,19 @@
 										<SymbolIcon>Save</SymbolIcon>
 									</Button.Content>
 								</Button>
+								<TextBlock Text="Save Folder" Margin="4"/>
+								<StackPanel Orientation="Horizontal" Margin="4">
+									
+								
+									<Button Content="Change Folder"
+											Command="{Binding ChooseSaveFolder}"
+											CommandParameter="{Binding ElementName=ChooseFolderButton}"
+											Name="ChooseFolderButton"/>
+									<TextBlock Text="Current:" VerticalAlignment="Center" Margin="4"/>
+									<TextBlock Text="{Binding SaveFolder}" VerticalAlignment="Center" Margin="4"/>
+								</StackPanel>
+								<Button Content="Use a Dropbox Folder"
+										Command="{Binding SelectDropboxFolder}"/>
 							</StackPanel>
 						</Flyout>
 					</AppBarButton.Flyout>

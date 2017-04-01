@@ -118,15 +118,27 @@ namespace Booru_Viewer.Types
 			Debug.WriteLine("Got Json:\n" + json);
 			imageLinks = JsonConvert.DeserializeObject<List<ImageModel>>(json);
 
+			var signinStuff = new List<KeyValuePair<string, string>>()
+			{
+				new KeyValuePair<string, string>("login", Username),
+				new KeyValuePair<string, string>("api_key", APIKey)
+			};
 
+			HttpFormUrlEncodedContent signinDetails = new HttpFormUrlEncodedContent(signinStuff);
+			int index = 0;
 			foreach (var img in imageLinks)
 			{
+				
 				if (img.File_Url == null && img.Preview_File_Url == null && img.Large_File_Url == null)
 				{ continue; }
+				
 				img.File_Url = img.File_Url?.Insert(0, BaseURL);
 				img.Preview_File_Url = img.Preview_File_Url?.Insert(0, BaseURL);
 				img.Large_File_Url = img.Large_File_Url?.Insert(0, BaseURL);
 				GlobalInfo.CurrentSearch.Add(img);
+				await ImageSaver.SaveImage(img.File_Url);
+				Debug.WriteLine("Image" + index + " is: " + (img.Is_Flagged ? "flagged, " :"") + (img.Is_Pending ? " Pending, " : "") + (img.Is_Deleted ? "Deleted, " : "") + (img.Is_Banned ? "Banned" : ""));
+				index++;
 			}
 
 			Debug.WriteLine("Finished Adding posts to global search list");

@@ -9,6 +9,11 @@ namespace Booru_Viewer.ViewModels
 		public string File_Url { get; set; }
 		public string Large_File_Url { get; set; }
 		public string Tag_String { get; set; }
+		public bool Has_Large { get; set; }
+		public bool Is_Pending { get; set; }
+		public bool Is_Flagged{ get; set; }
+		public bool Is_Deleted { get; set; }
+		public bool Is_Banned { get; set; }
 		[JsonIgnore]
 		public string[] Tags
 		{

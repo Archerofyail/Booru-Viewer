@@ -7,16 +7,21 @@ namespace Booru_Viewer.ViewModels
 	public class ThumbnailViewModel
 	{
 
-		public ThumbnailViewModel(string prevUrl, string fullUrl)
+		public ThumbnailViewModel(string prevUrl, string fullUrl, string backupURL = null)
 		{
 			PreviewURL = prevUrl;
 			FullURL = fullUrl;
+			if (backupURL != null)
+			{
+				BackupURL = backupURL;
+			}
 		}
+		public string BackupURL { get; set; }
 		public string PreviewURL { get; set; }
 		public string FullURL { get; set; }
-		void SaveImageExecute()
+		async void SaveImageExecute()
 		{
-			ImageSaver.SaveImage(FullURL);
+			await ImageSaver.SaveImage(FullURL);
 		}
 		
 

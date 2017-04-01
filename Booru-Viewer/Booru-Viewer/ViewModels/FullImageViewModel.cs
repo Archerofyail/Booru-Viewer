@@ -6,9 +6,12 @@ namespace Booru_Viewer.ViewModels
 	{
 		public string FullImage { get; set; }
 
-		public FullImageViewModel(string imageUrl)
+		public string LargeImage { get; set; }
+
+		public FullImageViewModel(string imageUrl, string largeImage = null)
 		{
 			FullImage = imageUrl;
+			LargeImage = largeImage ?? imageUrl;
 		}
 	}
 }

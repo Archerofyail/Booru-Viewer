@@ -57,7 +57,7 @@ namespace Booru_Viewer.ViewModels
 				{
 					foreach (var image in GlobalInfo.CurrentSearch)
 					{
-						images.Add(new FullImageViewModel(image.Large_File_Url == "" ? image.File_Url : image.Large_File_Url));
+						images.Add(new FullImageViewModel(image.File_Url));
 					}
 					if (GlobalInfo.SelectedImage < GlobalInfo.CurrentSearch.Count && GlobalInfo.SelectedImage >= 0)
 					{
@@ -85,7 +85,7 @@ namespace Booru_Viewer.ViewModels
 			set
 			{
 				GlobalInfo.SelectedImage = value;
-				if (GlobalInfo.CurrentSearch.Count - value < 2)
+				if (GlobalInfo.CurrentSearch.Count - value < 4)
 				{
 
 					LoadMoreImages();
@@ -145,7 +145,7 @@ namespace Booru_Viewer.ViewModels
 
 			foreach (var post in thumbnails)
 			{
-				Images.Add(new FullImageViewModel(post.Large_File_Url == "" ? post.File_Url : post.Large_File_Url));
+				Images.Add(new FullImageViewModel(post.File_Url));
 			}
 
 
@@ -155,7 +155,7 @@ namespace Booru_Viewer.ViewModels
 		async void SaveImageExec()
 		{
 			Saving = true;
-			SaveImageFailureReason = await ImageSaver.SaveImage(images[Index].FullImage);
+			SaveImageFailureReason = await ImageSaver.SaveImage(images[Index].LargeImage);
 			
 		}
 

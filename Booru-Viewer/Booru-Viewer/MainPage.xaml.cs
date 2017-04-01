@@ -157,5 +157,18 @@ namespace Booru_Viewer
 			var textbox = sender as TextBox;
 			textbox?.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
 		}
+
+		private void ImageOpened(object sender, ImageExOpenedEventArgs e)
+		{
+			
+			//Debug.WriteLine("Image opened at URI:" + (sender as ImageEx).Source + "\n, index is " + ImageGridView.Items.IndexOf((sender as ImageEx).DataContext));
+		}
+
+		private void ImageEx_OnImageExFailed(object sender, ImageExFailedEventArgs e)
+		{
+			var img = sender as ImageEx;
+			img.SetValue(ImageEx.SourceProperty, img.Source);
+			Debug.WriteLine("Failed to open " + (sender as ImageEx).Source + ".\nError message: " + e.ErrorMessage + ".\nException: " + e.ErrorException);
+		}
 	}
 }

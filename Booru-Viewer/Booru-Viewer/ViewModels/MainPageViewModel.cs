@@ -11,9 +11,12 @@ using System.Diagnostics;
 using System.Linq;
 using Windows.ApplicationModel.Appointments.AppointmentsProvider;
 using Windows.Foundation.Collections;
+using Windows.Storage.Pickers;
+using Windows.UI.Core;
 using GalaSoft.MvvmLight;
 using Windows.Web.Http;
 using Windows.UI.Xaml.Controls;
+using Dropbox.Api;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 
 //TODO: Saved Searches (should be somewhat straightforward)
@@ -24,7 +27,7 @@ namespace Booru_Viewer.ViewModels
 		private IPropertySet appSettings;
 		public MainPageViewModel()
 		{
-
+			GetSaveFolder();
 			appSettings = ApplicationData.Current.RoamingSettings.Values;
 			var savedUN = appSettings["Username"] as string;
 			var savedAPIKey = appSettings["APIKey"] as string;
@@ -103,6 +106,7 @@ namespace Booru_Viewer.ViewModels
 			};
 
 			thumbnails.CollectionChanged += (sender, args) => RaisePropertyChanged("Thumbnails");
+			RaisePropertyChanged("SelectedPrefixIndex");
 		}
 
 		private int totalTagCount
@@ -380,6 +384,15 @@ namespace Booru_Viewer.ViewModels
 			}
 		}
 
+		public string SaveFolder => ImageSaver.ImageFolder.Path;
+
+		public async void GetSaveFolder()
+		{
+
+			await ImageSaver.GetFolderAsync();
+
+		}
+
 		private bool dontHaveImages = false;
 
 		public bool DontHaveImages
@@ -503,7 +516,7 @@ namespace Booru_Viewer.ViewModels
 			try
 			{
 
-
+				SelectedPrefixIndex = 0;
 				var tags = await PrepTags();
 				GlobalInfo.CurrentSearch.Clear();
 				ResyncThumbnails();
@@ -547,7 +560,7 @@ namespace Booru_Viewer.ViewModels
 
 			foreach (var post in tn)
 			{
-				thumbnails.Add(new ThumbnailViewModel(post.Large_File_Url == "" ? post.File_Url : post.Large_File_Url, post.Large_File_Url == "" ? post.File_Url : post.Large_File_Url));
+				thumbnails.Add(new ThumbnailViewModel(post.Preview_File_Url, post.Has_Large ? post.Large_File_Url : post.File_Url));
 			}
 
 
@@ -581,7 +594,7 @@ namespace Booru_Viewer.ViewModels
 			thumbnails.Clear();
 			foreach (var post in GlobalInfo.CurrentSearch)
 			{
-				thumbnails.Add(new ThumbnailViewModel(post.Large_File_Url == "" ? post.File_Url : post.Large_File_Url, post.Large_File_Url == "" ? post.File_Url : post.Large_File_Url));
+				thumbnails.Add(new ThumbnailViewModel(post.Preview_File_Url, post.Has_Large ? post.Large_File_Url : post.File_Url));
 			}
 
 			RaisePropertyChanged("Thumbnails");
@@ -607,7 +620,7 @@ namespace Booru_Viewer.ViewModels
 			{
 				//
 			}
-			return result.Item2;
+			return result.Item2 ?? new List<ImageModel>();
 		}
 
 		async void LoadNextPageE()
@@ -705,6 +718,32 @@ namespace Booru_Viewer.ViewModels
 			{
 				checkBox.IsChecked = true;
 			}
+
+		}
+
+		public ICommand ChooseSaveFolder => new RelayCommand<Button>(ChooseSaveFolderExec);
+		async void ChooseSaveFolderExec(Button b)
+		{
+			await b.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+			{
+				FolderPicker picker = new FolderPicker { CommitButtonText = "Select" };
+
+				var folder = await picker.PickSingleFolderAsync();
+				if (folder != null)
+				{
+					ImageSaver.ImageFolder = folder;
+					appSettings["SaveFolderPath"] = folder.Path;
+				}
+			});
+		}
+
+		public ICommand SelectDropboxFolder => new RelayCommand(SelectDropboxFolderExec);
+		async void SelectDropboxFolderExec()
+		{
+			StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///DropboxInfo.txt"));
+			string[] dbInfo = (await FileIO.ReadTextAsync(file)).Split('\n');
+			var dBclient = new DropboxAppClient(dbInfo[0], dbInfo[1]);
+			var authURI = DropboxOAuth2Helper.GetAuthorizeUri(OAuthResponseType.Code, dbInfo[0], "https://localhost/authorize");
 
 		}
 	}

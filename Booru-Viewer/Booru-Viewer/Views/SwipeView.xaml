@@ -7,11 +7,14 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d"
 	xmlns:vm="using:Booru_Viewer.ViewModels"
-	xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls">
+	xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+	Name="Page">
 	<Page.DataContext>
 		<vm:SwipViewViewModel/>
 	</Page.DataContext>
+	
 	<Page.Resources>
+		
 		<SolidColorBrush Color="{ThemeResource SystemAccentColor}"
 						 x:Key="AccentColorBrush"></SolidColorBrush>
 		<DataTemplate x:Name="Tag">
@@ -42,34 +45,67 @@
 			</StackPanel>
 		</DataTemplate>
 	</Page.Resources>
-	<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+	<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+		  Name="Grid" VerticalAlignment="Stretch"
+		  HorizontalAlignment="Stretch">
 		<FlipView
 			ItemsSource="{Binding Images}"
 			SelectedIndex="{Binding Index, Mode=TwoWay}"
-			Name="FlipView">
+			Name="FlipView"
+			>
 			<FlipView.ItemTemplate>
 				<DataTemplate>
+					<StackPanel>
 					<ScrollViewer ZoomMode="Enabled"
 								MinZoomFactor="1"
-								MaxZoomFactor="15"
+								MaxZoomFactor="8"
 								AllowFocusOnInteraction="True"
 								HorizontalScrollMode="Enabled"
 								VerticalScrollMode="Enabled"
-								  >
-					<controls:ImageEx
-						Source="{Binding FullImage}"
-						HorizontalAlignment="Stretch"
-						VerticalAlignment="Stretch">
+								HorizontalScrollBarVisibility="Auto"
+								VerticalScrollBarVisibility="Auto"
+								MaxWidth="{Binding ElementName=Page, Path=ActualWidth}"
+								MaxHeight="{Binding ElementName=Page, Path=ActualHeight}"
+								  Height="{Binding ElementName=Grid, Path=ActualHeight}">
+						<controls:ImageEx
+							MaxWidth="{Binding ElementName=Grid, Path=ActualWidth}"
+							MaxHeight="{Binding ElementName=Grid, Path=ActualHeight}"
+							HorizontalAlignment="Center"
+							VerticalAlignment="Stretch"
+							Stretch="Uniform" RenderTransformOrigin="0.5,0.5"
+							ImageExOpened="ImageOpened"
+							ImageExFailed="ImageFailedToOpen">
+							<controls:ImageEx.RenderTransform>
+								<CompositeTransform TranslateX="0.5" TranslateY="0.5"/>
+							</controls:ImageEx.RenderTransform>
+							<controls:ImageEx.Source>
+								<BitmapImage UriSource="{Binding FullImage}"
+											 AutoPlay="True"
+											 ImageOpened="BitmapImage_OnImageOpened"
+											 ImageFailed="BitmapImage_OnImageFailed"
+											 DownloadProgress="BitmapImage_OnDownloadProgress">
 
-					</controls:ImageEx>
+								</BitmapImage>
+							</controls:ImageEx.Source>
+
+						</controls:ImageEx>
 					</ScrollViewer>
+						
+					</StackPanel>
+					
 				</DataTemplate>
 			</FlipView.ItemTemplate>
-
+			
 		</FlipView>
+		<ProgressBar Name="Progress" Minimum="0" Maximum="100" VerticalAlignment="Bottom"
+					 Visibility="Collapsed"></ProgressBar>
+		<TextBlock Text="{Binding ElementName=FlipView, Path=SelectedIndex}"
+				   VerticalAlignment="Bottom"
+				   MaxHeight="20"/>
 	</Grid>
 	<Page.BottomAppBar>
 		<CommandBar>
+			
 			<AppBarButton Label="Save Image"
 						  Icon="Save"
 						  Command="{Binding SaveImage}">
@@ -90,4 +126,6 @@
 		</CommandBar>
 	</Page.BottomAppBar>
 </Page>
+
+
 
