@@ -12,9 +12,9 @@
 	<Page.DataContext>
 		<vm:SwipViewViewModel/>
 	</Page.DataContext>
-	
+
 	<Page.Resources>
-		
+
 		<SolidColorBrush Color="{ThemeResource SystemAccentColor}"
 						 x:Key="AccentColorBrush"></SolidColorBrush>
 		<DataTemplate x:Name="Tag">
@@ -52,50 +52,40 @@
 			ItemsSource="{Binding Images}"
 			SelectedIndex="{Binding Index, Mode=TwoWay}"
 			Name="FlipView"
-			>
+			SelectionChanged="FlipView_OnSelectionChanged"
+			Tapped="FlipView_OnTapped">
 			<FlipView.ItemTemplate>
 				<DataTemplate>
-					<StackPanel>
-					<ScrollViewer ZoomMode="Enabled"
-								MinZoomFactor="1"
-								MaxZoomFactor="8"
-								AllowFocusOnInteraction="True"
-								HorizontalScrollMode="Enabled"
-								VerticalScrollMode="Enabled"
-								HorizontalScrollBarVisibility="Auto"
-								VerticalScrollBarVisibility="Auto"
-								MaxWidth="{Binding ElementName=Page, Path=ActualWidth}"
-								MaxHeight="{Binding ElementName=Page, Path=ActualHeight}"
-								  Height="{Binding ElementName=Grid, Path=ActualHeight}">
-						<controls:ImageEx
-							MaxWidth="{Binding ElementName=Grid, Path=ActualWidth}"
-							MaxHeight="{Binding ElementName=Grid, Path=ActualHeight}"
+
+					
+					<controls:ImageEx
+							
 							HorizontalAlignment="Center"
-							VerticalAlignment="Stretch"
-							Stretch="Uniform" RenderTransformOrigin="0.5,0.5"
-							ImageExOpened="ImageOpened"
-							ImageExFailed="ImageFailedToOpen">
-							<controls:ImageEx.RenderTransform>
-								<CompositeTransform TranslateX="0.5" TranslateY="0.5"/>
-							</controls:ImageEx.RenderTransform>
-							<controls:ImageEx.Source>
-								<BitmapImage UriSource="{Binding FullImage}"
+							VerticalAlignment="Center"
+							Stretch="Uniform" RenderTransformOrigin="0.5,0.5">
+						<controls:ImageEx.RenderTransform>
+							<CompositeTransform TranslateX="0.5" TranslateY="0.5"/>
+						</controls:ImageEx.RenderTransform>
+						<controls:ImageEx.Source>
+							<BitmapImage UriSource="{Binding FullImage}"
 											 AutoPlay="True"
 											 ImageOpened="BitmapImage_OnImageOpened"
 											 ImageFailed="BitmapImage_OnImageFailed"
-											 DownloadProgress="BitmapImage_OnDownloadProgress">
+											 DownloadProgress="BitmapImage_OnDownloadProgress"
+											 DecodePixelHeight="{Binding Height}"
+											 >
 
-								</BitmapImage>
-							</controls:ImageEx.Source>
+							</BitmapImage>
+						</controls:ImageEx.Source>
 
-						</controls:ImageEx>
-					</ScrollViewer>
-						
-					</StackPanel>
+					</controls:ImageEx>
 					
+
+
+
 				</DataTemplate>
 			</FlipView.ItemTemplate>
-			
+
 		</FlipView>
 		<ProgressBar Name="Progress" Minimum="0" Maximum="100" VerticalAlignment="Bottom"
 					 Visibility="Collapsed"></ProgressBar>
@@ -104,8 +94,8 @@
 				   MaxHeight="20"/>
 	</Grid>
 	<Page.BottomAppBar>
-		<CommandBar>
-			
+		<CommandBar Name="AppBar">
+
 			<AppBarButton Label="Save Image"
 						  Icon="Save"
 						  Command="{Binding SaveImage}">

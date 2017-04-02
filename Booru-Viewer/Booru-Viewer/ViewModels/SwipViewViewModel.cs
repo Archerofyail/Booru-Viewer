@@ -57,7 +57,7 @@ namespace Booru_Viewer.ViewModels
 				{
 					foreach (var image in GlobalInfo.CurrentSearch)
 					{
-						images.Add(new FullImageViewModel(image.File_Url));
+						images.Add(new FullImageViewModel(image.File_Url, image.Large_File_Url, image.image_width, image.image_height));
 					}
 					if (GlobalInfo.SelectedImage < GlobalInfo.CurrentSearch.Count && GlobalInfo.SelectedImage >= 0)
 					{
@@ -145,7 +145,7 @@ namespace Booru_Viewer.ViewModels
 
 			foreach (var post in thumbnails)
 			{
-				Images.Add(new FullImageViewModel(post.File_Url));
+				Images.Add(new FullImageViewModel(post.File_Url, post.Large_File_Url, post.image_width, post.image_height));
 			}
 
 

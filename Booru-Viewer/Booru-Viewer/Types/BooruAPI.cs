@@ -136,7 +136,6 @@ namespace Booru_Viewer.Types
 				img.Preview_File_Url = img.Preview_File_Url?.Insert(0, BaseURL);
 				img.Large_File_Url = img.Large_File_Url?.Insert(0, BaseURL);
 				GlobalInfo.CurrentSearch.Add(img);
-				await ImageSaver.SaveImage(img.File_Url);
 				Debug.WriteLine("Image" + index + " is: " + (img.Is_Flagged ? "flagged, " :"") + (img.Is_Pending ? " Pending, " : "") + (img.Is_Deleted ? "Deleted, " : "") + (img.Is_Banned ? "Banned" : ""));
 				index++;
 			}

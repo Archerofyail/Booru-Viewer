@@ -14,6 +14,8 @@ namespace Booru_Viewer.ViewModels
 		public bool Is_Flagged{ get; set; }
 		public bool Is_Deleted { get; set; }
 		public bool Is_Banned { get; set; }
+		public int image_width { get; set; }
+		public int image_height { get; set; }
 		[JsonIgnore]
 		public string[] Tags
 		{

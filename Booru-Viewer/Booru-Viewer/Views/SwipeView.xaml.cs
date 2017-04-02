@@ -82,6 +82,8 @@ namespace Booru_Viewer.Views
 			var img = sender as ImageEx;
 			Debug.WriteLine(FlipView.Items.IndexOf((sender as ImageEx).DataContext) + ": Image Width and height is " + img.ActualWidth + "x" + img.ActualHeight);
 			await Page.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => Page.UpdateLayout());
+			img.Width = (img.Source as BitmapImage).PixelWidth;
+			img.Height = (img.Source as BitmapImage).PixelHeight;
 
 		}
 
@@ -120,6 +122,18 @@ namespace Booru_Viewer.Views
 			{
 
 			}
+		}
+
+		private void FlipView_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			Debug.WriteLine("Changed");
+			Debug.WriteLine("Page actual height and width are:" + Page.ActualHeight + "x" + Page.ActualWidth);
+				
+		}
+
+		private void FlipView_OnTapped(object sender, TappedRoutedEventArgs e)
+		{
+			AppBar.Visibility = AppBar.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
 		}
 	}
 
