@@ -21,7 +21,7 @@ namespace Booru_Viewer.Types
 		private static HttpClient booruClient = new HttpClient();
 		public static EventHandler<Tuple<bool, List<Tag>, string>> TagSearchCompletedHandler;
 
-		//Tags must have a space added to them when they are passed to this function. This returns a null list if failed
+		//GeneralTags must have a space added to them when they are passed to this function. This returns a null list if failed
 		public static async Task<Tuple<bool, List<ImageModel>, string>> SearchPosts(string[] tags, int page, int limit, bool[] ratingChecks = null, bool restartSearch = true)
 		{
 
@@ -115,7 +115,6 @@ namespace Booru_Viewer.Types
 
 			var json = await response.Content.ReadAsStringAsync();
 
-			Debug.WriteLine("Got Json:\n" + json);
 			imageLinks = JsonConvert.DeserializeObject<List<ImageModel>>(json);
 
 			var signinStuff = new List<KeyValuePair<string, string>>()
@@ -136,12 +135,8 @@ namespace Booru_Viewer.Types
 				img.Preview_File_Url = img.Preview_File_Url?.Insert(0, BaseURL);
 				img.Large_File_Url = img.Large_File_Url?.Insert(0, BaseURL);
 				GlobalInfo.CurrentSearch.Add(img);
-				Debug.WriteLine("Image" + index + " is: " + (img.Is_Flagged ? "flagged, " :"") + (img.Is_Pending ? " Pending, " : "") + (img.Is_Deleted ? "Deleted, " : "") + (img.Is_Banned ? "Banned" : ""));
 				index++;
 			}
-
-			Debug.WriteLine("Finished Adding posts to global search list");
-
 			return new Tuple<bool, List<ImageModel>, string>(true, imageLinks, response.StatusCode.ToString());
 
 		}

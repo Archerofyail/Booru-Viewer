@@ -108,6 +108,7 @@
     <Compile Include="Models\Tag.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Types\BooruAPI.cs" />
+    <Compile Include="Types\CountToVisibilityConverter.cs" />
     <Compile Include="Types\GlobalInfo.cs" />
     <Compile Include="Models\ImageModel.cs" />
     <Compile Include="Types\ImageSaver.cs" />

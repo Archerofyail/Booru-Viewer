@@ -8,13 +8,16 @@
 	mc:Ignorable="d"
 	xmlns:vm="using:Booru_Viewer.ViewModels"
 	xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
-	Name="Page">
+	xmlns:interop="using:Windows.UI.Xaml.Interop"
+	Name="Page"
+	xmlns:t="using:Booru_Viewer.Types">
 	<Page.DataContext>
 		<vm:SwipViewViewModel/>
 	</Page.DataContext>
 
 	<Page.Resources>
-
+		
+		<t:CountToVisibilityConverter x:Key="CountToVis"></t:CountToVisibilityConverter>
 		<SolidColorBrush Color="{ThemeResource SystemAccentColor}"
 						 x:Key="AccentColorBrush"></SolidColorBrush>
 		<DataTemplate x:Name="Tag">
@@ -48,39 +51,45 @@
 	<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
 		  Name="Grid" VerticalAlignment="Stretch"
 		  HorizontalAlignment="Stretch">
+
 		<FlipView
 			ItemsSource="{Binding Images}"
 			SelectedIndex="{Binding Index, Mode=TwoWay}"
 			Name="FlipView"
-			SelectionChanged="FlipView_OnSelectionChanged"
-			Tapped="FlipView_OnTapped">
+			Tapped="FlipView_OnTapped"
+			SelectionChanged="FlipView_OnSelectionChanged">
 			<FlipView.ItemTemplate>
 				<DataTemplate>
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*"/>
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="*"/>
+						</Grid.RowDefinitions>
 
-					
-					<controls:ImageEx
-							
-							HorizontalAlignment="Center"
-							VerticalAlignment="Center"
-							Stretch="Uniform" RenderTransformOrigin="0.5,0.5">
-						<controls:ImageEx.RenderTransform>
-							<CompositeTransform TranslateX="0.5" TranslateY="0.5"/>
-						</controls:ImageEx.RenderTransform>
-						<controls:ImageEx.Source>
-							<BitmapImage UriSource="{Binding FullImage}"
+
+						<controls:ImageEx
+								Grid.RowSpan="1"
+								Grid.ColumnSpan="1"
+								Grid.Row="0"
+								Grid.Column="0"
+							RenderTransformOrigin="0.5,0.5">
+							<controls:ImageEx.RenderTransform>
+								<CompositeTransform TranslateX="0.5" TranslateY="0.5"/>
+							</controls:ImageEx.RenderTransform>
+							<controls:ImageEx.Source>
+								<BitmapImage UriSource="{Binding FullImage}"
 											 AutoPlay="True"
-											 ImageOpened="BitmapImage_OnImageOpened"
-											 ImageFailed="BitmapImage_OnImageFailed"
-											 DownloadProgress="BitmapImage_OnDownloadProgress"
-											 DecodePixelHeight="{Binding Height}"
-											 >
+											 DecodePixelHeight="{Binding Height}">
 
-							</BitmapImage>
-						</controls:ImageEx.Source>
+								</BitmapImage>
+							</controls:ImageEx.Source>
 
-					</controls:ImageEx>
-					
+						</controls:ImageEx>
 
+
+					</Grid>
 
 
 				</DataTemplate>
@@ -104,18 +113,55 @@
 					<TextBlock Text="{Binding SaveImageFailureReason}"></TextBlock>
 				</ToolTip>
 			</AppBarButton>
-			<AppBarButton Label="View Tags"
+			<AppBarButton Label="View GeneralTags"
 						  Icon="List">
 				<AppBarButton.Flyout>
-					<Flyout>
-						<ListView ItemsSource="{Binding Tags}"
-								  ItemTemplate="{StaticResource Tag}"/>
+					<Flyout x:Name="TagFlyout">
+						
+							<StackPanel>
+							<ListView ItemsSource="{Binding CharacterTags}"
+								  ItemTemplate="{StaticResource Tag}"
+									  Header="Character"
+									  Name="CharTagsList"/>
+								<TextBlock Text="No Characters" FontSize="12"
+										   Visibility="{Binding ElementName=CharTagsList, 
+														Path=Items.Count, 
+														Converter={StaticResource CountToVis}}"/>
+							<ListView ItemsSource="{Binding ArtistTags}"
+								  ItemTemplate="{StaticResource Tag}"
+									  Header="Artist"
+									  Name="ArtistTagList"/>
+							<TextBlock Text="No Artists" FontSize="12"
+										   Visibility="{Binding ElementName=ArtistTagList, 
+														Path=Items.Count, 
+														Converter={StaticResource CountToVis}}"/>
+							<ListView ItemsSource="{Binding CopyrightTags}"
+								  ItemTemplate="{StaticResource Tag}"
+									  Header="Copyright"
+									  Name="CopyrightTagList"/>
+							<TextBlock Text="No Artists" FontSize="12"
+										   Visibility="{Binding ElementName=CopyrightTagList, 
+														Path=Items.Count, 
+														Converter={StaticResource CountToVis}}"/>
+							<ListView ItemsSource="{Binding GeneralTags}"
+								  ItemTemplate="{StaticResource Tag}"
+									  Header="General"
+									  Name="GeneralTagList"/>
+							<TextBlock Text="No Artists" FontSize="12"
+										   Visibility="{Binding ElementName=GeneralTagList, 
+														Path=Items.Count, 
+														Converter={StaticResource CountToVis}}"/>
+						</StackPanel>
 					</Flyout>
 				</AppBarButton.Flyout>
 			</AppBarButton>
 		</CommandBar>
 	</Page.BottomAppBar>
 </Page>
+
+
+
+
 
 
 

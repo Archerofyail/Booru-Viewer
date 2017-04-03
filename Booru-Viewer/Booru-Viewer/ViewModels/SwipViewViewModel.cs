@@ -61,12 +61,30 @@ namespace Booru_Viewer.ViewModels
 					}
 					if (GlobalInfo.SelectedImage < GlobalInfo.CurrentSearch.Count && GlobalInfo.SelectedImage >= 0)
 					{
-						var tags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].Tags;
+						var genTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].GeneralTags;
+						var charTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].CharacterTags;
+						var artistTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].ArtistTags;
+						var copyTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].CopyrightTags;
 
-						Tags.Clear();
-						foreach (var tag in tags)
+						GeneralTags.Clear();
+						foreach (var tag in genTags)
 						{
-							Tags.Add(new TagViewModel(tag));
+							GeneralTags.Add(new TagViewModel(tag));
+						}
+						CharacterTags.Clear();
+						foreach (var tag in charTags)
+						{
+							CharacterTags.Add(new TagViewModel(tag));
+						}
+						ArtistTags.Clear();
+						foreach (var tag in artistTags)
+						{
+							ArtistTags.Add(new TagViewModel(tag));
+						}
+						CopyrightTags.Clear();
+						foreach (var tag in copyTags)
+						{
+							CopyrightTags.Add(new TagViewModel(tag));
 						}
 					}
 				}
@@ -90,22 +108,75 @@ namespace Booru_Viewer.ViewModels
 
 					LoadMoreImages();
 				}
-				var tags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].Tags;
-				Tags.Clear();
-				foreach (var tag in tags)
+				var genTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].GeneralTags;
+				var charTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].CharacterTags;
+				var artistTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].ArtistTags;
+				var copyTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].CopyrightTags;
+
+				GeneralTags.Clear();
+				CharacterTags.Clear();
+				ArtistTags.Clear();
+				CopyrightTags.Clear();
+				RaisePropertyChanged("GeneralTags");
+				RaisePropertyChanged("ArtistTags");
+				RaisePropertyChanged("CopyrightTags");
+				RaisePropertyChanged("CharacterTags");
+				foreach (var tag in genTags)
 				{
-					Tags.Add(new TagViewModel(tag));
+					GeneralTags.Add(new TagViewModel(tag));
+				}
+				
+				foreach (var tag in charTags)
+				{
+					CharacterTags.Add(new TagViewModel(tag));
+				}
+				
+				foreach (var tag in artistTags)
+				{
+					ArtistTags.Add(new TagViewModel(tag));
+				}
+				
+				foreach (var tag in copyTags)
+				{
+					CopyrightTags.Add(new TagViewModel(tag));
 				}
 				RaisePropertyChanged();
 			}
 		}
 
-		private ObservableCollection<TagViewModel> tags = new ObservableCollection<TagViewModel>();
+		private ObservableCollection<TagViewModel> generalTags = new ObservableCollection<TagViewModel>();
 
-		public ObservableCollection<TagViewModel> Tags
+		public ObservableCollection<TagViewModel> GeneralTags
 		{
-			get { return tags; }
-			set { tags = value; }
+			get { return generalTags; }
+			set { generalTags = value; }
+		}
+
+
+		private ObservableCollection<TagViewModel> characterTags = new ObservableCollection<TagViewModel>();
+
+		public ObservableCollection<TagViewModel> CharacterTags
+		{
+			get { return characterTags; }
+			set { characterTags = value; }
+		}
+
+
+		private ObservableCollection<TagViewModel> artistTags = new ObservableCollection<TagViewModel>();
+
+		public ObservableCollection<TagViewModel> ArtistTags
+		{
+			get { return artistTags; }
+			set { artistTags = value; }
+		}
+
+
+		private ObservableCollection<TagViewModel> copyrightTags = new ObservableCollection<TagViewModel>();
+
+		public ObservableCollection<TagViewModel> CopyrightTags
+		{
+			get { return copyrightTags; }
+			set { copyrightTags = value; }
 		}
 
 		async void LoadMoreImages()

@@ -125,8 +125,7 @@ namespace Booru_Viewer
 
 		private void SettingsTapped(object sender, TappedRoutedEventArgs e)
 		{
-			Debug.WriteLine("ActualHeight of Grid is: " + RootGrid.ActualHeight + " and page is :" + Page.ActualHeight);
-			Debug.Write("Max for slider is " + ImageHeightSlider.Maximum);
+			
 
 		}
 

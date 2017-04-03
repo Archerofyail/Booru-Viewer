@@ -153,13 +153,17 @@
 				   TextWrapping="WrapWholeWords"
 				   VerticalAlignment="Center"
 				   HorizontalAlignment="Center"/>
+	
 		<Button VerticalAlignment="Bottom" HorizontalAlignment="Right" 
 				Height="44" Margin="0,0,32,12" Width="44"
 				Padding="4"
 				BorderThickness="3" Style="{StaticResource CircularButton}"
 				HorizontalContentAlignment="Center"
 				VerticalContentAlignment="Center"
-				Tapped="BackToTopTapped">
+				Tapped="BackToTopTapped"
+				ToolTipService.ToolTip="Back to Top"
+				ToolTipService.Placement="Top">
+			
 
 			<Button.Background>
 				<SolidColorBrush Opacity="0.4"
@@ -193,6 +197,12 @@
 							  Name="SearchAppBarButton">
 					<AppBarButton.Flyout>
 						<Flyout x:Name="SearchFlyout">
+							<Flyout.FlyoutPresenterStyle>
+								<Style TargetType="FlyoutPresenter">
+									<Setter Property="ScrollViewer.HorizontalScrollMode" Value="Disabled"/>
+									<Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+								</Style>
+							</Flyout.FlyoutPresenterStyle>
 							<StackPanel Orientation="Vertical">
 								<StackPanel Margin="0, 0, 12, 0"
 											MaxHeight="250"
@@ -259,7 +269,7 @@
 												</Style>
 											</AutoSuggestBox.TextBoxStyle>
 										</AutoSuggestBox>
-										
+
 										<Button Name="AddTagButton" 
 											Margin="4, 0, 0, 0"
 											Background="{StaticResource ThemeBrush}" 
@@ -361,7 +371,9 @@
 							<Flyout.FlyoutPresenterStyle>
 								<Style TargetType="FlyoutPresenter">
 									<Setter Property="Height" Value="{ThemeResource FlyoutThemeMaxHeight}"></Setter>
-									<Setter Property="IsTapEnabled" Value="True"></Setter>
+									<Setter Property="IsTapEnabled" Value="True"/>
+									<Setter Property="ScrollViewer.HorizontalScrollBarVisibility" 
+											Value="Disabled"/>
 								</Style>
 							</Flyout.FlyoutPresenterStyle>
 							<StackPanel Orientation="Vertical" MinWidth="300">
@@ -388,21 +400,14 @@
 											  MinWidth="42"
 											  Margin="4"/>
 								</StackPanel>
-								<TextBlock Text="Images Per Page"/>
 								<Slider 
+									Header="Images Per Page"
 									Maximum="100"
 									Value="{Binding PerPage, Mode=TwoWay}"
 									Minimum="10"
 									StepFrequency="1"
 									SnapsTo="StepValues"
 									/>
-								<TextBlock Text="Thumbnail Size"/>
-								<Slider Minimum="100" Maximum="900"
-										SnapsTo="StepValues"
-										StepFrequency="5"
-										Value="{Binding ImageSize, Mode=TwoWay}"
-										Name="ImageHeightSlider"
-										IsThumbToolTipEnabled="False"/>
 								<TextBlock Text="Login Details"
 										   Margin="0, 0, 0, 5"/>
 								<TextBox PlaceholderText="Username"
@@ -431,8 +436,8 @@
 								</Button>
 								<TextBlock Text="Save Folder" Margin="4"/>
 								<StackPanel Orientation="Horizontal" Margin="4">
-									
-								
+
+
 									<Button Content="Change Folder"
 											Command="{Binding ChooseSaveFolder}"
 											CommandParameter="{Binding ElementName=ChooseFolderButton}"
@@ -440,8 +445,8 @@
 									<TextBlock Text="Current:" VerticalAlignment="Center" Margin="4"/>
 									<TextBlock Text="{Binding SaveFolder}" VerticalAlignment="Center" Margin="4"/>
 								</StackPanel>
-								<Button Content="Use a Dropbox Folder"
-										Command="{Binding SelectDropboxFolder}"/>
+								<!--<Button Content="Use a Dropbox Folder"
+										Command="{Binding SelectDropboxFolder}"/>-->
 							</StackPanel>
 						</Flyout>
 					</AppBarButton.Flyout>

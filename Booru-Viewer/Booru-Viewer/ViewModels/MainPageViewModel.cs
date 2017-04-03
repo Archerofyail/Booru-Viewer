@@ -35,10 +35,6 @@ namespace Booru_Viewer.ViewModels
 			{
 				perPage = (int)appSettings["PerPage"];
 			}
-			if (ApplicationData.Current.LocalSettings.Values["ImageSize"] != null)
-			{
-				ImageSize = (int)ApplicationData.Current.LocalSettings.Values["ImageSize"];
-			}
 			if (appSettings["SafeChecked"] != null)
 			{
 				safeChecked = (bool)appSettings["SafeChecked"];
