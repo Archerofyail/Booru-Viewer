@@ -16,7 +16,7 @@
 	</Page.DataContext>
 
 	<Page.Resources>
-		
+
 		<t:CountToVisibilityConverter x:Key="CountToVis"></t:CountToVisibilityConverter>
 		<SolidColorBrush Color="{ThemeResource SystemAccentColor}"
 						 x:Key="AccentColorBrush"></SolidColorBrush>
@@ -117,40 +117,36 @@
 						  Icon="List">
 				<AppBarButton.Flyout>
 					<Flyout x:Name="TagFlyout">
-						
-							<StackPanel>
+
+						<StackPanel>
 							<ListView ItemsSource="{Binding CharacterTags}"
 								  ItemTemplate="{StaticResource Tag}"
 									  Header="Character"
-									  Name="CharTagsList"/>
-								<TextBlock Text="No Characters" FontSize="12"
-										   Visibility="{Binding ElementName=CharTagsList, 
-														Path=Items.Count, 
+									  Name="CharTagsList"
+							          Visibility="{Binding Path=CharacterTags.Count, 
 														Converter={StaticResource CountToVis}}"/>
+
 							<ListView ItemsSource="{Binding ArtistTags}"
 								  ItemTemplate="{StaticResource Tag}"
 									  Header="Artist"
-									  Name="ArtistTagList"/>
-							<TextBlock Text="No Artists" FontSize="12"
-										   Visibility="{Binding ElementName=ArtistTagList, 
-														Path=Items.Count, 
+									  Name="ArtistTagList"
+							          Visibility="{Binding Path=ArtistTags.Count, 
 														Converter={StaticResource CountToVis}}"/>
+
 							<ListView ItemsSource="{Binding CopyrightTags}"
 								  ItemTemplate="{StaticResource Tag}"
 									  Header="Copyright"
-									  Name="CopyrightTagList"/>
-							<TextBlock Text="No Artists" FontSize="12"
-										   Visibility="{Binding ElementName=CopyrightTagList, 
-														Path=Items.Count, 
+									  Name="CopyrightTagList"
+							          Visibility="{Binding Path=CopyrightTags.Count, 
 														Converter={StaticResource CountToVis}}"/>
+
 							<ListView ItemsSource="{Binding GeneralTags}"
 								  ItemTemplate="{StaticResource Tag}"
 									  Header="General"
-									  Name="GeneralTagList"/>
-							<TextBlock Text="No Artists" FontSize="12"
-										   Visibility="{Binding ElementName=GeneralTagList, 
-														Path=Items.Count, 
+									  Name="GeneralTagList"
+							          Visibility="{Binding Path=GeneralTags.Count, 
 														Converter={StaticResource CountToVis}}"/>
+
 						</StackPanel>
 					</Flyout>
 				</AppBarButton.Flyout>

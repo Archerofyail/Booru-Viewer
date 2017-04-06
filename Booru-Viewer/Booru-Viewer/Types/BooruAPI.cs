@@ -105,7 +105,7 @@ namespace Booru_Viewer.Types
 			}
 			if (response == null)
 			{
-				return new Tuple<bool, List<ImageModel>, string>(false, null, "Request Failed");
+				return new Tuple<bool, List<ImageModel>, string>(false, null, "Request Failed, check your connection");
 			}
 			if (response.StatusCode != HttpStatusCode.Ok)
 			{

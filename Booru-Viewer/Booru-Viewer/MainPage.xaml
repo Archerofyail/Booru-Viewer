@@ -28,13 +28,10 @@
 			<DataTemplate x:Name="ImageTemplate">
 				<controls:ImageEx Name="Image"
 								  Source="{Binding Path=PreviewURL}"
-								  MaxWidth="{Binding ElementName=Page, Path=DataContext.ImageSize, Mode=OneWay}"
-								  MaxHeight="{Binding ElementName=Page, Path=DataContext.ImageSize, Mode=OneWay}"
-								  Height="{Binding ElementName=Page, Path=DataContext.ImageSize, Mode=OneWay}"
-								  Width="{Binding ElementName=Page, Path=DataContext.ImageSize, Mode=OneWay}"
 								  Stretch="Uniform"
 								  ImageExOpened="ImageOpened"
-								  ImageExFailed="ImageEx_OnImageExFailed">
+								  ImageExFailed="ImageEx_OnImageExFailed"
+								  MaxHeight="250">
 
 
 					<controls:ImageEx.ContextFlyout>
@@ -133,7 +130,7 @@
 	<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
 		  Name="RootGrid" MinHeight="250">
 
-		<GridView   Background="{StaticResource BackgroundThemeBrush}"
+		<controls:AdaptiveGridView   Background="{StaticResource BackgroundThemeBrush}"
 					ItemTemplate="{StaticResource ImageTemplate}"
 					ItemsSource="{Binding Path=Thumbnails, Mode=TwoWay}"
 					SelectionMode="None"
@@ -144,9 +141,10 @@
 					IncrementalLoadingTrigger="Edge"
 					SelectionChanged="GridView_SelectionChanged"
 					IsItemClickEnabled="True"
-					ItemClick="ImageGridView_OnItemClick">
+					ItemClick="ImageGridView_OnItemClick"
+					DesiredWidth="200">
 
-		</GridView>
+		</controls:AdaptiveGridView>
 		<TextBlock Text="{Binding NoImagesText}"
 				   Visibility="{Binding DontHaveImages}"
 				   Margin="20, 40"
@@ -407,8 +405,19 @@
 									Minimum="10"
 									StepFrequency="1"
 									SnapsTo="StepValues"
-									/>
-								<TextBlock Text="Login Details"
+									Name="PerPageSlider"
+									PointerReleased="{x:Bind ViewModel.PerPageChangedEx}">
+									
+									<!--<i:BehaviorCollection>
+										<core:EventTriggerBehavior EventName="PointerReleased">
+											<core:InvokeCommandAction Command="{Binding PerPageChanged}"
+																	  CommandParameter="{Binding ElementName=PerPageSlider,
+												Path=Value}"></core:InvokeCommandAction>
+										</core:EventTriggerBehavior>
+									</i:BehaviorCollection>-->
+									
+								</Slider>
+									<TextBlock Text="Login Details"
 										   Margin="0, 0, 0, 5"/>
 								<TextBox PlaceholderText="Username"
 										 Margin="0, 0, 0, 5"

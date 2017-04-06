@@ -17,6 +17,7 @@ using GalaSoft.MvvmLight;
 using Windows.Web.Http;
 using Windows.UI.Xaml.Controls;
 using Dropbox.Api;
+using Microsoft.Toolkit.Uwp;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 
 //TODO: Saved Searches (should be somewhat straightforward)
@@ -73,7 +74,7 @@ namespace Booru_Viewer.ViewModels
 
 			}
 
-			StartSearchExecute();
+			//StartSearchExecute();
 			Debug.WriteLine("Count for saved Searches is " + SavedSearches.Count);
 			BooruAPI.TagSearchCompletedHandler += (sender, tuple) =>
 			{
@@ -101,8 +102,10 @@ namespace Booru_Viewer.ViewModels
 				}
 			};
 
-			thumbnails.CollectionChanged += (sender, args) => RaisePropertyChanged("Thumbnails");
+			//thumbnails.CollectionChanged += (sender, args) => RaisePropertyChanged("Thumbnails");
 			RaisePropertyChanged("SelectedPrefixIndex");
+
+			thumbnails = new IncrementalLoadingCollection<PostSource, ThumbnailViewModel>(perPage, null, ImageOnLoadFinish, ImageLoadOnError);
 		}
 
 		private int totalTagCount
@@ -180,36 +183,40 @@ namespace Booru_Viewer.ViewModels
 			get { return perPage; }
 			set
 			{
-				if (value > perPage)
-				{
-					//Load enough images to fit the full page of the higher value. Then do the same as above.
-					//Find pages that will fit, then find number of times load next page needs to be called
-					var imagesNeeded = value - GlobalInfo.CurrentSearch.Count;
-					var timesToCall = (int)Math.Ceiling((double)imagesNeeded / perPage);
-					for (int i = 0; i < timesToCall; i++)
-					{
-						LoadNextPageExecute(0);
-					}
+				//if (value > perPage)
+				//{
+				//	//Load enough images to fit the full page of the higher value. Then do the same as above.
+				//	//Find pages that will fit, then find number of times load next page needs to be called
 
-					return;
-				}
+				//	/*
+				//	 Going from 10 -> 25 with 3 pages
+					 
+				//	 */
+				//	var imagesNeeded = value - GlobalInfo.CurrentSearch.Count;
+				//	var timesToCall = (int) Math.Ceiling((double) imagesNeeded / perPage);
+				//	for (int i = 0; i < timesToCall; i++)
+				//	{
+				//		LoadNextPageExecute(0);
+				//	}
+				//}
+				//else
+				//{
+				//	double newPageNum = ((double)(BooruAPI.Page * perPage)) / value;
+				//	int newPage = (int)Math.Floor(newPageNum);
+				//	BooruAPI.Page = newPage == 0 ? 1 : newPage;
+				//	int picsToRemove = (int)((newPageNum - newPage) * value);
+				//	int picsToKeep = newPage * value;
+				//	for (int i = Thumbnails.Count - 1; i > picsToKeep - 1; i--)
+				//	{
+				//		Thumbnails.RemoveAt(i);
+				//		GlobalInfo.CurrentSearch.RemoveAt(i);
+				//	}
 
-
-
-				double newPageNum = ((double)(BooruAPI.Page * perPage)) / value;
-				int newPage = (int)Math.Floor(newPageNum);
-				BooruAPI.Page = newPage == 0 ? 1 : newPage;
-				int picsToRemove = (int)((newPageNum - newPage) * value);
-				int picsToKeep = newPage * value;
-				for (int i = Thumbnails.Count - 1; i > picsToKeep - 1; i--)
-				{
-					Thumbnails.RemoveAt(i);
-					GlobalInfo.CurrentSearch.RemoveAt(i);
-				}
-				RaisePropertyChanged("Thumbnails");
+				//}
 				perPage = value;
 				ApplicationData.Current.RoamingSettings.Values["PerPage"] = value;
 				RaisePropertyChanged();
+				Thumbnails.RefreshAsync();
 
 
 			}
@@ -274,27 +281,9 @@ namespace Booru_Viewer.ViewModels
 			}
 		}
 
-		private PaginatedThumbnailList thumbnails = new PaginatedThumbnailList();
+		private IncrementalLoadingCollection<PostSource, ThumbnailViewModel> thumbnails;
 
-		public PaginatedThumbnailList Thumbnails
-		{
-			get
-			{
-				if (thumbnails.LoadMoreItemsDelegate == null)
-				{
-					thumbnails.load = LoadNextPageExecute;
-
-				}
-				return thumbnails;
-			}
-			set
-			{
-				if (thumbnails.Count != GlobalInfo.CurrentSearch.Count)
-				{
-					ResyncThumbnails();
-				}
-			}
-		}
+		public IncrementalLoadingCollection<PostSource, ThumbnailViewModel> Thumbnails => thumbnails;
 
 		public ObservableCollection<string> Prefixes => new ObservableCollection<string>(new[] { "none", "~", "-" });
 		private string orderPrefix = "order:";
@@ -507,6 +496,28 @@ namespace Booru_Viewer.ViewModels
 			return true;
 		}
 
+		void ImageLoadOnError(Exception e)
+		{
+			DontHaveImages = true;
+			NoImagesText = "Failed to grab images: " + e.Message;
+		}
+
+		void ImageOnLoadFinish()
+		{
+			if (thumbnails.Count == 0)
+			{
+				NoImagesText = "No Images found with those tags, try a different search";
+				DontHaveImages = true;
+				return;
+
+			}
+			else
+			{
+				DontHaveImages = false;
+			}
+
+		}
+
 		async void StartSearchExecute()
 		{
 			try
@@ -515,34 +526,11 @@ namespace Booru_Viewer.ViewModels
 				SelectedPrefixIndex = 0;
 				var tags = await PrepTags();
 				GlobalInfo.CurrentSearch.Clear();
-				ResyncThumbnails();
+
 				GlobalInfo.CurrentSearchTags.Clear();
 
 				GlobalInfo.CurrentSearchTags.AddRange(tags);
-				var result = await BooruAPI.SearchPosts(tags, startingPage, PerPage, new[] { safeChecked, questionableChecked, explicitChecked });
-				if (result.Item2 != null)
-				{
-
-					if (result.Item2.Count > 0 && result.Item3 == HttpStatusCode.Ok.ToString())
-					{
-						AddThumbnails(result.Item2);
-						DontHaveImages = false;
-
-					}
-					else if (result.Item3 == HttpStatusCode.NoContent.ToString() || result.Item2.Count == 0)
-					{
-						DontHaveImages = true;
-						NoImagesText = "No Images Found with those tags, try a different combination";
-						RaisePropertyChanged("NoImagesText");
-					}
-
-				}
-				else
-				{
-					DontHaveImages = true;
-					NoImagesText = "Failed to grab images: " + result.Item3;
-					RaisePropertyChanged("NoImagesText");
-				}
+				await Thumbnails.RefreshAsync();
 			}
 			catch (Exception e)
 			{
@@ -607,21 +595,15 @@ namespace Booru_Viewer.ViewModels
 
 
 
-		async Task<IEnumerable<ImageModel>> LoadNextPageExecute(uint count)
+		async void LoadNextPageExecute(uint count)
 		{
 			BooruAPI.Page++;
-			var tags = new List<string>(GlobalInfo.CurrentSearchTags);
-			var result = await BooruAPI.SearchPosts(tags.ToArray(), BooruAPI.Page, PerPage, new[] { safeChecked, questionableChecked, explicitChecked }, false);
-			if (result.Item3 == HttpStatusCode.Ok.ToString())
-			{
-				//
-			}
-			return result.Item2 ?? new List<ImageModel>();
+			await Thumbnails.LoadMoreItemsAsync(Convert.ToUInt32(PerPage));
 		}
 
 		async void LoadNextPageE()
 		{
-			AddThumbnails(await LoadNextPageExecute(0));
+			LoadNextPageExecute(0);
 		}
 
 
@@ -741,6 +723,11 @@ namespace Booru_Viewer.ViewModels
 			var dBclient = new DropboxAppClient(dbInfo[0], dbInfo[1]);
 			var authURI = DropboxOAuth2Helper.GetAuthorizeUri(OAuthResponseType.Code, dbInfo[0], "https://localhost/authorize");
 
+		}
+		//public ICommand PerPageChanged => new RelayCommand<int>(PerPageChangedEx);
+		public async void PerPageChangedEx(object sender, EventArgs e)
+		{
+			PerPage = (int) (sender as Slider).Value;
 		}
 	}
 }
