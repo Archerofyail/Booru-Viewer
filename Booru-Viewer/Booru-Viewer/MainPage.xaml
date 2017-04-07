@@ -401,12 +401,13 @@
 								<Slider 
 									Header="Images Per Page"
 									Maximum="100"
-									Value="{Binding PerPage, Mode=TwoWay}"
 									Minimum="10"
 									StepFrequency="1"
 									SnapsTo="StepValues"
 									Name="PerPageSlider"
-									PointerReleased="{x:Bind ViewModel.PerPageChangedEx}">
+									PointerReleased="{x:Bind ViewModel.PerPageChangedEx}"
+									PointerExited="{x:Bind ViewModel.PerPageChangedEx}"
+									Loaded="PerPageSlider_OnLoaded">
 									
 									<!--<i:BehaviorCollection>
 										<core:EventTriggerBehavior EventName="PointerReleased">

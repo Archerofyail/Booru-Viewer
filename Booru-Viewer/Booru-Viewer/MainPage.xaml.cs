@@ -5,6 +5,7 @@ using Windows.UI.Xaml.Navigation;
 using Booru_Viewer.Types;
 using System.Diagnostics;
 using System.Linq;
+using Windows.Storage;
 using Windows.UI.Xaml.Controls.Primitives;
 using Booru_Viewer.ViewModels;
 using Booru_Viewer.Views;
@@ -47,7 +48,10 @@ namespace Booru_Viewer
 			{
 				SavedSearchesList.GetBindingExpression(ListView.ItemsSourceProperty).UpdateSource();
 			};
-			ViewModel = DataContext as MainPageViewModel;
+			Loaded += (sender, args) =>
+			{
+				ViewModel = DataContext as MainPageViewModel;
+			};
 		}
 		
 		private void GridView_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -172,6 +176,11 @@ namespace Booru_Viewer
 			var img = sender as ImageEx;
 			img.SetValue(ImageEx.SourceProperty, img.Source);
 			Debug.WriteLine("Failed to open " + (sender as ImageEx).Source + ".\nError message: " + e.ErrorMessage + ".\nException: " + e.ErrorException);
+		}
+
+		private void PerPageSlider_OnLoaded(object sender, RoutedEventArgs e)
+		{
+			PerPageSlider.Value = (int)ApplicationData.Current.RoamingSettings.Values["PerPage"];
 		}
 	}
 }

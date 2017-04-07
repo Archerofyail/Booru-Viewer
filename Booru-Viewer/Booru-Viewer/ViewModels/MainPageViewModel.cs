@@ -16,6 +16,7 @@ using Windows.UI.Core;
 using GalaSoft.MvvmLight;
 using Windows.Web.Http;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Input;
 using Dropbox.Api;
 using Microsoft.Toolkit.Uwp;
 using Microsoft.Toolkit.Uwp.UI.Controls;
@@ -725,9 +726,11 @@ namespace Booru_Viewer.ViewModels
 
 		}
 		//public ICommand PerPageChanged => new RelayCommand<int>(PerPageChangedEx);
-		public async void PerPageChangedEx(object sender, EventArgs e)
+		public void PerPageChangedEx(object sender, PointerRoutedEventArgs e)
 		{
+			Debug.WriteLine("Per Page Changed, old value is {0}, new value is {1}", PerPage, (sender as Slider).Value);
 			PerPage = (int) (sender as Slider).Value;
+			Debug.WriteLine("PerPage Changed");
 		}
 	}
 }
