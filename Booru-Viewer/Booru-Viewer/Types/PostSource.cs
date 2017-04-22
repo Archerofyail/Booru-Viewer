@@ -19,7 +19,7 @@ namespace Booru_Viewer.Types
 			BooruAPI.Page++;
 			var result = await BooruAPI.SearchPosts(GlobalInfo.CurrentSearchTags.ToArray(), pageIndex, pageSize, GlobalInfo.ContentCheck, false);
 			if (!result.Item1) throw new Exception(result.Item3);
-			List<ThumbnailViewModel> tns = new List<ThumbnailViewModel>();
+			var tns = new List<ThumbnailViewModel>();
 			foreach (var image in result.Item2)
 			{
 				tns.Add(new ThumbnailViewModel(image.Preview_File_Url, image.Has_Large ? image.Large_File_Url : image.File_Url));

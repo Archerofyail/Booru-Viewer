@@ -25,7 +25,7 @@ namespace Booru_Viewer.ViewModels
 		}
 
 		private string tag;
-		public string Tag { get { return tag; } set { tag = value; RaisePropertyChanged(); } }
+		public string Tag { get => tag; set { tag = value; RaisePropertyChanged(); } }
 
 		void RemoveTagExecute()
 		{

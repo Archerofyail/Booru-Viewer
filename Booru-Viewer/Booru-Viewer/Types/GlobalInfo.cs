@@ -18,8 +18,7 @@ namespace Booru_Viewer.Types
 
 		public static string CurrentOrdering
 		{
-			get { return currentOrdering; }
-			set { currentOrdering = value == "" ? "" : "order:" + value; }
+			get => currentOrdering; set => currentOrdering = value == "" ? "" : "order:" + value;
 		}
 
 		public static bool[] ContentCheck { get; set; } = {true, true, true};
@@ -47,21 +46,30 @@ namespace Booru_Viewer.Types
 			CurrentTags.Remove(tag);
 		}
 
-		public static async void SaveSearches()
+		public static async void SaveSearches(List<SavedSearchViewModel> searches)
 		{
 
-			var item = await ApplicationData.Current.RoamingFolder.TryGetItemAsync("SavedSearches.json");
-			if (item != null)
+			try
 			{
-				SearchesFile = await ApplicationData.Current.RoamingFolder.GetFileAsync("SavedSearches.json");
-			}
-			else
-			{
-				SearchesFile = await ApplicationData.Current.RoamingFolder.CreateFileAsync("SavedSearches.json");
-			}
+				var item = await ApplicationData.Current.RoamingFolder.TryGetItemAsync("SavedSearches.json");
+				if (item != null)
+				{
+					SearchesFile = await ApplicationData.Current.RoamingFolder.GetFileAsync("SavedSearches.json");
+				}
+				else
+				{
+					SearchesFile = await ApplicationData.Current.RoamingFolder.CreateFileAsync("SavedSearches.json");
+				}
 
-			var json = JsonConvert.SerializeObject(SavedSearches.ToList());
-			await FileIO.WriteTextAsync(SearchesFile, json);
+				var json = JsonConvert.SerializeObject(searches.Select(x => x.Tags));
+				await FileIO.WriteTextAsync(SearchesFile, json);
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
+		
+			}
+			
 		}
 
 		public static async void LoadSavedSearches()
@@ -75,18 +83,27 @@ namespace Booru_Viewer.Types
 			}
 			SearchesFile = await ApplicationData.Current.RoamingFolder.GetFileAsync("SavedSearches.json");
 			var json = await FileIO.ReadTextAsync(SearchesFile);
-			var searchList = JsonConvert.DeserializeObject<List<string[]>>(json);
-			if (searchList != null)
+			try
 			{
-				foreach (var search in searchList)
+				var searchList = JsonConvert.DeserializeObject<List<string[]>>(json);
+				if (searchList != null)
 				{
-					savedSearches.Add(search);
+					foreach (var search in searchList)
+					{
+						savedSearches.Add(search);
+					}
+				}
+				else
+				{
+					Debug.WriteLine("SearchList was null");
 				}
 			}
-			else
+			catch (Exception e)
 			{
-				Debug.WriteLine("SearchList was null");
+				Console.WriteLine(e);
 			}
+			
+			
 			SavedSearchesLoadedEventHandler?.Invoke(typeof(GlobalInfo), EventArgs.Empty);
 		}
 	}

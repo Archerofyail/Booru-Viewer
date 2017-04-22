@@ -94,7 +94,6 @@ namespace Booru_Viewer
 		{
 			var deferral = e.SuspendingOperation.GetDeferral();
 			//TODO: Save application state and stop any background activity
-			GlobalInfo.SaveSearches();
 			deferral.Complete();
 		}
 

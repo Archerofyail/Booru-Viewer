@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Booru_Viewer.ViewModels;
 using Newtonsoft.Json;
 using Booru_Viewer.Models;
+using Newtonsoft.Json.Linq;
 
 namespace Booru_Viewer.Types
 {
@@ -21,6 +22,7 @@ namespace Booru_Viewer.Types
 		private static HttpClient booruClient = new HttpClient();
 		public static EventHandler<Tuple<bool, List<Tag>, string>> TagSearchCompletedHandler;
 
+		public static UserModel UserModel;
 		//GeneralTags must have a space added to them when they are passed to this function. This returns a null list if failed
 		public static async Task<Tuple<bool, List<ImageModel>, string>> SearchPosts(string[] tags, int page, int limit, bool[] ratingChecks = null, bool restartSearch = true)
 		{
@@ -127,10 +129,10 @@ namespace Booru_Viewer.Types
 			int index = 0;
 			foreach (var img in imageLinks)
 			{
-				
+
 				if (img.File_Url == null && img.Preview_File_Url == null && img.Large_File_Url == null)
 				{ continue; }
-				
+
 				img.File_Url = img.File_Url?.Insert(0, BaseURL);
 				img.Preview_File_Url = img.Preview_File_Url?.Insert(0, BaseURL);
 				img.Large_File_Url = img.Large_File_Url?.Insert(0, BaseURL);
@@ -146,7 +148,7 @@ namespace Booru_Viewer.Types
 			var tags = new List<Tag>();
 			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(new[] { new KeyValuePair<string, string>("search[name_matches]", search + "*") });
 			var requestURI = BaseURL + TagsURL + "?" + content.ToString();
-			HttpResponseMessage response;
+			HttpResponseMessage response = new HttpResponseMessage();
 			try
 			{
 				response = await booruClient.GetAsync(new Uri(requestURI));
@@ -154,7 +156,6 @@ namespace Booru_Viewer.Types
 			catch (Exception e)
 			{
 				Debug.WriteLine(e);
-				throw;
 			}
 
 			if (response == null)
@@ -183,6 +184,88 @@ namespace Booru_Viewer.Types
 			}
 			TagSearchCompletedHandler?.Invoke(typeof(BooruAPI), new Tuple<bool, List<Tag>, string>(true, tags, response.ReasonPhrase));
 			return new Tuple<bool, List<Tag>, string>(true, tags, response.ReasonPhrase);
+		}
+
+		public static async Task<UserModel> GetUser()
+		{
+			if (UserModel != null)
+			{
+				return UserModel;
+			}
+			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(new[] { new KeyValuePair<string, string>("search[name]", Username) });
+			var requestURI = BaseURL + "/users.json" + "?" + content.ToString();
+			HttpResponseMessage response = new HttpResponseMessage();
+			try
+			{
+				response = await booruClient.GetAsync(new Uri(requestURI));
+			}
+			catch (Exception e)
+			{
+				Debug.WriteLine(e.Message);
+
+			}
+			if (response?.StatusCode != HttpStatusCode.Ok)
+			{
+				return null;
+			}
+			var json = await response.Content.ReadAsStringAsync();
+			UserModel user = JsonConvert.DeserializeObject<List<UserModel>>(json)[0];
+			UserModel = user;
+			return user;
+		}
+
+		public static async Task<bool> FavouriteImage(ImageModel im)
+		{
+			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(new[]{
+																			new KeyValuePair<string, string>("post_id", im.id.ToString()),
+																			new KeyValuePair<string, string>("login", Username),
+																			new KeyValuePair<string, string>("api_key", APIKey),});
+			HttpResponseMessage response = new HttpResponseMessage();
+			var requestURI = BaseURL + "/favorites.json?" + content.ToString();
+			try
+			{
+				response = await booruClient.PostAsync(new Uri(requestURI), null);
+				Debug.WriteLine(await response.Content.ReadAsStringAsync());
+			}
+			catch (Exception e)
+			{
+
+
+			}
+			if (response == null)
+			{
+				return false;
+			}
+			var jobj = JObject.Parse(await response.Content.ReadAsStringAsync());
+			var isSuccess = jobj["success"].Value<bool>();
+			if (isSuccess)
+			{
+				return true;
+			}
+
+			return true;
+		}
+
+		public static async Task<bool> UnfavouriteImage(ImageModel im)
+		{
+			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(new []
+			{
+				new KeyValuePair<string, string>("login", Username),
+				new KeyValuePair<string, string>("api_key", APIKey), 
+			});
+			var requestURI = BaseURL + "/favorites/" + im.id + ".json?" + content.ToString();
+			var response = await booruClient.DeleteAsync(new Uri(requestURI));
+			if (response == null)
+			{
+				return false;
+			}
+			var jobj = JObject.Parse(await response.Content.ReadAsStringAsync());
+			var isSuccess = jobj["success"].Value<bool>();
+			if (isSuccess)
+			{
+				return true;
+			}
+			return false;
 		}
 
 		public static void SetLogin(string username, string APIKey)

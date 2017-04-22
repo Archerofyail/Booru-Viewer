@@ -31,7 +31,9 @@
 								  Stretch="Uniform"
 								  ImageExOpened="ImageOpened"
 								  ImageExFailed="ImageEx_OnImageExFailed"
-								  MaxHeight="250">
+								  MaxHeight="250"
+								  MinHeight="160"
+								  MinWidth="160">
 
 
 					<controls:ImageEx.ContextFlyout>
@@ -132,7 +134,7 @@
 
 		<controls:AdaptiveGridView   Background="{StaticResource BackgroundThemeBrush}"
 					ItemTemplate="{StaticResource ImageTemplate}"
-					ItemsSource="{Binding Path=Thumbnails, Mode=TwoWay}"
+					ItemsSource="{Binding Path=Thumbnails}"
 					SelectionMode="None"
 					Margin="0, 24, 0, 0" 
 					x:Name="ImageGridView"
@@ -407,6 +409,7 @@
 									Name="PerPageSlider"
 									PointerReleased="{x:Bind ViewModel.PerPageChangedEx}"
 									PointerExited="{x:Bind ViewModel.PerPageChangedEx}"
+									PointerPressed="{x:Bind ViewModel.PerPageClicked}"
 									Loaded="PerPageSlider_OnLoaded">
 									
 									<!--<i:BehaviorCollection>

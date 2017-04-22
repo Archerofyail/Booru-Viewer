@@ -22,7 +22,7 @@ namespace Booru_Viewer.Types
 				}
 				return imageFolder;
 			}
-			set { imageFolder = value; }
+			set => imageFolder = value;
 		}
 
 		static ImageSaver()

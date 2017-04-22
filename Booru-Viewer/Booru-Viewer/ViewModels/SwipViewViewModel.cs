@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.Web.Http;
@@ -7,6 +8,7 @@ using Booru_Viewer.Types;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Windows.Storage;
+using Windows.UI.Xaml.Controls;
 
 namespace Booru_Viewer.ViewModels
 {
@@ -20,7 +22,7 @@ namespace Booru_Viewer.ViewModels
 			var settings = ApplicationData.Current.RoamingSettings.Values;
 			if (settings["PerPage"] != null)
 			{
-				perPage = (int) settings["PerPage"];
+				perPage = (int)settings["PerPage"];
 			}
 		}
 
@@ -28,8 +30,7 @@ namespace Booru_Viewer.ViewModels
 
 		public string SaveImageFailureReason
 		{
-			get { return saveImageFailureReason; }
-			set
+			get => saveImageFailureReason; set
 			{
 				saveImageFailureReason = value;
 				RaisePropertyChanged();
@@ -39,8 +40,7 @@ namespace Booru_Viewer.ViewModels
 		private bool saving;
 		public bool Saving
 		{
-			get { return saving; }
-			set
+			get => saving; set
 			{
 				saving = value;
 				RaisePropertyChanged();
@@ -95,11 +95,7 @@ namespace Booru_Viewer.ViewModels
 
 		public int Index
 		{
-			get
-			{
-
-				return GlobalInfo.SelectedImage;
-			}
+			get => GlobalInfo.SelectedImage;
 			set
 			{
 				GlobalInfo.SelectedImage = value;
@@ -112,7 +108,8 @@ namespace Booru_Viewer.ViewModels
 				var charTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].CharacterTags;
 				var artistTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].ArtistTags;
 				var copyTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].CopyrightTags;
-
+				Rating = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].Rating;
+				var favourites = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].Favourites;
 				GeneralTags.Clear();
 				CharacterTags.Clear();
 				ArtistTags.Clear();
@@ -125,58 +122,97 @@ namespace Booru_Viewer.ViewModels
 				{
 					GeneralTags.Add(new TagViewModel(tag));
 				}
-				
+
 				foreach (var tag in charTags)
 				{
 					CharacterTags.Add(new TagViewModel(tag));
 				}
-				
+
 				foreach (var tag in artistTags)
 				{
 					ArtistTags.Add(new TagViewModel(tag));
 				}
-				
+
 				foreach (var tag in copyTags)
 				{
 					CopyrightTags.Add(new TagViewModel(tag));
 				}
+
+				if (favourites.Contains("fav:" + BooruAPI.UserModel.ID))
+				{
+					FavIcon = Symbol.Favorite;
+					FavString = "Unfavourite";
+				}
+				else
+				{
+					FavIcon = Symbol.OutlineStar;
+					FavString = "Favourite";
+				}
+
+				RaisePropertyChanged();
+
+			}
+		}
+
+		private string rating = "";
+
+		public string Rating
+		{
+			get => rating;
+			set
+			{
+				rating = value;
 				RaisePropertyChanged();
 			}
 		}
 
-		private ObservableCollection<TagViewModel> generalTags = new ObservableCollection<TagViewModel>();
+		public ObservableCollection<TagViewModel> GeneralTags { get; set; } = new ObservableCollection<TagViewModel>();
 
-		public ObservableCollection<TagViewModel> GeneralTags
+
+		public ObservableCollection<TagViewModel> CharacterTags { get; set; } = new ObservableCollection<TagViewModel>();
+
+
+		public ObservableCollection<TagViewModel> ArtistTags { get; set; } = new ObservableCollection<TagViewModel>();
+
+
+		public ObservableCollection<TagViewModel> CopyrightTags { get; set; } = new ObservableCollection<TagViewModel>();
+
+		private Symbol favIcon = Symbol.OutlineStar;
+
+		public Symbol FavIcon
 		{
-			get { return generalTags; }
-			set { generalTags = value; }
+			get
+			{
+				if (GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].Favourites.Contains("fav:" + BooruAPI.UserModel.ID))
+				{
+					favIcon = Symbol.Favorite;
+				}
+				return favIcon;
+			}
+			set
+			{
+				favIcon = value;
+				RaisePropertyChanged();
+			}
 		}
 
+		private string favString = "Favourite";
 
-		private ObservableCollection<TagViewModel> characterTags = new ObservableCollection<TagViewModel>();
-
-		public ObservableCollection<TagViewModel> CharacterTags
+		public string FavString
 		{
-			get { return characterTags; }
-			set { characterTags = value; }
-		}
-
-
-		private ObservableCollection<TagViewModel> artistTags = new ObservableCollection<TagViewModel>();
-
-		public ObservableCollection<TagViewModel> ArtistTags
-		{
-			get { return artistTags; }
-			set { artistTags = value; }
-		}
-
-
-		private ObservableCollection<TagViewModel> copyrightTags = new ObservableCollection<TagViewModel>();
-
-		public ObservableCollection<TagViewModel> CopyrightTags
-		{
-			get { return copyrightTags; }
-			set { copyrightTags = value; }
+			get
+			{
+				if (GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].Favourites.Contains("fav:" + BooruAPI.UserModel.ID))
+				{
+					favString = "Unfavourite";
+				}
+				return favString;
+			}
+			set
+			{
+				favString = value;
+				RaisePropertyChanged();
+			}
 		}
 
 		async void LoadMoreImages()
@@ -227,12 +263,38 @@ namespace Booru_Viewer.ViewModels
 		{
 			Saving = true;
 			SaveImageFailureReason = await ImageSaver.SaveImage(images[Index].LargeImage);
-			
+
 		}
 
 
 
 		public ICommand SaveImage => new RelayCommand(SaveImageExec);
+
+		public ICommand FavouriteImage => new RelayCommand(FavouriteImageExec);
+		async void FavouriteImageExec()
+		{
+			var postIndex = GlobalInfo.SelectedImage;
+			if (FavIcon == Symbol.OutlineStar)
+			{
+				if (await BooruAPI.FavouriteImage(GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage]))
+				{
+					GlobalInfo.CurrentSearch[postIndex].Fav_String += " fav:" + BooruAPI.UserModel.ID;
+					FavIcon = Symbol.Favorite;
+					FavString = "Unfavourite";
+				}
+				
+			}
+			else
+			{
+				if (await BooruAPI.UnfavouriteImage(GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage]))
+				{
+					var im = GlobalInfo.CurrentSearch[postIndex];
+					im.Fav_String = im.Fav_String.Replace(" fav:" + BooruAPI.UserModel.ID, "");
+					FavIcon = Symbol.OutlineStar;
+					FavString = "Favourite";
+				}
+			}
+		}
 
 	}
 }

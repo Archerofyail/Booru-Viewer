@@ -107,6 +107,8 @@ namespace Booru_Viewer.ViewModels
 			RaisePropertyChanged("SelectedPrefixIndex");
 
 			thumbnails = new IncrementalLoadingCollection<PostSource, ThumbnailViewModel>(perPage, null, ImageOnLoadFinish, ImageLoadOnError);
+			BooruAPI.GetUser();
+
 		}
 
 		private int totalTagCount
@@ -124,8 +126,7 @@ namespace Booru_Viewer.ViewModels
 
 		public bool SafeChecked
 		{
-			get { return safeChecked; }
-			set
+			get => safeChecked; set
 			{
 				safeChecked = value;
 				GlobalInfo.ContentCheck[0] = value;
@@ -139,8 +140,7 @@ namespace Booru_Viewer.ViewModels
 
 		public bool QuestionableChecked
 		{
-			get { return questionableChecked; }
-			set
+			get => questionableChecked; set
 			{
 				questionableChecked = value;
 				GlobalInfo.ContentCheck[1] = value;
@@ -154,8 +154,7 @@ namespace Booru_Viewer.ViewModels
 
 		public bool ExplicitChecked
 		{
-			get { return explicitChecked; }
-			set
+			get => explicitChecked; set
 			{
 				explicitChecked = value;
 				GlobalInfo.ContentCheck[2] = value;
@@ -169,8 +168,7 @@ namespace Booru_Viewer.ViewModels
 		private int startingPage = 1;
 		public int PageNum
 		{
-			get { return startingPage; }
-			set
+			get => startingPage; set
 			{
 				startingPage = value;
 				RaisePropertyChanged();
@@ -181,8 +179,7 @@ namespace Booru_Viewer.ViewModels
 
 		public int PerPage
 		{
-			get { return perPage; }
-			set
+			get => perPage; set
 			{
 				//if (value > perPage)
 				//{
@@ -191,7 +188,7 @@ namespace Booru_Viewer.ViewModels
 
 				//	/*
 				//	 Going from 10 -> 25 with 3 pages
-					 
+
 				//	 */
 				//	var imagesNeeded = value - GlobalInfo.CurrentSearch.Count;
 				//	var timesToCall = (int) Math.Ceiling((double) imagesNeeded / perPage);
@@ -227,8 +224,7 @@ namespace Booru_Viewer.ViewModels
 
 		public int ImageSize
 		{
-			get { return imageSize; }
-			set
+			get => imageSize; set
 			{
 				imageSize = value;
 				ApplicationData.Current.LocalSettings.Values["ImageSize"] = value;
@@ -239,8 +235,7 @@ namespace Booru_Viewer.ViewModels
 
 		public ObservableCollection<string> SuggestedTags
 		{
-			get { return suggestedTags; }
-			set
+			get => suggestedTags; set
 			{
 				suggestedTags = value;
 				RaisePropertyChanged();
@@ -251,8 +246,7 @@ namespace Booru_Viewer.ViewModels
 
 		public int SuggestedTagIndex
 		{
-			get { return suggestedTagIndex; }
-			set
+			get => suggestedTagIndex; set
 			{
 				if (value < suggestedTags.Count && value >= 0)
 				{
@@ -299,10 +293,7 @@ namespace Booru_Viewer.ViewModels
 
 		public int SelectedPrefixIndex
 		{
-			get
-			{
-				return selectedPrefixIndex;
-			}
+			get => selectedPrefixIndex;
 			set
 			{
 				selectedPrefixIndex = value;
@@ -314,8 +305,7 @@ namespace Booru_Viewer.ViewModels
 
 		public int SelectedOrderIndex
 		{
-			get { return selectedOrderIndex; }
-			set
+			get => selectedOrderIndex; set
 			{
 				selectedOrderIndex = value;
 				RaisePropertyChanged();
@@ -330,10 +320,7 @@ namespace Booru_Viewer.ViewModels
 
 		public string CurrentTag
 		{
-			get
-			{
-				return currentTag;
-			}
+			get => currentTag;
 			set
 			{
 				currentTag = value;
@@ -348,8 +335,7 @@ namespace Booru_Viewer.ViewModels
 		private string username;
 		public string Username
 		{
-			get { return BooruAPI.Username; }
-			set
+			get => BooruAPI.Username; set
 			{
 				username = value;
 				RaisePropertyChanged("IsSignedOutWithMoreThan2Tags");
@@ -360,8 +346,7 @@ namespace Booru_Viewer.ViewModels
 		private string apiKey;
 		public string APIKey
 		{
-			get { return BooruAPI.APIKey; }
-			set
+			get => BooruAPI.APIKey; set
 			{
 
 				apiKey = value;
@@ -383,8 +368,8 @@ namespace Booru_Viewer.ViewModels
 
 		public bool DontHaveImages
 		{
-			get { return dontHaveImages; }
-			set
+			get => dontHaveImages;
+			private set
 			{
 				dontHaveImages = value;
 				RaisePropertyChanged();
@@ -394,8 +379,7 @@ namespace Booru_Viewer.ViewModels
 		private string noImagesText = "Press the search key to get started";
 		public string NoImagesText
 		{
-			get { return noImagesText; }
-			set
+			get => noImagesText; set
 			{
 				noImagesText = value;
 				RaisePropertyChanged();
@@ -406,8 +390,7 @@ namespace Booru_Viewer.ViewModels
 		private bool isMultiSelectOn = false;
 		public ListViewSelectionMode ImageSelectionMode
 		{
-			get { return isMultiSelectOn ? ListViewSelectionMode.Multiple : ListViewSelectionMode.Single; }
-			set
+			get => isMultiSelectOn ? ListViewSelectionMode.Multiple : ListViewSelectionMode.Single; set
 			{
 				isMultiSelectOn = value == ListViewSelectionMode.Multiple;
 				RaisePropertyChanged("MultiSelectButtonIcon");
@@ -416,8 +399,7 @@ namespace Booru_Viewer.ViewModels
 		}
 		public SymbolIcon MultiSelectButtonIcon
 		{
-			get { return isMultiSelectOn ? new SymbolIcon(Symbol.Cancel) : new SymbolIcon(Symbol.SelectAll); }
-			set
+			get => isMultiSelectOn ? new SymbolIcon(Symbol.Cancel) : new SymbolIcon(Symbol.SelectAll); set
 			{
 				isMultiSelectOn = value == new SymbolIcon(Symbol.Cancel);
 				RaisePropertyChanged();
@@ -432,8 +414,7 @@ namespace Booru_Viewer.ViewModels
 
 		public int SelectedSavedSearch
 		{
-			get { return selectedSavedSearch; }
-			set
+			get => selectedSavedSearch; set
 			{
 				selectedSavedSearch = value;
 				RaisePropertyChanged();
@@ -444,14 +425,25 @@ namespace Booru_Viewer.ViewModels
 
 		public void DeleteSavedSearch(SavedSearchViewModel search)
 		{
-			SavedSearches.Remove(search);
-			RaisePropertyChanged("HaveSavedSearches");
+			try
+			{
+				SavedSearches.Remove(search);
+				RaisePropertyChanged("HaveSavedSearches");
+				GlobalInfo.SaveSearches(savedSearches.ToList());
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
+				throw;
+			}
+
 		}
 
 		public void RemoveTagExec(TagViewModel tag)
 		{
 			CurrentTags.Remove(tag);
 			RaisePropertyChanged("CurrentTags");
+
 		}
 
 		void AddTagExecute()
@@ -509,11 +501,10 @@ namespace Booru_Viewer.ViewModels
 			{
 				NoImagesText = "No Images found with those tags, try a different search";
 				DontHaveImages = true;
-				return;
-
 			}
 			else
 			{
+				NoImagesText = "";
 				DontHaveImages = false;
 			}
 
@@ -634,7 +625,7 @@ namespace Booru_Viewer.ViewModels
 				RaisePropertyChanged("SavedSearches");
 				RaisePropertyChanged("HaveSavedSearches");
 			}
-			GlobalInfo.SaveSearches();
+			GlobalInfo.SaveSearches(savedSearches.ToList());
 		}
 
 		public void StartSavedSearch(string[] tags)
@@ -728,9 +719,19 @@ namespace Booru_Viewer.ViewModels
 		//public ICommand PerPageChanged => new RelayCommand<int>(PerPageChangedEx);
 		public void PerPageChangedEx(object sender, PointerRoutedEventArgs e)
 		{
-			Debug.WriteLine("Per Page Changed, old value is {0}, new value is {1}", PerPage, (sender as Slider).Value);
-			PerPage = (int) (sender as Slider).Value;
-			Debug.WriteLine("PerPage Changed");
+			if (clicked)
+			{
+				Debug.WriteLine("Per Page Changed, old value is {0}, new value is {1}", PerPage, (sender as Slider).Value);
+				PerPage = (int) (sender as Slider).Value;
+				Debug.WriteLine("PerPage Changed");
+				clicked = false;
+			}
+		}
+
+		private bool clicked = false;
+		public void PerPageClicked(object sender, PointerRoutedEventArgs e)
+		{
+			clicked = true;
 		}
 	}
 }

@@ -38,25 +38,7 @@ namespace Booru_Viewer.ViewModels
 		void DeleteSearchExecute()
 		{
 			
-			GlobalInfo.SavedSearches.FirstOrDefault((x) =>
-			{
-				if (x.Length == Tags.Length)
-				{
-
-					for (var i = 0; i < x.Length; i++)
-					{
-						var tag = x[i];
-						if (tag != Tags[i])
-						{
-							return false;
-
-						}
-					}
-				}
-				return true;
-			});
 			parentVM.DeleteSavedSearch(this);
-			GlobalInfo.SaveSearches();
 		}
 
 		void StartSearchExecute()

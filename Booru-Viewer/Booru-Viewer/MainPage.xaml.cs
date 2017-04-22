@@ -52,6 +52,7 @@ namespace Booru_Viewer
 			{
 				ViewModel = DataContext as MainPageViewModel;
 			};
+			
 		}
 		
 		private void GridView_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -180,7 +181,11 @@ namespace Booru_Viewer
 
 		private void PerPageSlider_OnLoaded(object sender, RoutedEventArgs e)
 		{
-			PerPageSlider.Value = (int)ApplicationData.Current.RoamingSettings.Values["PerPage"];
+			var perPage = ApplicationData.Current.RoamingSettings.Values["PerPage"] as int?;
+			if (perPage != null)
+			{
+				PerPageSlider.Value = perPage.Value;
+			}
 		}
 	}
 }
