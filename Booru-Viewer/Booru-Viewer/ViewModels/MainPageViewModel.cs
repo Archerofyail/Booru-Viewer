@@ -17,9 +17,11 @@ using GalaSoft.MvvmLight;
 using Windows.Web.Http;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
+using Booru_Viewer.Models;
 using Dropbox.Api;
 using Microsoft.Toolkit.Uwp;
 using Microsoft.Toolkit.Uwp.UI.Controls;
+using Newtonsoft.Json;
 
 //TODO: Saved Searches (should be somewhat straightforward)
 namespace Booru_Viewer.ViewModels
@@ -36,6 +38,7 @@ namespace Booru_Viewer.ViewModels
 			if (appSettings["PerPage"] != null)
 			{
 				perPage = (int)appSettings["PerPage"];
+				RaisePropertyChanged("PerPage");
 			}
 			if (appSettings["SafeChecked"] != null)
 			{
@@ -106,7 +109,10 @@ namespace Booru_Viewer.ViewModels
 			//thumbnails.CollectionChanged += (sender, args) => RaisePropertyChanged("Thumbnails");
 			RaisePropertyChanged("SelectedPrefixIndex");
 
-			thumbnails = new IncrementalLoadingCollection<PostSource, ThumbnailViewModel>(perPage, null, ImageOnLoadFinish, ImageLoadOnError);
+			thumbnails = GlobalInfo.ImageViewModels;
+			Thumbnails.OnEndLoading = ImageOnLoadFinish;
+			Thumbnails.OnError = ImageLoadOnError;
+			Thumbnails.RefreshAsync();
 			BooruAPI.GetUser();
 
 		}
@@ -211,12 +217,15 @@ namespace Booru_Viewer.ViewModels
 				//	}
 
 				//}
+				var pagesToLoad = Math.Ceiling(BooruAPI.Page * perPage / (double)value);
 				perPage = value;
 				ApplicationData.Current.RoamingSettings.Values["PerPage"] = value;
 				RaisePropertyChanged();
-				Thumbnails.RefreshAsync();
-
-
+				Thumbnails = new IncrementalLoadingCollection<PostSource, FullImageViewModel>(perPage, null, ImageOnLoadFinish, ImageLoadOnError);
+				for (int i = 0; i < pagesToLoad; i++)
+				{
+					Thumbnails.LoadMoreItemsAsync(Convert.ToUInt32(PerPage));
+				}
 			}
 		}
 
@@ -276,9 +285,13 @@ namespace Booru_Viewer.ViewModels
 			}
 		}
 
-		private IncrementalLoadingCollection<PostSource, ThumbnailViewModel> thumbnails;
+		private IncrementalLoadingCollection<PostSource, FullImageViewModel> thumbnails;
 
-		public IncrementalLoadingCollection<PostSource, ThumbnailViewModel> Thumbnails => thumbnails;
+		public IncrementalLoadingCollection<PostSource, FullImageViewModel> Thumbnails
+		{
+			get => thumbnails;
+			set => thumbnails = value;
+		}
 
 		public ObservableCollection<string> Prefixes => new ObservableCollection<string>(new[] { "none", "~", "-" });
 		private string orderPrefix = "order:";
@@ -497,6 +510,7 @@ namespace Booru_Viewer.ViewModels
 
 		void ImageOnLoadFinish()
 		{
+			Debug.WriteLine("ImagesFinished Loading");
 			if (thumbnails.Count == 0)
 			{
 				NoImagesText = "No Images found with those tags, try a different search";
@@ -507,7 +521,7 @@ namespace Booru_Viewer.ViewModels
 				NoImagesText = "";
 				DontHaveImages = false;
 			}
-
+			RaisePropertyChanged("Thumbnails");
 		}
 
 		async void StartSearchExecute()
@@ -522,6 +536,7 @@ namespace Booru_Viewer.ViewModels
 				GlobalInfo.CurrentSearchTags.Clear();
 
 				GlobalInfo.CurrentSearchTags.AddRange(tags);
+				BooruAPI.Page = 1;
 				await Thumbnails.RefreshAsync();
 			}
 			catch (Exception e)
@@ -536,7 +551,7 @@ namespace Booru_Viewer.ViewModels
 
 			foreach (var post in tn)
 			{
-				thumbnails.Add(new ThumbnailViewModel(post.Preview_File_Url, post.Has_Large ? post.Large_File_Url : post.File_Url));
+				thumbnails.Add(new FullImageViewModel(post.Preview_File_Url, post.Has_Large ? post.Large_File_Url : post.File_Url));
 			}
 
 
@@ -570,7 +585,7 @@ namespace Booru_Viewer.ViewModels
 			thumbnails.Clear();
 			foreach (var post in GlobalInfo.CurrentSearch)
 			{
-				thumbnails.Add(new ThumbnailViewModel(post.Preview_File_Url, post.Has_Large ? post.Large_File_Url : post.File_Url));
+				thumbnails.Add(new FullImageViewModel(post.Preview_File_Url, post.Has_Large ? post.Large_File_Url : post.File_Url));
 			}
 
 			RaisePropertyChanged("Thumbnails");
@@ -589,7 +604,6 @@ namespace Booru_Viewer.ViewModels
 
 		async void LoadNextPageExecute(uint count)
 		{
-			BooruAPI.Page++;
 			await Thumbnails.LoadMoreItemsAsync(Convert.ToUInt32(PerPage));
 		}
 
@@ -716,6 +730,39 @@ namespace Booru_Viewer.ViewModels
 			var authURI = DropboxOAuth2Helper.GetAuthorizeUri(OAuthResponseType.Code, dbInfo[0], "https://localhost/authorize");
 
 		}
+
+		public ICommand Backup => new RelayCommand(BackupEx);
+
+		async void BackupEx()
+		{
+			var picker = new FolderPicker();
+			picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+			var result = await picker.PickSingleFolderAsync();
+			if (result != null)
+			{
+				await GlobalInfo.SaveSearches(SavedSearches.ToList(), result);
+				SettingsData settings = new SettingsData()
+				{
+					PerPage = PerPage,
+					Username = BooruAPI.Username,
+					APIKey = BooruAPI.APIKey,
+					contentChecks = new[] {safeChecked, QuestionableChecked, ExplicitChecked}
+				};
+				var saveFolder = await result.GetFolderAsync("Booru-Viewer");
+				var obj = await saveFolder.TryGetItemAsync("Settings.json");
+				StorageFile settingsFile;
+				if (obj != null)
+				{
+					settingsFile = await saveFolder.GetFileAsync("Settings.json");
+				}
+				else
+				{
+					settingsFile = await saveFolder.CreateFileAsync("Settings.json");
+				}
+				await FileIO.WriteTextAsync(settingsFile, JsonConvert.SerializeObject(settings));
+			}
+		}
+
 		//public ICommand PerPageChanged => new RelayCommand<int>(PerPageChangedEx);
 		public void PerPageChangedEx(object sender, PointerRoutedEventArgs e)
 		{

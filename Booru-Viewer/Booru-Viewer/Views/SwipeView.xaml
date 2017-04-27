@@ -78,7 +78,7 @@
 								<CompositeTransform TranslateX="0.5" TranslateY="0.5"/>
 							</controls:ImageEx.RenderTransform>
 							<controls:ImageEx.Source>
-								<BitmapImage UriSource="{Binding FullImageWithLogin}"
+								<BitmapImage UriSource="{Binding FullImageWithLoginURL}"
 											 AutoPlay="True"
 											 DecodePixelHeight="{Binding Height}">
 
@@ -95,17 +95,16 @@
 			</FlipView.ItemTemplate>
 
 		</FlipView>
-		<ProgressBar Name="Progress" Minimum="0" Maximum="100" VerticalAlignment="Bottom"
-					 Visibility="Collapsed"></ProgressBar>
-		<TextBlock Text="{Binding ElementName=FlipView, Path=SelectedIndex}"
+	
+		<!--<TextBlock Text="{Binding ElementName=FlipView, Path=SelectedIndex}"
 				   VerticalAlignment="Bottom"
-				   MaxHeight="20"/>
+				   MaxHeight="20"/>-->
 	</Grid>
 	<Page.BottomAppBar>
 		<CommandBar Name="AppBar">
 			<AppBarButton Label="{Binding FavString}" RenderTransformOrigin="0.5,0.5"
 						  Command="{Binding FavouriteImage}">
-				
+
 				<AppBarButton.Icon>
 					<SymbolIcon Symbol="{Binding FavIcon}"></SymbolIcon>
 				</AppBarButton.Icon>
@@ -123,21 +122,17 @@
 						  Icon="List">
 				<AppBarButton.Flyout>
 					<Flyout x:Name="TagFlyout">
-						<Flyout.FlyoutPresenterStyle>
-							<Style TargetType="FlyoutPresenter">
-								<Setter Value="Disabled" Property="ScrollViewer.VerticalScrollMode"/>
-								<Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled"/>
-							</Style>
-						</Flyout.FlyoutPresenterStyle>
+
 						<StackPanel>
 							<StackPanel Orientation="Horizontal">
-							<TextBlock Text="Rating: "></TextBlock>
-							<TextBlock Text="{Binding Rating}"></TextBlock>
+								<TextBlock Text="Rating: "></TextBlock>
+								<TextBlock Text="{Binding Rating}"></TextBlock>
 							</StackPanel>
 							<ListView ItemsSource="{Binding CharacterTags}"
 								  ItemTemplate="{StaticResource Tag}"
 									  Header="Character"
 									  Name="CharTagsList"
+							          SelectionMode="None"
 							          Visibility="{Binding Path=CharacterTags.Count, 
 														Converter={StaticResource CountToVis}}"/>
 
@@ -145,6 +140,7 @@
 								  ItemTemplate="{StaticResource Tag}"
 									  Header="Artist"
 									  Name="ArtistTagList"
+							          SelectionMode="None"
 							          Visibility="{Binding Path=ArtistTags.Count, 
 														Converter={StaticResource CountToVis}}"/>
 
@@ -152,6 +148,7 @@
 								  ItemTemplate="{StaticResource Tag}"
 									  Header="Copyright"
 									  Name="CopyrightTagList"
+							          SelectionMode="None"
 							          Visibility="{Binding Path=CopyrightTags.Count, 
 														Converter={StaticResource CountToVis}}"/>
 
@@ -159,6 +156,7 @@
 								  ItemTemplate="{StaticResource Tag}"
 									  Header="General"
 									  Name="GeneralTagList"
+									  SelectionMode="None"
 							          Visibility="{Binding Path=GeneralTags.Count, 
 														Converter={StaticResource CountToVis}}"/>
 

@@ -460,7 +460,17 @@
 											CommandParameter="{Binding ElementName=ChooseFolderButton}"
 											Name="ChooseFolderButton"/>
 									<TextBlock Text="Current:" VerticalAlignment="Center" Margin="4"/>
-									<TextBlock Text="{Binding SaveFolder}" VerticalAlignment="Center" Margin="4"/>
+									
+								
+								</StackPanel>
+								<TextBlock Text="{Binding SaveFolder}" VerticalAlignment="Center" Margin="4"
+								           TextWrapping="WrapWholeWords"/>
+
+								<StackPanel Margin="4">
+									<TextBlock Text="Backs up settings and saved searches to your Documents folder"
+									           FontSize="14" TextWrapping="WrapWholeWords"></TextBlock>
+									<Button Content="Backup" Command="{Binding Backup}"></Button>
+									
 								</StackPanel>
 								<!--<Button Content="Use a Dropbox Folder"
 										Command="{Binding SelectDropboxFolder}"/>-->

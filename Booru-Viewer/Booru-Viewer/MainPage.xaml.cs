@@ -7,6 +7,7 @@ using Booru_Viewer.Types;
 using System.Diagnostics;
 using System.Linq;
 using Windows.Storage;
+using Windows.UI.Core;
 using Windows.UI.Xaml.Controls.Primitives;
 using Booru_Viewer.ViewModels;
 using Booru_Viewer.Views;
@@ -124,6 +125,19 @@ namespace Booru_Viewer
 
 			ImageGridView.GetBindingExpression(GridView.ItemsSourceProperty).UpdateSource();
 
+			Frame rootFrame = Window.Current.Content as Frame;
+			if (rootFrame.CanGoBack)
+			{
+				// Show UI in title bar if opted-in and in-app backstack is not empty.
+				SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility =
+					AppViewBackButtonVisibility.Visible;
+			}
+			else
+			{
+				// Remove the UI from the title bar if in-app back stack is empty.
+				SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility =
+					AppViewBackButtonVisibility.Collapsed;
+			}
 			base.OnNavigatedTo(e);
 		}
 

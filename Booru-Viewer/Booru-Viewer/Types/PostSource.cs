@@ -11,18 +11,18 @@ using Microsoft.Toolkit.Uwp;
 
 namespace Booru_Viewer.Types
 {
-	public class PostSource : IIncrementalSource<ThumbnailViewModel>
+	public class PostSource : IIncrementalSource<FullImageViewModel>
 	{
-		async Task<IEnumerable<ThumbnailViewModel>> IIncrementalSource<ThumbnailViewModel>.GetPagedItemsAsync(int pageIndex, int pageSize, CancellationToken cancellationToken)
+		async Task<IEnumerable<FullImageViewModel>> IIncrementalSource<FullImageViewModel>.GetPagedItemsAsync(int pageIndex, int pageSize, CancellationToken cancellationToken)
 		{
 			pageIndex++;
 			BooruAPI.Page++;
 			var result = await BooruAPI.SearchPosts(GlobalInfo.CurrentSearchTags.ToArray(), BooruAPI.Page, pageSize, GlobalInfo.ContentCheck, false);
 			if (!result.Item1) throw new Exception(result.Item3);
-			var tns = new List<ThumbnailViewModel>();
+			var tns = new List<FullImageViewModel>();
 			foreach (var image in result.Item2)
 			{
-				tns.Add(new ThumbnailViewModel(image.Preview_File_Url, image.Has_Large ? image.Large_File_Url : image.File_Url));
+				tns.Add(new FullImageViewModel(image.Preview_File_Url, image.Has_Large ? image.Large_File_Url : image.File_Url, image.Large_File_Url, image.image_width, image.image_height));
 			}
 			return tns;
 		}

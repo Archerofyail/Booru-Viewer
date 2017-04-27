@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Windows.Storage;
+using Microsoft.Toolkit.Uwp;
 using Newtonsoft.Json;
 
 namespace Booru_Viewer.Types
@@ -12,6 +14,8 @@ namespace Booru_Viewer.Types
 	public static class GlobalInfo
 	{
 		public static ObservableCollection<ImageModel> CurrentSearch { get; set; } = new ObservableCollection<ImageModel>();
+		public static IncrementalLoadingCollection<PostSource, FullImageViewModel> ImageViewModels { get; set; } = new IncrementalLoadingCollection<PostSource, FullImageViewModel>();
+
 		public static ObservableCollection<TagViewModel> CurrentTags { get; set; } = new ObservableCollection<TagViewModel>();
 		public static List<string> CurrentSearchTags { get; set; } = new List<string>();
 		private static string currentOrdering = "";
@@ -46,7 +50,7 @@ namespace Booru_Viewer.Types
 			CurrentTags.Remove(tag);
 		}
 
-		public static async void SaveSearches(List<SavedSearchViewModel> searches)
+		public static async Task SaveSearches(List<SavedSearchViewModel> searches, StorageFolder baseFolder = null)
 		{
 			if (searches == null)
 			{
@@ -54,14 +58,32 @@ namespace Booru_Viewer.Types
 			}
 			try
 			{
-				var item = await ApplicationData.Current.RoamingFolder.TryGetItemAsync("SavedSearches.json");
-				if (item != null)
+				StorageFolder folder;
+				if (baseFolder != null)
 				{
-					SearchesFile = await ApplicationData.Current.RoamingFolder.GetFileAsync("SavedSearches.json");
+					var potFold = await baseFolder.TryGetItemAsync("BooruViewer");
+					if (potFold != null)
+					{
+						folder = await baseFolder.GetFolderAsync("Booru-Viewer");
+					}
+					else
+					{
+						folder = await baseFolder.CreateFolderAsync("Booru-Viewer");
+					}
 				}
 				else
 				{
-					SearchesFile = await ApplicationData.Current.RoamingFolder.CreateFileAsync("SavedSearches.json");
+					folder = ApplicationData.Current.RoamingFolder;
+				}
+				 
+				var item = await folder.TryGetItemAsync("SavedSearches.json");
+				if (item != null)
+				{
+					SearchesFile = await folder.GetFileAsync("SavedSearches.json");
+				}
+				else
+				{
+					SearchesFile = await folder.CreateFileAsync("SavedSearches.json");
 				}
 
 				var json = JsonConvert.SerializeObject(searches.Select(x => x.Tags));

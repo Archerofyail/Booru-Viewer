@@ -22,18 +22,7 @@ namespace Booru_Viewer.Views
 		{
 			this.InitializeComponent();
 
-			FlipView.Loaded += (sender, args) =>
-			{
-				FlipView.SelectedIndex = GlobalInfo.SelectedImage;
-			};
-			FlipView.SelectionChanged += (sender, args) =>
-			{
-				if (FlipView.Items.Count - FlipView.SelectedIndex < 2)
-				{
-
-				}
-			};
-
+			
 		}
 
 		protected override void OnNavigatedTo(NavigationEventArgs e)

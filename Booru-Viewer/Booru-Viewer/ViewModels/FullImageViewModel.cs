@@ -3,19 +3,21 @@ using GalaSoft.MvvmLight;
 
 namespace Booru_Viewer.ViewModels
 {
-	class FullImageViewModel : ViewModelBase
+	public class FullImageViewModel : ViewModelBase
 	{
-		public string FullImage { get; set; }
-		public string FullImageWithLogin { get; set; }
-		public string LargeImage { get; set; }
+		public string FullImageURL { get; set; }
+		public string FullImageWithLoginURL { get; set; }
+		public string LargeImageURL { get; set; }
+		public string PreviewURL { get; set; }
 		public int Width { get; set; }
 		public int Height { get; set; }
 
-		public FullImageViewModel(string imageUrl, string largeImage = null, int width = 0, int height = 0)
+		public FullImageViewModel(string previewURL, string imageURLUrl, string largeImage = null, int width = 0, int height = 0)
 		{
-			FullImage = imageUrl;
-			FullImageWithLogin = imageUrl + "?login=" + BooruAPI.Username + "&api_key=" + BooruAPI.APIKey;
-			LargeImage = largeImage ?? imageUrl;
+			FullImageURL = imageURLUrl;
+			FullImageWithLoginURL = imageURLUrl + "?login=" + BooruAPI.Username + "&api_key=" + BooruAPI.APIKey;
+			LargeImageURL = largeImage ?? imageURLUrl;
+			PreviewURL = previewURL;
 			Width = width;
 			Height = height;
 		}
