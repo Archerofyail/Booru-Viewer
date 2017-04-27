@@ -1,4 +1,5 @@
-﻿using Windows.UI.Xaml;
+﻿using System.Collections.Generic;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Navigation;
@@ -186,6 +187,12 @@ namespace Booru_Viewer
 			{
 				PerPageSlider.Value = perPage.Value;
 			}
+		}
+
+		private void SavedSearchesList_OnDragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
+		{
+			Debug.WriteLine("Drag Finished");
+			GlobalInfo.SaveSearches(SavedSearchesList.ItemsSource as List<SavedSearchViewModel>);
 		}
 	}
 }

@@ -27,7 +27,7 @@ namespace Booru_Viewer.ViewModels
 
 
 
-		private string rating;
+		public string rating { get; set; }
 		[JsonIgnore]
 		public string Rating
 		{

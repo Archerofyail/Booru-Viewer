@@ -217,7 +217,11 @@
 											  ItemContainerStyle="{StaticResource TagStyleNoMargin}"
 											  IsItemClickEnabled="True"
 											  SelectionMode="None"
-											  ItemClick="SavedSearchesList_OnItemClick">
+											  ItemClick="SavedSearchesList_OnItemClick"
+											  ReorderMode="Enabled"
+											  CanReorderItems="True"
+											  AllowDrop="True"
+											  DragItemsCompleted="SavedSearchesList_OnDragItemsCompleted">
 										<i:Interaction.Behaviors>
 											<core:EventTriggerBehavior EventName="ItemClick" >
 												<core:InvokeCommandAction Command="{Binding SavedSearchSelected}"

@@ -158,7 +158,13 @@ namespace Booru_Viewer.ViewModels
 
 		public string Rating
 		{
-			get => rating;
+			get
+
+			{
+				rating = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].Rating;
+				return " " + rating;
+			}
+			
 			set
 			{
 				rating = value;
@@ -282,7 +288,7 @@ namespace Booru_Viewer.ViewModels
 					FavIcon = Symbol.Favorite;
 					FavString = "Unfavourite";
 				}
-				
+
 			}
 			else
 			{

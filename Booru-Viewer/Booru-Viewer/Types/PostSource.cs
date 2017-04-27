@@ -17,7 +17,7 @@ namespace Booru_Viewer.Types
 		{
 			pageIndex++;
 			BooruAPI.Page++;
-			var result = await BooruAPI.SearchPosts(GlobalInfo.CurrentSearchTags.ToArray(), pageIndex, pageSize, GlobalInfo.ContentCheck, false);
+			var result = await BooruAPI.SearchPosts(GlobalInfo.CurrentSearchTags.ToArray(), BooruAPI.Page, pageSize, GlobalInfo.ContentCheck, false);
 			if (!result.Item1) throw new Exception(result.Item3);
 			var tns = new List<ThumbnailViewModel>();
 			foreach (var image in result.Item2)

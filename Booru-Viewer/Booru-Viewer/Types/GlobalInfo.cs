@@ -48,7 +48,10 @@ namespace Booru_Viewer.Types
 
 		public static async void SaveSearches(List<SavedSearchViewModel> searches)
 		{
-
+			if (searches == null)
+			{
+				throw new NullReferenceException("searches list can't be null");
+			}
 			try
 			{
 				var item = await ApplicationData.Current.RoamingFolder.TryGetItemAsync("SavedSearches.json");

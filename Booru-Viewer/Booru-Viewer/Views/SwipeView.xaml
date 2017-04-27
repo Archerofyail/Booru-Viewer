@@ -78,7 +78,7 @@
 								<CompositeTransform TranslateX="0.5" TranslateY="0.5"/>
 							</controls:ImageEx.RenderTransform>
 							<controls:ImageEx.Source>
-								<BitmapImage UriSource="{Binding FullImage}"
+								<BitmapImage UriSource="{Binding FullImageWithLogin}"
 											 AutoPlay="True"
 											 DecodePixelHeight="{Binding Height}">
 
@@ -123,10 +123,15 @@
 						  Icon="List">
 				<AppBarButton.Flyout>
 					<Flyout x:Name="TagFlyout">
-
+						<Flyout.FlyoutPresenterStyle>
+							<Style TargetType="FlyoutPresenter">
+								<Setter Value="Disabled" Property="ScrollViewer.VerticalScrollMode"/>
+								<Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled"/>
+							</Style>
+						</Flyout.FlyoutPresenterStyle>
 						<StackPanel>
 							<StackPanel Orientation="Horizontal">
-							<TextBlock Text="Rating:"></TextBlock>
+							<TextBlock Text="Rating: "></TextBlock>
 							<TextBlock Text="{Binding Rating}"></TextBlock>
 							</StackPanel>
 							<ListView ItemsSource="{Binding CharacterTags}"
