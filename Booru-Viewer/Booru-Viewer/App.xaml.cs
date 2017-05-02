@@ -6,7 +6,7 @@ using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
-using Booru_Viewer.Types;
+
 namespace Booru_Viewer
 {
 	/// <summary>

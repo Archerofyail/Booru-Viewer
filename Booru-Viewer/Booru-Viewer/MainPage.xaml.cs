@@ -1,14 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Navigation;
 using Booru_Viewer.Types;
 using System.Diagnostics;
-using System.Linq;
-using Windows.Storage;
 using Windows.UI.Core;
-using Windows.UI.Xaml.Controls.Primitives;
 using Booru_Viewer.ViewModels;
 using Booru_Viewer.Views;
 using Microsoft.Toolkit.Uwp.UI.Controls;
@@ -42,7 +40,7 @@ namespace Booru_Viewer
 				}
 
 			}
-			this.NavigationCacheMode = NavigationCacheMode.Enabled;
+			this.NavigationCacheMode = NavigationCacheMode.Required;
 			SearchButton.Loaded += (sender, args) => { SearchButton.CommandParameter = SearchAppBarButton; };
 			SearchFavouritesButton.Loaded += (sender, args) => { SearchButton.CommandParameter = SearchAppBarButton; };
 
@@ -141,6 +139,11 @@ namespace Booru_Viewer
 			base.OnNavigatedTo(e);
 		}
 
+		protected override void OnNavigatedFrom(NavigationEventArgs e)
+		{
+			Debug.WriteLine("Globalinfo imageviewmodels count is " + GlobalInfo.ImageViewModels.Count + ", itemssource is " + (ImageGridView.Items).Count);
+		}
+
 		private void SavedSearchSelection(object sender, SelectionChangedEventArgs e)
 		{
 			var list = sender as ListView;
@@ -196,11 +199,11 @@ namespace Booru_Viewer
 
 		private void PerPageSlider_OnLoaded(object sender, RoutedEventArgs e)
 		{
-			var perPage = ApplicationData.Current.RoamingSettings.Values["PerPage"] as int?;
-			if (perPage != null)
-			{
-				PerPageSlider.Value = perPage.Value;
-			}
+			//var perPage = ApplicationData.Current.RoamingSettings.Values["PerPage"] as int?;
+			//if (perPage != null)
+			//{
+			//	PerPageSlider.Value = perPage.Value;
+			//}
 		}
 
 		private void SavedSearchesList_OnDragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)

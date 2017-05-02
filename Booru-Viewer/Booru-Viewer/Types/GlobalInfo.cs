@@ -25,7 +25,7 @@ namespace Booru_Viewer.Types
 			get => currentOrdering; set => currentOrdering = value == "" ? "" : "order:" + value;
 		}
 
-		public static bool[] ContentCheck { get; set; } = {true, true, true};
+		public static bool[] ContentCheck { get; set; } = { true, true, true };
 
 		private static ObservableCollection<string[]> savedSearches;
 		public static EventHandler SavedSearchesLoadedEventHandler;
@@ -61,21 +61,28 @@ namespace Booru_Viewer.Types
 				StorageFolder folder;
 				if (baseFolder != null)
 				{
-					var potFold = await baseFolder.TryGetItemAsync("BooruViewer");
-					if (potFold != null)
+					if (baseFolder.DisplayName != "Booru-Viewer")
 					{
-						folder = await baseFolder.GetFolderAsync("Booru-Viewer");
+						var potFold = await baseFolder.TryGetItemAsync("BooruViewer");
+						if (potFold != null)
+						{
+							folder = await baseFolder.GetFolderAsync("Booru-Viewer");
+						}
+						else
+						{
+							folder = await baseFolder.CreateFolderAsync("Booru-Viewer");
+						}
 					}
 					else
 					{
-						folder = await baseFolder.CreateFolderAsync("Booru-Viewer");
+						folder = baseFolder;
 					}
 				}
 				else
 				{
 					folder = ApplicationData.Current.RoamingFolder;
 				}
-				 
+
 				var item = await folder.TryGetItemAsync("SavedSearches.json");
 				if (item != null)
 				{
@@ -92,27 +99,34 @@ namespace Booru_Viewer.Types
 			catch (Exception e)
 			{
 				Console.WriteLine(e);
-		
+
 			}
-			
+
 		}
 
-		public static async void LoadSavedSearches()
+		public static async Task LoadSavedSearches(StorageFolder searchesFolder = null)
 		{
-			savedSearches.Clear();
-			var item = await ApplicationData.Current.RoamingFolder.TryGetItemAsync("SavedSearches.json");
+
+
+			StorageFolder folder = ApplicationData.Current.RoamingFolder;
+			if (searchesFolder != null)
+			{
+				folder = searchesFolder;
+			}
+			var item = await folder.TryGetItemAsync("SavedSearches.json");
 			if (item == null)
 			{
 				Debug.WriteLine("File was null");
 				return;
 			}
-			SearchesFile = await ApplicationData.Current.RoamingFolder.GetFileAsync("SavedSearches.json");
+			SearchesFile = await folder.GetFileAsync("SavedSearches.json");
 			var json = await FileIO.ReadTextAsync(SearchesFile);
 			try
 			{
 				var searchList = JsonConvert.DeserializeObject<List<string[]>>(json);
 				if (searchList != null)
 				{
+					savedSearches.Clear();
 					foreach (var search in searchList)
 					{
 						savedSearches.Add(search);
@@ -127,8 +141,8 @@ namespace Booru_Viewer.Types
 			{
 				Console.WriteLine(e);
 			}
-			
-			
+
+
 			SavedSearchesLoadedEventHandler?.Invoke(typeof(GlobalInfo), EventArgs.Empty);
 		}
 	}

@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using System.Windows.Input;
-using Booru_Viewer.Types;
+﻿using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 

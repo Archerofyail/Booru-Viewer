@@ -153,7 +153,7 @@
 				   TextWrapping="WrapWholeWords"
 				   VerticalAlignment="Center"
 				   HorizontalAlignment="Center"/>
-	
+
 		<Button VerticalAlignment="Bottom" HorizontalAlignment="Right" 
 				Height="44" Margin="0,0,32,12" Width="44"
 				Padding="4"
@@ -163,7 +163,7 @@
 				Tapped="BackToTopTapped"
 				ToolTipService.ToolTip="Back to Top"
 				ToolTipService.Placement="Top">
-			
+
 
 			<Button.Background>
 				<SolidColorBrush Opacity="0.4"
@@ -413,9 +413,10 @@
 									Name="PerPageSlider"
 									PointerReleased="{x:Bind ViewModel.PerPageChangedEx}"
 									PointerExited="{x:Bind ViewModel.PerPageChangedEx}"
-									PointerPressed="{x:Bind ViewModel.PerPageClicked}"
-									Loaded="PerPageSlider_OnLoaded">
 									
+									Loaded="PerPageSlider_OnLoaded"
+									Value="{Binding PerPage, Mode=TwoWay}">
+
 									<!--<i:BehaviorCollection>
 										<core:EventTriggerBehavior EventName="PointerReleased">
 											<core:InvokeCommandAction Command="{Binding PerPageChanged}"
@@ -423,9 +424,9 @@
 												Path=Value}"></core:InvokeCommandAction>
 										</core:EventTriggerBehavior>
 									</i:BehaviorCollection>-->
-									
+
 								</Slider>
-									<TextBlock Text="Login Details"
+								<TextBlock Text="Login Details"
 										   Margin="0, 0, 0, 5"/>
 								<TextBox PlaceholderText="Username"
 										 Margin="0, 0, 0, 5"
@@ -460,17 +461,21 @@
 											CommandParameter="{Binding ElementName=ChooseFolderButton}"
 											Name="ChooseFolderButton"/>
 									<TextBlock Text="Current:" VerticalAlignment="Center" Margin="4"/>
-									
-								
+
+
 								</StackPanel>
 								<TextBlock Text="{Binding SaveFolder}" VerticalAlignment="Center" Margin="4"
 								           TextWrapping="WrapWholeWords"/>
 
 								<StackPanel Margin="4">
-									<TextBlock Text="Backs up settings and saved searches to your Documents folder"
-									           FontSize="14" TextWrapping="WrapWholeWords"></TextBlock>
-									<Button Content="Backup" Command="{Binding Backup}"></Button>
-									
+									<TextBlock Text="Back up or restore your settings and saved searches"
+									          TextWrapping="WrapWholeWords"></TextBlock>
+									<StackPanel Orientation="Horizontal">
+										<Button Content="Backup" Command="{Binding Backup}"
+												Margin="4"></Button>
+										<Button Content="Restore" Command="{Binding Restore}"
+												Margin="4"></Button>
+									</StackPanel>
 								</StackPanel>
 								<!--<Button Content="Use a Dropbox Folder"
 										Command="{Binding SelectDropboxFolder}"/>-->

@@ -73,14 +73,17 @@
 								
 								Grid.Row="0"
 								Grid.Column="0"
-							RenderTransformOrigin="0.5,0.5">
+							RenderTransformOrigin="0.5,0.5"
+							>
 							<controls:ImageEx.RenderTransform>
 								<CompositeTransform TranslateX="0.5" TranslateY="0.5"/>
 							</controls:ImageEx.RenderTransform>
 							<controls:ImageEx.Source>
 								<BitmapImage UriSource="{Binding FullImageWithLoginURL}"
 											 AutoPlay="True"
-											 DecodePixelHeight="{Binding Height}">
+											 DecodePixelHeight="{Binding Height}"
+											 ImageOpened="BitmapImage_OnImageOpened"
+											 ImageFailed="BitmapImage_OnImageFailed">
 
 								</BitmapImage>
 							</controls:ImageEx.Source>
@@ -96,9 +99,9 @@
 
 		</FlipView>
 	
-		<!--<TextBlock Text="{Binding ElementName=FlipView, Path=SelectedIndex}"
+		<TextBlock Text="{Binding ElementName=FlipView, Path=SelectedIndex}"
 				   VerticalAlignment="Bottom"
-				   MaxHeight="20"/>-->
+				   MaxHeight="20"/>
 	</Grid>
 	<Page.BottomAppBar>
 		<CommandBar Name="AppBar">

@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Input;
-using Windows.Web.Http;
 using Booru_Viewer.Types;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
@@ -24,10 +23,11 @@ namespace Booru_Viewer.ViewModels
 			if (settings["PerPage"] != null)
 			{
 				perPage = (int)settings["PerPage"];
-				
+
 			}
 			images = GlobalInfo.ImageViewModels;
 			Index = GlobalInfo.SelectedImage;
+			Debug.WriteLine("iamges count is " + images.Count + ", globalinfo version is " + GlobalInfo.ImageViewModels.Count);
 		}
 
 		private string saveImageFailureReason = "";
@@ -57,6 +57,10 @@ namespace Booru_Viewer.ViewModels
 		{
 			get
 			{
+
+				images = GlobalInfo.ImageViewModels;
+
+
 
 				if (GlobalInfo.SelectedImage < GlobalInfo.CurrentSearch.Count && GlobalInfo.SelectedImage >= 0)
 				{
@@ -144,6 +148,10 @@ namespace Booru_Viewer.ViewModels
 						FavIcon = Symbol.OutlineStar;
 						FavString = "Favourite";
 					}
+					if (Images.Count - value < 5)
+					{
+						Images.LoadMoreItemsAsync(Convert.ToUInt32(perPage));
+					}
 				}
 
 				RaisePropertyChanged();
@@ -216,50 +224,6 @@ namespace Booru_Viewer.ViewModels
 				favString = value;
 				RaisePropertyChanged();
 			}
-		}
-
-		async void LoadMoreImages()
-		{
-			BooruAPI.Page++;
-			var result = await BooruAPI.SearchPosts(await PrepTags(), BooruAPI.Page, perPage, GlobalInfo.ContentCheck, false);
-			if (result.Item3 == HttpStatusCode.Ok.ToString())
-			{
-				AddImages(result.Item2);
-			}
-		}
-
-
-		async Task<string[]> PrepTags()
-		{
-			string[] tags = new string[GlobalInfo.CurrentTags.Count];
-			var tagModels = new ObservableCollection<TagViewModel>(GlobalInfo.CurrentTags);
-			await Task.Run(() =>
-			{
-				var i = 0;
-				foreach (var tag in tagModels)
-				{
-					if (!string.IsNullOrEmpty(tag.Tag))
-					{
-						tags[i] = tag.Tag.Replace(" ", "_") + " ";
-					}
-					i++;
-				}
-			});
-
-
-			return tags;
-		}
-
-		void AddImages(List<ImageModel> thumbnails)
-		{
-
-			foreach (var post in thumbnails)
-			{
-				Images.Add(new FullImageViewModel(post.Preview_File_Url, post.File_Url, post.Large_File_Url, post.image_width, post.image_height));
-			}
-
-
-			RaisePropertyChanged("Images");
 		}
 
 		async void SaveImageExec()

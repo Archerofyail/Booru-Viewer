@@ -8,19 +8,17 @@ using GalaSoft.MvvmLight.Command;
 using Windows.UI.Xaml;
 using Windows.Storage;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
-using Windows.ApplicationModel.Appointments.AppointmentsProvider;
 using Windows.Foundation.Collections;
 using Windows.Storage.Pickers;
 using Windows.UI.Core;
 using GalaSoft.MvvmLight;
-using Windows.Web.Http;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Booru_Viewer.Models;
 using Dropbox.Api;
 using Microsoft.Toolkit.Uwp;
-using Microsoft.Toolkit.Uwp.UI.Controls;
 using Newtonsoft.Json;
 
 //TODO: Saved Searches (should be somewhat straightforward)
@@ -109,7 +107,12 @@ namespace Booru_Viewer.ViewModels
 			//thumbnails.CollectionChanged += (sender, args) => RaisePropertyChanged("Thumbnails");
 			RaisePropertyChanged("SelectedPrefixIndex");
 
-			thumbnails = GlobalInfo.ImageViewModels;
+			
+			thumbnails = new IncrementalLoadingCollection<PostSource, FullImageViewModel>(perPage);
+			foreach (var model in GlobalInfo.ImageViewModels)
+			{
+				thumbnails.Add(model);
+			}
 			Thumbnails.OnEndLoading = ImageOnLoadFinish;
 			Thumbnails.OnError = ImageLoadOnError;
 			Thumbnails.RefreshAsync();
@@ -132,7 +135,15 @@ namespace Booru_Viewer.ViewModels
 
 		public bool SafeChecked
 		{
-			get => safeChecked; set
+			get
+			{
+				if (appSettings["SafeChecked"] != null)
+				{
+					safeChecked = (bool)appSettings["SafeChecked"];
+				}
+				return safeChecked;
+			}
+			set
 			{
 				safeChecked = value;
 				GlobalInfo.ContentCheck[0] = value;
@@ -146,7 +157,15 @@ namespace Booru_Viewer.ViewModels
 
 		public bool QuestionableChecked
 		{
-			get => questionableChecked; set
+			get
+			{
+				if (appSettings["QuestionableChecked"] != null)
+				{
+					questionableChecked = (bool)appSettings["QuestionableChecked"];
+				}
+				return questionableChecked;
+			}
+			set
 			{
 				questionableChecked = value;
 				GlobalInfo.ContentCheck[1] = value;
@@ -160,7 +179,15 @@ namespace Booru_Viewer.ViewModels
 
 		public bool ExplicitChecked
 		{
-			get => explicitChecked; set
+			get
+			{
+				if (appSettings["ExplicitChecked"] != null)
+				{
+					explicitChecked = (bool)appSettings["ExplicitChecked"];
+				}
+				return explicitChecked;
+			}
+			set
 			{
 				explicitChecked = value;
 				GlobalInfo.ContentCheck[2] = value;
@@ -185,47 +212,20 @@ namespace Booru_Viewer.ViewModels
 
 		public int PerPage
 		{
-			get => perPage; set
+			get
 			{
-				//if (value > perPage)
-				//{
-				//	//Load enough images to fit the full page of the higher value. Then do the same as above.
-				//	//Find pages that will fit, then find number of times load next page needs to be called
-
-				//	/*
-				//	 Going from 10 -> 25 with 3 pages
-
-				//	 */
-				//	var imagesNeeded = value - GlobalInfo.CurrentSearch.Count;
-				//	var timesToCall = (int) Math.Ceiling((double) imagesNeeded / perPage);
-				//	for (int i = 0; i < timesToCall; i++)
-				//	{
-				//		LoadNextPageExecute(0);
-				//	}
-				//}
-				//else
-				//{
-				//	double newPageNum = ((double)(BooruAPI.Page * perPage)) / value;
-				//	int newPage = (int)Math.Floor(newPageNum);
-				//	BooruAPI.Page = newPage == 0 ? 1 : newPage;
-				//	int picsToRemove = (int)((newPageNum - newPage) * value);
-				//	int picsToKeep = newPage * value;
-				//	for (int i = Thumbnails.Count - 1; i > picsToKeep - 1; i--)
-				//	{
-				//		Thumbnails.RemoveAt(i);
-				//		GlobalInfo.CurrentSearch.RemoveAt(i);
-				//	}
-
-				//}
-				var pagesToLoad = Math.Ceiling(BooruAPI.Page * perPage / (double)value);
-				perPage = value;
+				if (appSettings["PerPage"] != null)
+				{
+					perPage = (int)appSettings["PerPage"];
+				}
+				return perPage;
+			}
+			set
+			{
 				ApplicationData.Current.RoamingSettings.Values["PerPage"] = value;
 				RaisePropertyChanged();
-				Thumbnails = new IncrementalLoadingCollection<PostSource, FullImageViewModel>(perPage, null, ImageOnLoadFinish, ImageLoadOnError);
-				for (int i = 0; i < pagesToLoad; i++)
-				{
-					Thumbnails.LoadMoreItemsAsync(Convert.ToUInt32(PerPage));
-				}
+
+
 			}
 		}
 
@@ -290,7 +290,6 @@ namespace Booru_Viewer.ViewModels
 		public IncrementalLoadingCollection<PostSource, FullImageViewModel> Thumbnails
 		{
 			get => thumbnails;
-			set => thumbnails = value;
 		}
 
 		public ObservableCollection<string> Prefixes => new ObservableCollection<string>(new[] { "none", "~", "-" });
@@ -522,6 +521,7 @@ namespace Booru_Viewer.ViewModels
 				DontHaveImages = false;
 			}
 			RaisePropertyChanged("Thumbnails");
+			GlobalInfo.ImageViewModels = Thumbnails;
 		}
 
 		async void StartSearchExecute()
@@ -546,18 +546,6 @@ namespace Booru_Viewer.ViewModels
 			}
 		}
 
-		void AddThumbnails(IEnumerable<ImageModel> tn)
-		{
-
-			foreach (var post in tn)
-			{
-				thumbnails.Add(new FullImageViewModel(post.Preview_File_Url, post.Has_Large ? post.Large_File_Url : post.File_Url));
-			}
-
-
-			RaisePropertyChanged("Thumbnails");
-		}
-
 		async Task<string[]> PrepTags()
 		{
 			string[] tags = new string[CurrentTags.Count];
@@ -578,17 +566,6 @@ namespace Booru_Viewer.ViewModels
 
 
 			return tags;
-		}
-
-		void ResyncThumbnails()
-		{
-			thumbnails.Clear();
-			foreach (var post in GlobalInfo.CurrentSearch)
-			{
-				thumbnails.Add(new FullImageViewModel(post.Preview_File_Url, post.Has_Large ? post.Large_File_Url : post.File_Url));
-			}
-
-			RaisePropertyChanged("Thumbnails");
 		}
 
 		void SearchFavouritesExecute()
@@ -746,9 +723,14 @@ namespace Booru_Viewer.ViewModels
 					PerPage = PerPage,
 					Username = BooruAPI.Username,
 					APIKey = BooruAPI.APIKey,
-					contentChecks = new[] {safeChecked, QuestionableChecked, ExplicitChecked}
+					contentChecks = new[] { safeChecked, QuestionableChecked, ExplicitChecked }
 				};
-				var saveFolder = await result.GetFolderAsync("Booru-Viewer");
+				var saveFolder = result;
+				
+				if (result.DisplayName != "Booru-Viewer")
+				{
+					saveFolder = await result.GetFolderAsync("Booru-Viewer");
+				}
 				var obj = await saveFolder.TryGetItemAsync("Settings.json");
 				StorageFile settingsFile;
 				if (obj != null)
@@ -763,22 +745,58 @@ namespace Booru_Viewer.ViewModels
 			}
 		}
 
-		//public ICommand PerPageChanged => new RelayCommand<int>(PerPageChangedEx);
-		public void PerPageChangedEx(object sender, PointerRoutedEventArgs e)
+		public ICommand Restore => new RelayCommand(RestoreEx);
+		async void RestoreEx()
 		{
-			if (clicked)
+			var picker = new FolderPicker();
+			picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+			var result = await picker.PickSingleFolderAsync();
+			if (result != null)
 			{
-				Debug.WriteLine("Per Page Changed, old value is {0}, new value is {1}", PerPage, (sender as Slider).Value);
-				PerPage = (int) (sender as Slider).Value;
-				Debug.WriteLine("PerPage Changed");
-				clicked = false;
+				await GlobalInfo.LoadSavedSearches(result);
+				await GlobalInfo.SaveSearches(SavedSearches.ToList());
+				var saveFolder = result;
+				if (result.Name != "Booru-Viewer")
+				{
+					saveFolder = await result.GetFolderAsync("Booru-Viewer");
+				}
+				var obj = await saveFolder.TryGetItemAsync("Settings.json");
+				StorageFile settingsFile;
+				if (obj != null)
+				{
+					settingsFile = await saveFolder.GetFileAsync("Settings.json");
+					var json = await FileIO.ReadTextAsync(settingsFile);
+					SettingsData data = JsonConvert.DeserializeObject<SettingsData>(json);
+					PerPage = data.PerPage;
+					BooruAPI.SetLogin(data.Username, data.APIKey);
+					SafeChecked = data.contentChecks[0];
+					QuestionableChecked = data.contentChecks[1];
+					ExplicitChecked = data.contentChecks[2];
+
+				}
 			}
 		}
 
-		private bool clicked = false;
-		public void PerPageClicked(object sender, PointerRoutedEventArgs e)
+		//public ICommand PerPageChanged => new RelayCommand<int>(PerPageChangedEx);
+		public async void PerPageChangedEx(object sender, PointerRoutedEventArgs e)
 		{
-			clicked = true;
+			if (perPage != (int)(sender as Slider).Value)
+			{
+				Debug.WriteLine("Per Page Changed, old value is {0}, new value is {1}", perPage, (sender as Slider).Value);
+				Debug.WriteLine("PerPage Changed");
+				BooruAPI.Page = 1;
+				perPage = (int)(sender as Slider).Value;
+				ApplicationData.Current.RoamingSettings.Values["PerPage"] = perPage;
+				thumbnails =
+					new IncrementalLoadingCollection<PostSource, FullImageViewModel>(perPage, null, ImageOnLoadFinish,
+						ImageLoadOnError);
+				
+				await Thumbnails.RefreshAsync();
+				RaisePropertyChanged("Thumbnails");
+			}
 		}
 	}
+
+
 }
+

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using Windows.Web.Http;
 using System.Threading.Tasks;
 using Booru_Viewer.ViewModels;
@@ -139,6 +138,7 @@ namespace Booru_Viewer.Types
 				GlobalInfo.CurrentSearch.Add(img);
 				index++;
 			}
+			Debug.WriteLine("Page is: " + page + ". URL: " + requestURI);
 			return new Tuple<bool, List<ImageModel>, string>(true, imageLinks, response.StatusCode.ToString());
 
 		}

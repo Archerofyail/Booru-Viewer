@@ -1,12 +1,9 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
-using Booru_Viewer.Types;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media.Imaging;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
@@ -77,6 +74,21 @@ namespace Booru_Viewer.Views
 		private void FlipView_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			
+		}
+
+		private void ImageEx_OnImageExFailed(object sender, ImageExFailedEventArgs e)
+		{
+			Debug.WriteLine("Failed to open image: " + e.ErrorMessage);
+		}
+
+		private void BitmapImage_OnImageOpened(object sender, RoutedEventArgs e)
+		{
+			Debug.WriteLine("Bitmap opened");
+		}
+
+		private void BitmapImage_OnImageFailed(object sender, ExceptionRoutedEventArgs e)
+		{
+			Debug.WriteLine("Failed to open image");
 		}
 	}
 
