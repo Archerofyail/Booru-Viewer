@@ -1,5 +1,7 @@
-﻿using Booru_Viewer.Types;
+﻿using System.Windows.Input;
+using Booru_Viewer.Types;
 using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
 
 namespace Booru_Viewer.ViewModels
 {
@@ -11,7 +13,7 @@ namespace Booru_Viewer.ViewModels
 		public string PreviewURL { get; set; }
 		public int Width { get; set; }
 		public int Height { get; set; }
-
+		private RelayCommand<string> saveImageCommand;
 		public FullImageViewModel(string previewURL, string imageURLUrl, string largeImage = null, int width = 0, int height = 0)
 		{
 			FullImageURL = imageURLUrl;
@@ -20,6 +22,17 @@ namespace Booru_Viewer.ViewModels
 			PreviewURL = previewURL;
 			Width = width;
 			Height = height;
+			if (saveImageCommand != null)
+			{
+				this.saveImageCommand = saveImageCommand;
+			}
+		}
+
+		public ICommand SaveImage => new RelayCommand(SaveImageExec);
+
+		void SaveImageExec()
+		{
+			saveImageCommand.Execute(LargeImageURL);
 		}
 	}
 }

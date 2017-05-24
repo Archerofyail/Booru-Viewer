@@ -3,12 +3,15 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Input;
+using System.Xml;
 using Booru_Viewer.Types;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Windows.Storage;
+using Windows.UI.Notifications;
 using Windows.UI.Xaml.Controls;
 using Microsoft.Toolkit.Uwp;
+using Microsoft.Toolkit.Uwp.Notifications;
 
 namespace Booru_Viewer.ViewModels
 {
@@ -230,6 +233,32 @@ namespace Booru_Viewer.ViewModels
 		{
 			Saving = true;
 			SaveImageFailureReason = await ImageSaver.SaveImage(images[Index].LargeImageURL);
+			Saving = false;
+			ToastContent content = new ToastContent()
+			{
+				Visual = new ToastVisual()
+				{
+					BindingGeneric = new ToastBindingGeneric()
+					{
+						Children =
+						{
+							new AdaptiveImage()
+							{
+								Source = images[Index].FullImageURL
+							},
+							new AdaptiveText()
+							{
+								Text = SaveImageFailureReason
+							}
+						}
+					}
+				}
+			};
+			Windows.Data.Xml.Dom.XmlDocument doc = content.GetXml();
+			ToastNotification not = new ToastNotification(doc);
+			ToastNotificationManager.ConfigureNotificationMirroring(NotificationMirroring.Disabled);
+			ToastNotificationManager.CreateToastNotifier().Show(not);
+			ToastNotificationManager.History.Clear();
 
 		}
 

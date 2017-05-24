@@ -11,14 +11,17 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using Windows.Foundation.Collections;
+using Windows.Storage.AccessCache;
 using Windows.Storage.Pickers;
 using Windows.UI.Core;
+using Windows.UI.Notifications;
 using GalaSoft.MvvmLight;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Booru_Viewer.Models;
 using Dropbox.Api;
 using Microsoft.Toolkit.Uwp;
+using Microsoft.Toolkit.Uwp.Notifications;
 using Newtonsoft.Json;
 
 //TODO: Saved Searches (should be somewhat straightforward)
@@ -113,6 +116,11 @@ namespace Booru_Viewer.ViewModels
 			{
 				thumbnails.Add(model);
 			}
+			Thumbnails.OnStartLoading = () =>
+			{
+				IsLoading = true;
+				NoImagesText = "Loading";
+			};
 			Thumbnails.OnEndLoading = ImageOnLoadFinish;
 			Thumbnails.OnError = ImageLoadOnError;
 			Thumbnails.RefreshAsync();
@@ -263,6 +271,18 @@ namespace Booru_Viewer.ViewModels
 					CurrentTag = suggestedTags[suggestedTagIndex];
 					RaisePropertyChanged();
 				}
+			}
+		}
+
+		private bool isLoading = false;
+
+		public bool IsLoading
+		{
+			get => isLoading;
+			set
+			{
+				isLoading = value;
+				RaisePropertyChanged();
 			}
 		}
 
@@ -519,6 +539,7 @@ namespace Booru_Viewer.ViewModels
 			{
 				NoImagesText = "";
 				DontHaveImages = false;
+				IsLoading = false;
 			}
 			RaisePropertyChanged("Thumbnails");
 			GlobalInfo.ImageViewModels = Thumbnails;
@@ -692,8 +713,11 @@ namespace Booru_Viewer.ViewModels
 				var folder = await picker.PickSingleFolderAsync();
 				if (folder != null)
 				{
+					
 					ImageSaver.ImageFolder = folder;
-					appSettings["SaveFolderPath"] = folder.Path;
+					var token = StorageApplicationPermissions.FutureAccessList.Add(ImageSaver.ImageFolder);
+					ApplicationData.Current.LocalSettings.Values["SaveFolderToken"] = token;
+					RaisePropertyChanged("SaveFolder");
 				}
 			});
 		}
@@ -795,6 +819,47 @@ namespace Booru_Viewer.ViewModels
 				RaisePropertyChanged("Thumbnails");
 			}
 		}
+
+		public FullImageViewModel ImageContextOpened { get; set; }
+		
+		public ICommand SaveImage => new RelayCommand(SaveImageExec);
+
+		async void SaveImageExec()
+		{
+			Debug.WriteLine("Started saving image");
+			IsLoading = true;
+			var saveImageFailureReason = await ImageSaver.SaveImage(ImageContextOpened.LargeImageURL);
+			IsLoading = false;
+			Debug.WriteLine("Finished saving image: " + saveImageFailureReason);
+			ToastContent content = new ToastContent()
+			{
+				Visual = new ToastVisual()
+				{
+					BindingGeneric = new ToastBindingGeneric()
+					{
+						Children =
+						{
+							new AdaptiveImage()
+							{
+								Source = ImageContextOpened.FullImageURL
+							},
+							new AdaptiveText()
+							{
+								Text = saveImageFailureReason
+							}
+						}
+					}
+				}
+			};
+			Windows.Data.Xml.Dom.XmlDocument doc = content.GetXml();
+			ToastNotification not = new ToastNotification(doc);
+			ToastNotificationManager.ConfigureNotificationMirroring(NotificationMirroring.Disabled);
+			ToastNotificationManager.CreateToastNotifier().Show(not);
+			ToastNotificationManager.History.Clear();
+		}
+
+		
+
 	}
 
 

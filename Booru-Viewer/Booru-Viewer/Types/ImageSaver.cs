@@ -3,6 +3,8 @@ using System.Diagnostics;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Windows.Storage;
+using Windows.Storage.AccessCache;
+using Windows.UI.ViewManagement;
 
 namespace Booru_Viewer.Types
 {
@@ -30,15 +32,18 @@ namespace Booru_Viewer.Types
 		}
 
 
-		public static void GetFolder()
+		private static void GetFolder()
 		{
-			var savedFolderPath = ApplicationData.Current.RoamingSettings.Values["SaveFolderPath"] as string;
 
-			if (!string.IsNullOrEmpty(savedFolderPath))
+			var folderToken = ApplicationData.Current.LocalSettings.Values["SaveFolderToken"] as string;
+			if (folderToken != null)
 			{
-				ImageFolder = StorageFolder.GetFolderFromPathAsync(savedFolderPath).GetResults();
+				var folder = StorageApplicationPermissions.FutureAccessList.GetFolderAsync(folderToken).GetResults();
+				ImageFolder = folder;
 				return;
+
 			}
+			
 			var item = KnownFolders.PicturesLibrary.TryGetItemAsync("Booru-Viewer").GetResults();
 			if (item != null)
 			{
@@ -52,18 +57,19 @@ namespace Booru_Viewer.Types
 		}
 		public static async Task GetFolderAsync()
 		{
-			var savedFolderPath = ApplicationData.Current.RoamingSettings.Values["SaveFolderPath"] as string;
-
-			if (savedFolderPath != null)
+			var folderToken = ApplicationData.Current.LocalSettings.Values["SaveFolderToken"] as string;
+			if (folderToken != null)
 			{
-				ImageFolder = await StorageFolder.GetFolderFromPathAsync(savedFolderPath);
+				var folder = await StorageApplicationPermissions.FutureAccessList.GetFolderAsync(folderToken);
+				ImageFolder = folder;
 				return;
+
 			}
 			var item = await KnownFolders.PicturesLibrary.TryGetItemAsync("Booru-Viewer");
 			if (item != null)
 			{
 
-				ImageFolder = await KnownFolders.PicturesLibrary.GetFolderAsync(savedFolderPath ?? "Booru-Viewer");
+				ImageFolder = await KnownFolders.PicturesLibrary.GetFolderAsync("Booru-Viewer");
 			}
 			else
 			{
@@ -83,7 +89,7 @@ namespace Booru_Viewer.Types
 				catch (Exception e)
 				{
 					Debug.WriteLine(e);
-					return "Could not open Booru Viewer Folder";
+					return "Could not open Save Folder";
 					throw;
 				}
 

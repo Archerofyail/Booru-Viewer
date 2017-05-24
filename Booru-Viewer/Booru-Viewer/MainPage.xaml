@@ -11,14 +11,14 @@
 	xmlns:mvvml="using:GalaSoft.MvvmLight"
 	mc:Ignorable="d"
 	RequestedTheme="Default"
-	Name="Page"
+	x:Name="Page"
 	xmlns:i="using:Microsoft.Xaml.Interactivity"
 	xmlns:core="using:Microsoft.Xaml.Interactions.Core">
 
 	<Page.DataContext>
 		<vm1:MainPageViewModel></vm1:MainPageViewModel>
 	</Page.DataContext>
-
+	
 	<Page.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
@@ -33,17 +33,28 @@
 								  ImageExFailed="ImageEx_OnImageExFailed"
 								  MaxHeight="250"
 								  MinHeight="160"
-								  MinWidth="160">
-
-
+								  MinWidth="160"
+				                 >
 					<controls:ImageEx.ContextFlyout>
-						<MenuFlyout>
+						<MenuFlyout x:Name="ImageContextFlyout">
 							<MenuFlyoutItem Text="Save Image"
-											Command="{Binding SaveImage}"/>
+							                Command="{Binding ElementName=Page, Path=DataContext.SaveImage}"/>
 							<!--<MenuFlyoutItem Text="Select"
 											Command="{Binding EnableMultiSelect}"/>-->
 						</MenuFlyout>
 					</controls:ImageEx.ContextFlyout>
+					<controls:ImageEx.Resources>
+						
+					</controls:ImageEx.Resources>
+					
+					<!--<i:Interaction.Behaviors>
+						<core:EventTriggerBehavior EventName="RightTapped" x:Name="RightTappedEventBehavior"
+												   >
+							<core:InvokeCommandAction Command="{Binding ElementName=Page, Path=DataContext.ImageContextOpened}"
+							                          CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=SourceObject}"
+							/>
+						</core:EventTriggerBehavior>
+					</i:Interaction.Behaviors>-->
 				</controls:ImageEx>
 			</DataTemplate>
 			<DataTemplate x:Name="Tag">
@@ -131,7 +142,6 @@
 	</Page.Resources>
 	<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
 		  Name="RootGrid" MinHeight="250">
-
 		<controls:AdaptiveGridView   Background="{StaticResource BackgroundThemeBrush}"
 					ItemTemplate="{StaticResource ImageTemplate}"
 					ItemsSource="{Binding Path=Thumbnails}"
@@ -144,8 +154,18 @@
 					SelectionChanged="GridView_SelectionChanged"
 					IsItemClickEnabled="True"
 					ItemClick="ImageGridView_OnItemClick"
-					DesiredWidth="200">
-
+					DesiredWidth="200"
+		                            >
+			<i:Interaction.Behaviors>
+				<core:EventTriggerBehavior SourceObject="{Binding ElementName=ImageGridView}">
+					<core:InvokeCommandAction Command="{Binding ImageContextOpened}"></core:InvokeCommandAction>
+				</core:EventTriggerBehavior>
+				</i:Interaction.Behaviors>
+				<controls:AdaptiveGridView.Resources
+	>
+				
+					
+			</controls:AdaptiveGridView.Resources>
 		</controls:AdaptiveGridView>
 		<TextBlock Text="{Binding NoImagesText}"
 				   Visibility="{Binding DontHaveImages}"
@@ -153,6 +173,7 @@
 				   TextWrapping="WrapWholeWords"
 				   VerticalAlignment="Center"
 				   HorizontalAlignment="Center"/>
+
 
 		<Button VerticalAlignment="Bottom" HorizontalAlignment="Right" 
 				Height="44" Margin="0,0,32,12" Width="44"

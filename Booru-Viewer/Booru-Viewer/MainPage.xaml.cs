@@ -1,12 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Navigation;
 using Booru_Viewer.Types;
 using System.Diagnostics;
+using System.Linq;
 using Windows.UI.Core;
+using Windows.UI.Xaml.Media;
 using Booru_Viewer.ViewModels;
 using Booru_Viewer.Views;
 using Microsoft.Toolkit.Uwp.UI.Controls;
@@ -52,7 +55,20 @@ namespace Booru_Viewer
 			{
 				ViewModel = DataContext as MainPageViewModel;
 			};
+			ImageGridView.Loaded += (sender, args) =>
+			{
+				ImageGridView.RightTapped += (o, eventArgs) =>
+				{
+					//ImageContextFlyout.ShowAt(o as UIElement, eventArgs.GetPosition(null));
+					eventArgs.Handled = false;
+					var elements = VisualTreeHelper.FindElementsInHostCoordinates(eventArgs.GetPosition(o as UIElement), ImageGridView);
+					var imageView = elements.First((x) => x.GetType() == typeof(ImageEx)) as ImageEx;
+					Debug.WriteLine("imageView is " + imageView);
+					ViewModel.ImageContextOpened = imageView.DataContext as FullImageViewModel;
+				};
+			};
 			
+
 		}
 		
 		private void GridView_SelectionChanged(object sender, SelectionChangedEventArgs e)

@@ -51,7 +51,10 @@
 	<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
 		  Name="Grid" VerticalAlignment="Stretch"
 		  HorizontalAlignment="Stretch">
-
+		<ProgressBar IsIndeterminate="True"
+					 VerticalAlignment="Top"
+					 Margin="4"
+					 Visibility="{Binding Saving}"></ProgressBar>
 		<FlipView
 			ItemsSource="{Binding Images}"
 			SelectedIndex="{Binding Index, Mode=TwoWay}"
