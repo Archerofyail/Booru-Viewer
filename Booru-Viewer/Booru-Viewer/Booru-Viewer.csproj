@@ -115,7 +115,6 @@
     <Compile Include="Models\ImageModel.cs" />
     <Compile Include="Types\ImageSaver.cs" />
     <Compile Include="Types\PostSource.cs" />
-    <Compile Include="Types\UIHelper.cs" />
     <Compile Include="ViewModels\FullImageViewModel.cs" />
     <Compile Include="ViewModels\MainPageViewModel.cs" />
     <Compile Include="ViewModels\SavedSearchViewModel.cs" />

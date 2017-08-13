@@ -85,7 +85,7 @@ namespace Booru_Viewer.ViewModels
 			{
 				if (tuple.Item1)
 				{
-					suggestedTags.Clear();
+
 					foreach (var tag in tuple.Item2)
 					{
 						suggestedTags.Add(tag.Name);
@@ -107,10 +107,23 @@ namespace Booru_Viewer.ViewModels
 				}
 			};
 
+			GlobalInfo.FavouriteTagsLoadedEventHandler += (sender, args) =>
+			{
+				if (GlobalInfo.FavouriteTags.Count > 0)
+				{
+					foreach (var tag in GlobalInfo.FavouriteTags)
+					{
+						favouriteTags.Add(new TagViewModel(tag, this));
+					}
+					RaisePropertyChanged("FavouriteTags");
+					RaisePropertyChanged("HaveSavedSearches");
+				}
+			};
+
 			//thumbnails.CollectionChanged += (sender, args) => RaisePropertyChanged("Thumbnails");
 			RaisePropertyChanged("SelectedPrefixIndex");
 
-			
+
 			thumbnails = new IncrementalLoadingCollection<PostSource, FullImageViewModel>(perPage);
 			foreach (var model in GlobalInfo.ImageViewModels)
 			{
@@ -305,6 +318,25 @@ namespace Booru_Viewer.ViewModels
 			}
 		}
 
+		private ObservableCollection<TagViewModel> favouriteTags = new ObservableCollection<TagViewModel>();
+
+		public ObservableCollection<TagViewModel> FavouriteTags
+		{
+			get
+			{
+				favouriteTags.Clear();
+
+				foreach (var search in GlobalInfo.FavouriteTags)
+				{
+					favouriteTags.Add(new TagViewModel(search, this));
+				}
+				RaisePropertyChanged("HaveSavedSearches");
+
+
+				return favouriteTags;
+			}
+		}
+
 		private IncrementalLoadingCollection<PostSource, FullImageViewModel> thumbnails;
 
 		public IncrementalLoadingCollection<PostSource, FullImageViewModel> Thumbnails
@@ -359,9 +391,16 @@ namespace Booru_Viewer.ViewModels
 				RaisePropertyChanged();
 				if (!string.IsNullOrEmpty(value))
 				{
-					BooruAPI.SearchTags(value.Replace(" ", "_"), 6);
+					SearchForCurrentTag(value);
 				}
 			}
+		}
+
+		async void SearchForCurrentTag(string val)
+		{
+			SuggestedTags.Clear();
+			await BooruAPI.SearchTags(val.Replace(" ", "_"), 1, true);
+			await BooruAPI.SearchTags(val.Replace(" ", "_"), 6);
 		}
 
 		private string username;
@@ -543,9 +582,10 @@ namespace Booru_Viewer.ViewModels
 			}
 			RaisePropertyChanged("Thumbnails");
 			GlobalInfo.ImageViewModels = Thumbnails;
+			RaisePropertyChanged("TotalPageNumber");
 		}
 
-		async void StartSearchExecute()
+		public async void StartSearchExecute()
 		{
 			try
 			{
@@ -713,7 +753,7 @@ namespace Booru_Viewer.ViewModels
 				var folder = await picker.PickSingleFolderAsync();
 				if (folder != null)
 				{
-					
+
 					ImageSaver.ImageFolder = folder;
 					var token = StorageApplicationPermissions.FutureAccessList.Add(ImageSaver.ImageFolder);
 					ApplicationData.Current.LocalSettings.Values["SaveFolderToken"] = token;
@@ -750,7 +790,7 @@ namespace Booru_Viewer.ViewModels
 					contentChecks = new[] { safeChecked, QuestionableChecked, ExplicitChecked }
 				};
 				var saveFolder = result;
-				
+
 				if (result.DisplayName != "Booru-Viewer")
 				{
 					saveFolder = await result.GetFolderAsync("Booru-Viewer");
@@ -814,17 +854,17 @@ namespace Booru_Viewer.ViewModels
 				thumbnails =
 					new IncrementalLoadingCollection<PostSource, FullImageViewModel>(perPage, null, ImageOnLoadFinish,
 						ImageLoadOnError);
-				
+
 				await Thumbnails.RefreshAsync();
 				RaisePropertyChanged("Thumbnails");
 			}
 		}
 
 		public FullImageViewModel ImageContextOpened { get; set; }
-		
-		public ICommand SaveImage => new RelayCommand(SaveImageExec);
 
-		async void SaveImageExec()
+		public ICommand SaveImage => new RelayCommand<bool>(SaveImageExec);
+
+		async void SaveImageExec(bool showNotification = true)
 		{
 			Debug.WriteLine("Started saving image");
 			IsLoading = true;
@@ -855,11 +895,39 @@ namespace Booru_Viewer.ViewModels
 			ToastNotification not = new ToastNotification(doc);
 			ToastNotificationManager.ConfigureNotificationMirroring(NotificationMirroring.Disabled);
 			ToastNotificationManager.CreateToastNotifier().Show(not);
-			ToastNotificationManager.History.Clear();
 		}
 
-		
+		public ICommand StartImageSave => new RelayCommand<int>(StartImageSaveEx);
+		async void StartImageSaveEx(int pageTo)
+		{
 
+			int imageCount = (SelectedPageToSave + 1) * PerPage;
+			for (int i = 0; i < imageCount; i++)
+			{
+				if (i > GlobalInfo.CurrentSearch.Count - 1)
+				{
+					break;
+				}
+				await ImageSaver.SaveImage(string.IsNullOrEmpty(GlobalInfo.CurrentSearch[i].Large_File_Url)
+					? GlobalInfo.CurrentSearch[i].File_Url
+					: GlobalInfo.CurrentSearch[i].Large_File_Url);
+			}
+		}
+
+		public int SelectedPageToSave { get; set; } = 0;
+
+		public int[] TotalPageNumber
+		{
+			get
+			{
+				int[] pages = new int[BooruAPI.Page];
+				for (int i = 0; i < pages.Length; i++)
+				{
+					pages[i] = i + 1;
+				}
+				return pages;
+			}
+		}
 	}
 
 

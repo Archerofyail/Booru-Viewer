@@ -143,10 +143,10 @@ namespace Booru_Viewer.Types
 
 		}
 
-		public static async Task<Tuple<bool, List<Tag>, string>> SearchTags(string search, int limit = -1)
+		public static async Task<Tuple<bool, List<Tag>, string>> SearchTags(string search, int limit = -1, bool isExact = false)
 		{
 			var tags = new List<Tag>();
-			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(new[] { new KeyValuePair<string, string>("search[name_matches]", search + "*") });
+			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(new[] { new KeyValuePair<string, string>("search[name" + (isExact ? "	" : "_matches]"), search + "*") });
 			var requestURI = BaseURL + TagsURL + "?" + content.ToString();
 			HttpResponseMessage response = new HttpResponseMessage();
 			try
@@ -248,10 +248,10 @@ namespace Booru_Viewer.Types
 
 		public static async Task<bool> UnfavouriteImage(ImageModel im)
 		{
-			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(new []
+			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(new[]
 			{
 				new KeyValuePair<string, string>("login", Username),
-				new KeyValuePair<string, string>("api_key", APIKey), 
+				new KeyValuePair<string, string>("api_key", APIKey),
 			});
 			var requestURI = BaseURL + "/favorites/" + im.id + ".json?" + content.ToString();
 			var response = await booruClient.DeleteAsync(new Uri(requestURI));

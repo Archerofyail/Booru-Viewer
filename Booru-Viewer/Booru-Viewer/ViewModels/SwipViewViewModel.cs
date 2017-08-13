@@ -229,42 +229,44 @@ namespace Booru_Viewer.ViewModels
 			}
 		}
 
-		async void SaveImageExec()
+		async void SaveImageExec(bool showNotification = true)
 		{
 			Saving = true;
 			SaveImageFailureReason = await ImageSaver.SaveImage(images[Index].LargeImageURL);
 			Saving = false;
-			ToastContent content = new ToastContent()
+			if (showNotification)
 			{
-				Visual = new ToastVisual()
+				ToastContent content = new ToastContent()
 				{
-					BindingGeneric = new ToastBindingGeneric()
+					Visual = new ToastVisual()
 					{
-						Children =
+						BindingGeneric = new ToastBindingGeneric()
 						{
-							new AdaptiveImage()
+							Children =
 							{
-								Source = images[Index].FullImageURL
-							},
-							new AdaptiveText()
-							{
-								Text = SaveImageFailureReason
+								new AdaptiveImage()
+								{
+									Source = images[Index].FullImageURL
+								},
+								new AdaptiveText()
+								{
+									Text = SaveImageFailureReason
+								}
 							}
 						}
 					}
-				}
-			};
-			Windows.Data.Xml.Dom.XmlDocument doc = content.GetXml();
-			ToastNotification not = new ToastNotification(doc);
-			ToastNotificationManager.ConfigureNotificationMirroring(NotificationMirroring.Disabled);
-			ToastNotificationManager.CreateToastNotifier().Show(not);
-			ToastNotificationManager.History.Clear();
-
+				};
+				Windows.Data.Xml.Dom.XmlDocument doc = content.GetXml();
+				ToastNotification not = new ToastNotification(doc);
+				ToastNotificationManager.ConfigureNotificationMirroring(NotificationMirroring.Disabled);
+				ToastNotificationManager.CreateToastNotifier().Show(not);
+				ToastNotificationManager.History.Clear();
+			}
 		}
 
 
 
-		public ICommand SaveImage => new RelayCommand(SaveImageExec);
+		public ICommand SaveImage => new RelayCommand<bool>(SaveImageExec);
 
 		public ICommand FavouriteImage => new RelayCommand(FavouriteImageExec);
 		async void FavouriteImageExec()

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Windows.UI.Xaml;
@@ -138,7 +139,7 @@ namespace Booru_Viewer
 		{
 
 			ImageGridView.GetBindingExpression(GridView.ItemsSourceProperty).UpdateSource();
-
+			ViewModel?.RaisePropertyChanged("FavouriteTags");
 			Frame rootFrame = Window.Current.Content as Frame;
 			if (rootFrame.CanGoBack)
 			{
@@ -191,7 +192,7 @@ namespace Booru_Viewer
 		private void SavedSearchesList_OnItemClick(object sender, ItemClickEventArgs e)
 		{
 			
-			SavedSearchCommandInvoker.CommandParameter = e.ClickedItem;
+			
 		}
 
 		private void TextBox_OnLostFocus(object sender, RoutedEventArgs e)
@@ -222,10 +223,23 @@ namespace Booru_Viewer
 			//}
 		}
 
-		private void SavedSearchesList_OnDragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
+		async void SavedSearchesList_OnDragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
 		{
 			Debug.WriteLine("Drag Finished");
-			GlobalInfo.SaveSearches(SavedSearchesList.ItemsSource as List<SavedSearchViewModel>);
+			await GlobalInfo.SaveSearches(SavedSearchesList.ItemsSource as List<SavedSearchViewModel>);
 		}
+
+		private void SaveAllDialog(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+		{
+			sender.Hide();
+		}
+
+		async void SaveAllClicked(object sender, RoutedEventArgs e)
+		{
+			
+			await SaveAllDialogBox.ShowAsync();
+		}
+
+
 	}
 }

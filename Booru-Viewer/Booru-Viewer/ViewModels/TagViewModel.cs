@@ -2,6 +2,8 @@
 using GalaSoft.MvvmLight.Command;
 using System.Windows.Input;
 using Windows.ApplicationModel.DataTransfer;
+using Windows.UI.Xaml.Controls;
+using Booru_Viewer.Types;
 
 namespace Booru_Viewer.ViewModels
 {
@@ -26,11 +28,14 @@ namespace Booru_Viewer.ViewModels
 
 		private string tag;
 		public string Tag { get => tag; set { tag = value; RaisePropertyChanged(); } }
+		public bool IsFavourite => GlobalInfo.FavouriteTags.Contains(tag);
+
+		public Symbol FavouriteIcon => IsFavourite ? Symbol.SolidStar : Symbol.OutlineStar;
 
 		void RemoveTagExecute()
 		{
-			
-				parentVM.RemoveTagExec(this);
+
+			parentVM.RemoveTagExec(this);
 			parentVM.RaisePropertyChanged("IsSignedOutWithMoreThan2Tags");
 		}
 
@@ -46,7 +51,52 @@ namespace Booru_Viewer.ViewModels
 			Clipboard.SetContent(dp);
 
 		}
+
+		void FavouriteTagEx()
+		{
+			if (!IsFavourite)
+			{
+
+				GlobalInfo.FavouriteTags.Add(tag);
+				
+				parentVM?.FavouriteTags.Add(this);
+			}
+			else
+			{
+				GlobalInfo.FavouriteTags.Remove(tag);
+				parentVM?.FavouriteTags.Remove(this);
+			}
+			parentVM?.RaisePropertyChanged("FavouriteTags");
+			RaisePropertyChanged("IsFavourite");
+			RaisePropertyChanged("FavouriteIcon");
+			GlobalInfo.SaveFavouriteTags();
+		}
+
+		void UnfavouriteTagEx()
+		{
+			GlobalInfo.FavouriteTags.Remove(tag);
+			parentVM?.FavouriteTags.Remove(this);
+			RaisePropertyChanged("IsFavourite");
+			RaisePropertyChanged("FavouriteIcon");
+			GlobalInfo.SaveFavouriteTags();
+		}
+
+		void AddTagToSearchEx()
+		{
+			parentVM?.CurrentTags.Add(new TagViewModel(tag, parentVM));
+		}
+
+		void StartSearchFromThisEx()
+		{
+			parentVM?.CurrentTags.Clear();
+			parentVM?.CurrentTags.Add(this);
+			parentVM?.StartSearchExecute();
+		}
+		public ICommand AddTagToSearch => new RelayCommand(AddTagToSearchEx);
+		public ICommand UnfavouriteTag => new RelayCommand(UnfavouriteTagEx);
+		public ICommand FavouriteTag => new RelayCommand(FavouriteTagEx);
 		public ICommand CopyTag => new RelayCommand<string>(CopyTagExec);
 		public ICommand RemoveTag => new RelayCommand(RemoveTagExecute, RemoveTagCanExecute);
+		public ICommand StartSearchFromFavourite => new RelayCommand(StartSearchFromThisEx);
 	}
 }

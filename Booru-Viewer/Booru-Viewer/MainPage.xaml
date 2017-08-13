@@ -18,7 +18,7 @@
 	<Page.DataContext>
 		<vm1:MainPageViewModel></vm1:MainPageViewModel>
 	</Page.DataContext>
-	
+
 	<Page.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
@@ -38,15 +38,20 @@
 					<controls:ImageEx.ContextFlyout>
 						<MenuFlyout x:Name="ImageContextFlyout">
 							<MenuFlyoutItem Text="Save Image"
-							                Command="{Binding ElementName=Page, Path=DataContext.SaveImage}"/>
+							                Command="{Binding ElementName=Page, Path=DataContext.SaveImage}"
+											>
+								<MenuFlyoutItem.CommandParameter>
+									<x:Boolean>True</x:Boolean>
+								</MenuFlyoutItem.CommandParameter>
+							</MenuFlyoutItem>
 							<!--<MenuFlyoutItem Text="Select"
 											Command="{Binding EnableMultiSelect}"/>-->
 						</MenuFlyout>
 					</controls:ImageEx.ContextFlyout>
 					<controls:ImageEx.Resources>
-						
+
 					</controls:ImageEx.Resources>
-					
+
 					<!--<i:Interaction.Behaviors>
 						<core:EventTriggerBehavior EventName="RightTapped" x:Name="RightTappedEventBehavior"
 												   >
@@ -72,9 +77,49 @@
 							   HorizontalAlignment="Center" 
 							   VerticalAlignment="Center"
 							   />
+					<Button Command="{Binding FavouriteTag, Mode=TwoWay}"
+					        Background="#FF7C7C7C">
+						<SymbolIcon Symbol="{Binding FavouriteIcon}"/>
+					</Button>
 					<Button Command="{Binding RemoveTag, Mode=TwoWay}"
-							Background="#FF7C7C7C">
+							Background="#FF7C7C7C"
+					        Margin="4, 0, 0, 0">
+						<SymbolIcon Symbol="Cancel"
+									/>
+					</Button>
+				</StackPanel>
+			</DataTemplate>
+			<DataTemplate x:Key="FavouriteTag" x:DataType="vm1:TagViewModel">
+				<StackPanel Orientation="Horizontal"
+				            Background="{StaticResource ThemeBrush}"
+				            BorderThickness="1"
+				            Margin="0">
+					<StackPanel.BorderBrush>
+						<SolidColorBrush Color="{ThemeResource SystemBaseLowColor}"/>
+					</StackPanel.BorderBrush>
+					<TextBlock Name="Tag"
+					           Text="{Binding Path=Tag, Mode=TwoWay}" 
+					           MinWidth="20" 
+					           Margin="8,0" 
+					           HorizontalAlignment="Center" 
+					           VerticalAlignment="Center"
+					/>
+					<Button Command="{Binding UnfavouriteTag, Mode=TwoWay}"
+					        Background="#FF7C7C7C">
 						<SymbolIcon Symbol="Cancel"/>
+					</Button>
+					<Button Command="{Binding AddTagToSearch, Mode=TwoWay}"
+							CommandParameter="{x:Bind Tag}"
+					        Background="#FF7C7C7C"
+					        Margin="4, 0, 0, 0">
+						<SymbolIcon Symbol="Add"
+									/>
+					</Button>
+					<Button Command="{Binding StartSearchFromFavourite, Mode=TwoWay}"
+							CommandParameter="{x:Bind Tag}"
+					        Background="#FF7C7C7C"
+							Margin="4, 0, 0, 0">
+						<SymbolIcon Symbol="Find"/>
 					</Button>
 				</StackPanel>
 			</DataTemplate>
@@ -160,11 +205,11 @@
 				<core:EventTriggerBehavior SourceObject="{Binding ElementName=ImageGridView}">
 					<core:InvokeCommandAction Command="{Binding ImageContextOpened}"></core:InvokeCommandAction>
 				</core:EventTriggerBehavior>
-				</i:Interaction.Behaviors>
-				<controls:AdaptiveGridView.Resources
+			</i:Interaction.Behaviors>
+			<controls:AdaptiveGridView.Resources
 	>
-				
-					
+
+
 			</controls:AdaptiveGridView.Resources>
 		</controls:AdaptiveGridView>
 		<TextBlock Text="{Binding NoImagesText}"
@@ -206,7 +251,26 @@
 			</Button.Content>
 		</Button>
 
+		<ContentDialog IsPrimaryButtonEnabled="True"
+					   IsSecondaryButtonEnabled="True"
+			PrimaryButtonCommand="{Binding StartImageSave}"
+					   PrimaryButtonClick="SaveAllDialog"
+					   SecondaryButtonClick="SaveAllDialog"
+					   PrimaryButtonCommandParameter="{x:Bind PageToCB.SelectedItem}"
+					   Name="SaveAllDialogBox"
+					   PrimaryButtonText="Save"
+					   SecondaryButtonText="Cancel">
+			<StackPanel>
 
+				<StackPanel Orientation="Horizontal">
+					<TextBlock Text="To Page"></TextBlock>
+					<ComboBox ItemsSource="{Binding TotalPageNumber}" SelectedIndex="{Binding SelectedPageToSave, Mode=TwoWay}"  Name="PageToCB"></ComboBox>
+				</StackPanel>
+
+			</StackPanel>
+
+
+		</ContentDialog>
 
 
 	</Grid>
@@ -228,9 +292,9 @@
 								<StackPanel Margin="0, 0, 12, 0"
 											MaxHeight="250"
 											  MinHeight="80">
-									<TextBlock Text="Saved Searches"/>
-									<ListView ItemsSource="{Binding SavedSearches}"
-											  ItemTemplate="{StaticResource SavedSearch}"
+									<TextBlock Text="Favourite Tags"/>
+									<ListView ItemsSource="{Binding FavouriteTags}"
+											  ItemTemplate="{StaticResource FavouriteTag}"
 											  SelectionChanged="SavedSearchSelection"
 											  SelectedIndex="{Binding SelectedSavedSearch, Mode=TwoWay}"
 											  Name="SavedSearchesList"
@@ -243,15 +307,9 @@
 											  CanReorderItems="True"
 											  AllowDrop="True"
 											  DragItemsCompleted="SavedSearchesList_OnDragItemsCompleted">
-										<i:Interaction.Behaviors>
-											<core:EventTriggerBehavior EventName="ItemClick" >
-												<core:InvokeCommandAction Command="{Binding SavedSearchSelected}"
-																		  CommandParameter="{Binding ElementName=SavedSearchesList, Path=SelectedItem}"
-																		  x:Name="SavedSearchCommandInvoker"/>
-											</core:EventTriggerBehavior>
-										</i:Interaction.Behaviors>
+
 									</ListView>
-									<TextBlock Text="You save no saved searches"
+									<TextBlock Text="You have no favourite tags yet"
 											   FontSize="12"
 											   Visibility="{Binding HaveSavedSearches}"/>
 								</StackPanel>
@@ -364,10 +422,7 @@
 											Visibility="{Binding IsFavButtonVisible}"
 											Name="SearchFavouritesButton"
 											Margin="8, 0"></Button>
-										<Button Content="Save Search"
-												Command="{Binding SaveSearch}"
-												
-												Name="SaveSearchButton"/>
+
 									</StackPanel>
 									<TextBlock Text="This search will return empty because you
 											   have more than 2 tags and are not signed in" 
@@ -505,6 +560,12 @@
 					</AppBarButton.Flyout>
 				</AppBarButton>
 			</CommandBar.PrimaryCommands>
+			<CommandBar.SecondaryCommands>
+				<AppBarButton Click="SaveAllClicked"
+							  Label="Save current search">
+
+				</AppBarButton>
+			</CommandBar.SecondaryCommands>
 		</CommandBar>
 	</Page.BottomAppBar>
 </Page>

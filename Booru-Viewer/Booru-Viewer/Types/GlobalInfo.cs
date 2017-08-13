@@ -28,7 +28,22 @@ namespace Booru_Viewer.Types
 		public static bool[] ContentCheck { get; set; } = { true, true, true };
 
 		private static ObservableCollection<string[]> savedSearches;
+
+		private static ObservableCollection<string> favouriteTags;
+		public static ObservableCollection<string> FavouriteTags
+		{
+			get
+			{
+				if (favouriteTags == null)
+				{
+					favouriteTags = new ObservableCollection<string>();
+					LoadFavouriteTags();
+				}
+				return favouriteTags;
+			}
+		}
 		public static EventHandler SavedSearchesLoadedEventHandler;
+		public static EventHandler FavouriteTagsLoadedEventHandler;
 		public static ObservableCollection<string[]> SavedSearches
 		{
 			get
@@ -63,7 +78,7 @@ namespace Booru_Viewer.Types
 				{
 					if (baseFolder.DisplayName != "Booru-Viewer")
 					{
-						var potFold = await baseFolder.TryGetItemAsync("BooruViewer");
+						var potFold = await baseFolder.TryGetItemAsync("Booru-Viewer");
 						if (potFold != null)
 						{
 							folder = await baseFolder.GetFolderAsync("Booru-Viewer");
@@ -144,6 +159,126 @@ namespace Booru_Viewer.Types
 
 
 			SavedSearchesLoadedEventHandler?.Invoke(typeof(GlobalInfo), EventArgs.Empty);
+		}
+
+		public static async Task<ObservableCollection<string>> GetFavouriteTags()
+		{
+			await LoadFavouriteTags();
+			return favouriteTags;
+
+		}
+
+		public static async Task SaveFavouriteTags(StorageFolder baseFolder = null)
+		{
+			try
+			{
+				StorageFolder folder;
+				if (baseFolder != null)
+				{
+					if (baseFolder.DisplayName != "Booru-Viewer")
+					{
+						var potFold = await baseFolder.TryGetItemAsync("Booru-Viewer");
+						if (potFold != null)
+						{
+							folder = await baseFolder.GetFolderAsync("Booru-Viewer");
+						}
+						else
+						{
+							folder = await baseFolder.CreateFolderAsync("Booru-Viewer");
+						}
+					}
+					else
+					{
+						folder = baseFolder;
+					}
+				}
+				else
+				{
+					folder = ApplicationData.Current.RoamingFolder;
+				}
+
+				var item = await folder.TryGetItemAsync("FavouriteTags.json");
+				if (item != null)
+				{
+					SearchesFile = await folder.GetFileAsync("FavouriteTags.json");
+				}
+				else
+				{
+					SearchesFile = await folder.CreateFileAsync("FavouriteTags.json");
+				}
+
+				var json = JsonConvert.SerializeObject(FavouriteTags.Select(x => x));
+				await FileIO.WriteTextAsync(SearchesFile, json);
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
+
+			}
+
+		}
+
+		public static async Task LoadFavouriteTags(StorageFolder tagsFolder = null)
+		{
+			StorageFolder folder;
+			if (tagsFolder != null)
+			{
+				if (tagsFolder.DisplayName != "Booru-Viewer")
+				{
+					var potFold = await tagsFolder.TryGetItemAsync("Booru-Viewer");
+					if (potFold != null)
+					{
+						folder = await tagsFolder.GetFolderAsync("Booru-Viewer");
+					}
+					else
+					{
+						folder = await tagsFolder.CreateFolderAsync("Booru-Viewer");
+					}
+				}
+				else
+				{
+					folder = tagsFolder;
+				}
+			}
+			else
+			{
+				folder = ApplicationData.Current.RoamingFolder;
+			}
+			if (tagsFolder != null)
+			{
+				folder = tagsFolder;
+			}
+			var item = await folder.TryGetItemAsync("FavouriteTags.json");
+			if (item == null)
+			{
+				Debug.WriteLine("File was null");
+				return;
+			}
+			SearchesFile = await folder.GetFileAsync("FavouriteTags.json");
+			var json = await FileIO.ReadTextAsync(SearchesFile);
+			try
+			{
+				var searchList = JsonConvert.DeserializeObject<List<string>>(json);
+				if (searchList != null)
+				{
+					savedSearches.Clear();
+					foreach (var search in searchList)
+					{
+						favouriteTags.Add(search);
+					}
+				}
+				else
+				{
+					Debug.WriteLine("FavouriteTagslist was null");
+				}
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
+			}
+
+
+			FavouriteTagsLoadedEventHandler?.Invoke(typeof(GlobalInfo), EventArgs.Empty);
 		}
 	}
 }

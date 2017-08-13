@@ -37,9 +37,18 @@
 							   VerticalAlignment="Center"
 							   Foreground="White"/>
 				<Button
+					Command="{Binding FavouriteTag}"
+					Background="#FF7C7C7C" VerticalAlignment="Stretch">
+					<Button.Content>
+						<SymbolIcon Symbol="{Binding FavouriteIcon}"/>
+					</Button.Content>
+				</Button>
+
+				<Button
 					Command="{Binding CopyTag}"
 					CommandParameter="{Binding ElementName=Tag, Path=Text}"
-					Background="#FF7C7C7C" VerticalAlignment="Stretch">
+					Background="#FF7C7C7C" VerticalAlignment="Stretch"
+					Margin="4, 0, 0, 0">
 					<Button.Content>
 						<SymbolIcon Symbol="Copy"/>
 					</Button.Content>
@@ -117,7 +126,11 @@
 			</AppBarButton>
 			<AppBarButton Label="Save Image"
 						  Icon="Save"
-						  Command="{Binding SaveImage}">
+						  Command="{Binding SaveImage}"
+			              >
+				<AppBarButton.CommandParameter>
+					<x:Boolean>True</x:Boolean>
+				</AppBarButton.CommandParameter>
 				<ToolTip
 						 IsOpen="{Binding Saving}">
 					<TextBlock Text="{Binding SaveImageFailureReason}"></TextBlock>
