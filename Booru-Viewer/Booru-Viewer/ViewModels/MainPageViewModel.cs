@@ -381,18 +381,26 @@ namespace Booru_Viewer.ViewModels
 		public ObservableCollection<TagViewModel> CurrentTags => GlobalInfo.CurrentTags;
 
 		private string currentTag = "";
-
+		private DateTime start;
+		private TimeSpan timeSinceChange;
 		public string CurrentTag
 		{
 			get => currentTag;
 			set
 			{
-				currentTag = value;
+				timeSinceChange = DateTime.Now - start;
 				RaisePropertyChanged();
-				if (!string.IsNullOrEmpty(value))
+				if (!string.IsNullOrEmpty(value) && timeSinceChange.TotalSeconds > 0.10f)
 				{
+					start = DateTime.Now;
+					timeSinceChange = TimeSpan.Zero;
 					SearchForCurrentTag(value);
 				}
+				if (string.IsNullOrEmpty(value))
+				{
+					SuggestedTags.Clear();
+				}
+				currentTag = value;
 			}
 		}
 

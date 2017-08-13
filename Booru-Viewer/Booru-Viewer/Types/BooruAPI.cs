@@ -146,8 +146,10 @@ namespace Booru_Viewer.Types
 		public static async Task<Tuple<bool, List<Tag>, string>> SearchTags(string search, int limit = -1, bool isExact = false)
 		{
 			var tags = new List<Tag>();
-			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(new[] { new KeyValuePair<string, string>("search[name" + (isExact ? "	" : "_matches]"), search + "*") });
+			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(new[] { new KeyValuePair<string, string>("search[name" + (isExact ? "]" : "_matches]"), search.ToLower() + (isExact ? "" : "*")),
+				new KeyValuePair<string, string>("search[order]", "name"),  });
 			var requestURI = BaseURL + TagsURL + "?" + content.ToString();
+
 			HttpResponseMessage response = new HttpResponseMessage();
 			try
 			{
