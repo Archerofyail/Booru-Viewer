@@ -709,6 +709,13 @@ namespace Booru_Viewer.ViewModels
 		public ICommand SearchFavourites => new RelayCommand(SearchFavouritesExecute);
 		public ICommand SaveSearch => new RelayCommand(SaveSearchExecute);
 		public ICommand SavedSearchSelected => new RelayCommand<SavedSearchViewModel>(SavedSearchSelectedExec);
+		public ICommand ClearSearch => new RelayCommand(ClearSearchEx);
+
+		void ClearSearchEx()
+		{
+			CurrentTags.Clear();
+			RaisePropertyChanged("CurrentTags");
+		}
 		void SavedSearchSelectedExec(SavedSearchViewModel savedSearch)
 		{
 			Debug.WriteLine("Saved Search tapped in mainpageviewmodel");
