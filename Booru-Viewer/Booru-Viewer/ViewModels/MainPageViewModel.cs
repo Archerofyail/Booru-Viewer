@@ -30,6 +30,7 @@ namespace Booru_Viewer.ViewModels
 	public class MainPageViewModel : ViewModelBase
 	{
 		private IPropertySet appSettings;
+		
 		public MainPageViewModel()
 		{
 			GetSaveFolder();
@@ -83,7 +84,7 @@ namespace Booru_Viewer.ViewModels
 			Debug.WriteLine("Count for saved Searches is " + SavedSearches.Count);
 			BooruAPI.TagSearchCompletedHandler += (sender, tuple) =>
 			{
-				if (tuple.Item1)
+				if (tuple.Item1 && currentTag.Length > 0)
 				{
 
 					foreach (var tag in tuple.Item2)
