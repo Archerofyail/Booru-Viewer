@@ -41,6 +41,7 @@ namespace Booru_Viewer.Types
 				}
 				return favouriteTags;
 			}
+			set => favouriteTags = value;
 		}
 		public static EventHandler SavedSearchesLoadedEventHandler;
 		public static EventHandler FavouriteTagsLoadedEventHandler;
@@ -144,6 +145,7 @@ namespace Booru_Viewer.Types
 					savedSearches.Clear();
 					foreach (var search in searchList)
 					{
+						
 						savedSearches.Add(search);
 					}
 				}
@@ -264,7 +266,8 @@ namespace Booru_Viewer.Types
 					savedSearches.Clear();
 					foreach (var search in searchList)
 					{
-						favouriteTags.Add(search);
+						var tag = search.ToLower();
+						favouriteTags.Add(tag);
 					}
 				}
 				else

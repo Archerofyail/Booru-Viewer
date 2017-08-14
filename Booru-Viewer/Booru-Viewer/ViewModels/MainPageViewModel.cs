@@ -335,6 +335,7 @@ namespace Booru_Viewer.ViewModels
 
 				return favouriteTags;
 			}
+			set => favouriteTags = value;
 		}
 
 		private IncrementalLoadingCollection<PostSource, FullImageViewModel> thumbnails;
@@ -409,6 +410,7 @@ namespace Booru_Viewer.ViewModels
 			SuggestedTags.Clear();
 			await BooruAPI.SearchTags(val.Replace(" ", "_"), 1, true);
 			await BooruAPI.SearchTags(val.Replace(" ", "_"), 6);
+			SuggestedTags = new ObservableCollection<string>(SuggestedTags.Distinct());
 		}
 
 		private string username;
@@ -532,7 +534,7 @@ namespace Booru_Viewer.ViewModels
 			{
 				prefix = Prefixes[selectedPrefixIndex];
 			}
-			CurrentTags.Add(new TagViewModel(prefix + CurrentTag.Trim(), this));
+			CurrentTags.Add(new TagViewModel(prefix + CurrentTag.Trim().ToLower(), this));
 			CurrentTag = "";
 			suggestedTagIndex = -1;
 			SuggestedTags.Clear();

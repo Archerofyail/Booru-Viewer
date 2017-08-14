@@ -1,4 +1,7 @@
-﻿using GalaSoft.MvvmLight;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using System.Windows.Input;
 using Windows.ApplicationModel.DataTransfer;
@@ -7,7 +10,7 @@ using Booru_Viewer.Types;
 
 namespace Booru_Viewer.ViewModels
 {
-	public class TagViewModel : ViewModelBase
+	public class TagViewModel : ViewModelBase, IComparable
 	{
 		private MainPageViewModel parentVM;
 
@@ -58,8 +61,16 @@ namespace Booru_Viewer.ViewModels
 			{
 
 				GlobalInfo.FavouriteTags.Add(tag);
-				
+
 				parentVM?.FavouriteTags.Add(this);
+				var tagList = parentVM?.FavouriteTags.ToList();
+				
+				tagList.Sort();
+				GlobalInfo.FavouriteTags = new ObservableCollection<string>(tagList.Select(x => x.tag));
+				if (parentVM != null)
+				{
+					parentVM.FavouriteTags = new ObservableCollection<TagViewModel>(tagList);
+				}
 			}
 			else
 			{
@@ -98,5 +109,13 @@ namespace Booru_Viewer.ViewModels
 		public ICommand CopyTag => new RelayCommand<string>(CopyTagExec);
 		public ICommand RemoveTag => new RelayCommand(RemoveTagExecute, RemoveTagCanExecute);
 		public ICommand StartSearchFromFavourite => new RelayCommand(StartSearchFromThisEx);
+		public int CompareTo(object obj)
+		{
+			if (obj != null && obj.GetType() == typeof(TagViewModel))
+			{
+				return String.Compare(tag, ((TagViewModel)obj).tag, StringComparison.CurrentCultureIgnoreCase);
+			}
+			return 1;
+		}
 	}
 }
