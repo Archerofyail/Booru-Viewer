@@ -343,8 +343,10 @@
 													AllowFocusOnInteraction="True"
 													KeyUp="TagTextBox_KeyUp"
 													ItemsSource="{Binding SuggestedTags}"
-													UpdateTextOnSelect="True"
+													
+													UpdateTextOnSelect="False"
 													VerticalAlignment="Center"
+													SuggestionChosen="TagTextBox_OnSuggestionChosen"
 													>
 											<AutoSuggestBox.TextBoxStyle>
 												<Style TargetType="TextBox">
@@ -412,7 +414,10 @@
 											</ItemsPanelTemplate>
 										</ListView.ItemsPanel>
 									</ListView>
-
+									<StackPanel Orientation="Horizontal">
+									<TextBlock Text="Total tags:"></TextBlock>
+										<TextBlock Text="{Binding TotalTagCount}"></TextBlock>
+									</StackPanel>
 									<StackPanel Orientation="Horizontal"
 											FlowDirection="RightToLeft"
 												 Margin="8">

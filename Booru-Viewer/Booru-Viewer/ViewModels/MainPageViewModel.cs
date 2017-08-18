@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
@@ -30,7 +31,7 @@ namespace Booru_Viewer.ViewModels
 	public class MainPageViewModel : ViewModelBase
 	{
 		private IPropertySet appSettings;
-		
+
 		public MainPageViewModel()
 		{
 			GetSaveFolder();
@@ -142,12 +143,12 @@ namespace Booru_Viewer.ViewModels
 
 		}
 
-		private int totalTagCount
+		public int TotalTagCount
 		{
-			get { return CurrentTags.Count + (checkedList.All(x => x) || checkedList.All(x => !x) ? 0 : 1) + (selectedOrderIndex > 0 ? 1 : 0); }
+			get { return CurrentTags.Count + (checkedList.All(x => x) || checkedList.All(x => !x) ? 0 : 1) + (selectedOrderIndex > 1 ? 1 : 0); }
 		}
 
-		public bool IsSignedOutWithMoreThan2Tags => totalTagCount > 2 && Username == "" && APIKey == "";
+		public bool IsSignedOutWithMoreThan2Tags => TotalTagCount > 2 && Username == "" && APIKey == "";
 
 		private bool safeChecked = true;
 		private bool questionableChecked = false;
@@ -288,6 +289,8 @@ namespace Booru_Viewer.ViewModels
 			}
 		}
 
+		public bool TagSuggestionChosen { get; set; } = false;
+
 		private bool isLoading = false;
 
 		public bool IsLoading
@@ -377,6 +380,7 @@ namespace Booru_Viewer.ViewModels
 				RaisePropertyChanged();
 				GlobalInfo.CurrentOrdering = SelectedOrderIndex > 0 ? OrderOptions[SelectedOrderIndex] : "";
 				RaisePropertyChanged("IsSignedOutWithMoreThan2Tags");
+				RaisePropertyChanged("TotalTagCount");
 			}
 		}
 
@@ -390,6 +394,14 @@ namespace Booru_Viewer.ViewModels
 			get => currentTag;
 			set
 			{
+				if (TagSuggestionChosen)
+				{
+					TagSuggestionChosen = false;
+					suggestedTags.Clear();
+					currentTag = value;
+					AddTagExecute();
+					currentTag = "";
+				}
 				timeSinceChange = DateTime.Now - start;
 				RaisePropertyChanged();
 				if (!string.IsNullOrEmpty(value) && timeSinceChange.TotalSeconds > 0.10f)
@@ -545,6 +557,7 @@ namespace Booru_Viewer.ViewModels
 
 			RaisePropertyChanged("SuggestedTags");
 			RaisePropertyChanged("CurrentTags");
+			RaisePropertyChanged("TotalTagCount");
 		}
 
 		bool AddTagCanExecute()
@@ -645,6 +658,7 @@ namespace Booru_Viewer.ViewModels
 			CurrentTags.Clear();
 			CurrentTag = "ordfav:" + Username;
 			RaisePropertyChanged("CurrentTags");
+			RaisePropertyChanged("TotalTagCount");
 			AddTagExecute();
 			StartSearchExecute();
 		}
@@ -718,6 +732,7 @@ namespace Booru_Viewer.ViewModels
 		{
 			CurrentTags.Clear();
 			RaisePropertyChanged("CurrentTags");
+			RaisePropertyChanged("TotalTagCount");
 		}
 		void SavedSearchSelectedExec(SavedSearchViewModel savedSearch)
 		{
@@ -758,6 +773,7 @@ namespace Booru_Viewer.ViewModels
 			{
 				checkBox.IsChecked = true;
 			}
+			RaisePropertyChanged("TotalTagCount");
 
 		}
 
@@ -919,13 +935,9 @@ namespace Booru_Viewer.ViewModels
 		async void StartImageSaveEx(int pageTo)
 		{
 
-			int imageCount = (SelectedPageToSave + 1) * PerPage;
+			int imageCount = Math.Min(GlobalInfo.CurrentSearch.Count, (SelectedPageToSave + 1) * PerPage);
 			for (int i = 0; i < imageCount; i++)
 			{
-				if (i > GlobalInfo.CurrentSearch.Count - 1)
-				{
-					break;
-				}
 				await ImageSaver.SaveImage(string.IsNullOrEmpty(GlobalInfo.CurrentSearch[i].Large_File_Url)
 					? GlobalInfo.CurrentSearch[i].File_Url
 					: GlobalInfo.CurrentSearch[i].Large_File_Url);

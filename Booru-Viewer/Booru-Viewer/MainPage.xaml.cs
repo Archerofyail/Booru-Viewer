@@ -241,5 +241,10 @@ namespace Booru_Viewer
 		}
 
 
+		private void TagTextBox_OnSuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+		{
+			ViewModel.TagSuggestionChosen = true;
+			ViewModel.CurrentTag = args.SelectedItem as string;
+		}
 	}
 }

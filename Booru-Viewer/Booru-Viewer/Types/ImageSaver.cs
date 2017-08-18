@@ -12,7 +12,7 @@ namespace Booru_Viewer.Types
 	{
 		public static HttpClient client = new HttpClient();
 		private static StorageFolder imageFolder;
-
+		private static int currSaveCount = 0;
 		public static StorageFolder ImageFolder
 		{
 			get
@@ -79,6 +79,11 @@ namespace Booru_Viewer.Types
 		}
 		public static async Task<string> SaveImage(string ImageURL)
 		{
+			while (currSaveCount >= 4)
+			{
+				Debug.WriteLine("Save Count is:" + currSaveCount);
+			}
+			currSaveCount++;
 			var baseURLLength = (BooruAPI.BaseURL + "/data/").Length;
 			if (ImageFolder == null)
 			{
@@ -89,16 +94,19 @@ namespace Booru_Viewer.Types
 				catch (Exception e)
 				{
 					Debug.WriteLine(e);
+					currSaveCount--;
 					return "Could not open Save Folder";
 					throw;
 				}
 
 			}
 			var imageName = ImageURL.Substring(baseURLLength);
-			imageName = imageName.Replace("/", "");
+			imageName = imageName.Replace("/", "").Replace("__", "").Replace("_", " ");
+			imageName = imageName.Remove(imageName.Length - 37, 32);
 			var imageItem = await ImageFolder.TryGetItemAsync(imageName);
 			if (imageItem != null)
 			{
+				currSaveCount--;
 				return "Already saved image";
 			}
 			try
@@ -110,14 +118,17 @@ namespace Booru_Viewer.Types
 					var bytes = await response.Content.ReadAsByteArrayAsync();
 					await FileIO.WriteBytesAsync(file, bytes);
 				}
+				currSaveCount--;
 				return "Image Saved";
+				
 			}
 			catch (Exception e)
 			{
 				Debug.WriteLine(e);
-				throw;
+				currSaveCount--;
+				return "An error ocurred when saving, please try again";
 			}
-
+			
 
 		}
 	}

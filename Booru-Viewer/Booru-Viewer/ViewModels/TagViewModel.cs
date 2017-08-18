@@ -64,8 +64,7 @@ namespace Booru_Viewer.ViewModels
 
 				parentVM?.FavouriteTags.Add(this);
 				var tagList = parentVM?.FavouriteTags.ToList();
-				
-				tagList.Sort();
+				tagList?.Sort();
 				GlobalInfo.FavouriteTags = new ObservableCollection<string>(tagList.Select(x => x.tag));
 				if (parentVM != null)
 				{
@@ -95,6 +94,7 @@ namespace Booru_Viewer.ViewModels
 		void AddTagToSearchEx()
 		{
 			parentVM?.CurrentTags.Add(new TagViewModel(tag, parentVM));
+			parentVM?.RaisePropertyChanged("TotalTagCount");
 		}
 
 		void StartSearchFromThisEx()
