@@ -9,6 +9,7 @@ using Windows.UI.Xaml.Navigation;
 using Booru_Viewer.Types;
 using System.Diagnostics;
 using System.Linq;
+using Windows.Foundation.Collections;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Media;
 using Booru_Viewer.ViewModels;
@@ -67,11 +68,33 @@ namespace Booru_Viewer
 					Debug.WriteLine("imageView is " + imageView);
 					ViewModel.ImageContextOpened = imageView.DataContext as FullImageViewModel;
 				};
+
+				if (GlobalInfo.CurrentSearch.Count > 0)
+				{
+					Debug.WriteLine("ImageCount coming back is: " + GlobalInfo.CurrentSearch.Count);
+					int layoutcount = 0;
+					ImageGridView.LayoutUpdated += (sender1, o) =>
+					{
+						if (layoutcount == 0)
+						{
+							layoutcount++;
+							var image = ImageGridView.Items[GlobalInfo.SelectedImage];
+							ImageGridView.ScrollIntoView(image, ScrollIntoViewAlignment.Leading);
+						}
+
+					};
+					ImageGridView.UpdateLayout();
+					
+				}
+
 			};
-			
+
+
 
 		}
-		
+
+
+
 		private void GridView_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			var grid = sender as GridView;
@@ -97,7 +120,7 @@ namespace Booru_Viewer
 
 		private void SearchClicked(object sender, RoutedEventArgs e)
 		{
-			
+
 		}
 
 		private void AddTagClicked(object sender, RoutedEventArgs e)
@@ -108,7 +131,7 @@ namespace Booru_Viewer
 
 		private void SaveLoginDataButtonTapped(object sender, TappedRoutedEventArgs e)
 		{
-			UsernameTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();	
+			UsernameTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
 			APIKeyTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
 		}
 
@@ -137,9 +160,10 @@ namespace Booru_Viewer
 
 		protected override void OnNavigatedTo(NavigationEventArgs e)
 		{
+			ViewModel?.RaisePropertyChanged("Thumbnails");
+			
 
-			ImageGridView.GetBindingExpression(GridView.ItemsSourceProperty).UpdateSource();
-			ViewModel?.RaisePropertyChanged("FavouriteTags");
+		ViewModel?.RaisePropertyChanged("FavouriteTags");
 			Frame rootFrame = Window.Current.Content as Frame;
 			if (rootFrame.CanGoBack)
 			{
@@ -158,6 +182,7 @@ namespace Booru_Viewer
 
 		protected override void OnNavigatedFrom(NavigationEventArgs e)
 		{
+			Debug.WriteLine("ImageCount is: " + GlobalInfo.CurrentSearch.Count);
 			Debug.WriteLine("Globalinfo imageviewmodels count is " + GlobalInfo.ImageViewModels.Count + ", itemssource is " + (ImageGridView.Items).Count);
 		}
 
@@ -169,7 +194,7 @@ namespace Booru_Viewer
 
 		private void SettingsTapped(object sender, TappedRoutedEventArgs e)
 		{
-			
+
 
 		}
 
@@ -191,8 +216,8 @@ namespace Booru_Viewer
 
 		private void SavedSearchesList_OnItemClick(object sender, ItemClickEventArgs e)
 		{
-			
-			
+
+
 		}
 
 		private void TextBox_OnLostFocus(object sender, RoutedEventArgs e)
@@ -203,7 +228,7 @@ namespace Booru_Viewer
 
 		private void ImageOpened(object sender, ImageExOpenedEventArgs e)
 		{
-			
+
 			//Debug.WriteLine("Image opened at URI:" + (sender as ImageEx).Source + "\n, index is " + ImageGridView.Items.IndexOf((sender as ImageEx).DataContext));
 		}
 
@@ -236,7 +261,7 @@ namespace Booru_Viewer
 
 		async void SaveAllClicked(object sender, RoutedEventArgs e)
 		{
-			
+
 			await SaveAllDialogBox.ShowAsync();
 		}
 
