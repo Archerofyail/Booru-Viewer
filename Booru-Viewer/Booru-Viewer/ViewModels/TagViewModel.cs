@@ -40,6 +40,7 @@ namespace Booru_Viewer.ViewModels
 
 			parentVM.RemoveTagExec(this);
 			parentVM.RaisePropertyChanged("IsSignedOutWithMoreThan2Tags");
+			parentVM.RaisePropertyChanged("TotalTagCount");
 		}
 
 		bool RemoveTagCanExecute()
@@ -101,6 +102,8 @@ namespace Booru_Viewer.ViewModels
 		{
 			parentVM?.CurrentTags.Clear();
 			parentVM?.CurrentTags.Add(this);
+			parentVM?.RaisePropertyChanged("IsSignedOutWithMoreThan2Tags");
+			parentVM?.RaisePropertyChanged("TotalTagCount");
 			parentVM?.StartSearchExecute();
 		}
 		public ICommand AddTagToSearch => new RelayCommand(AddTagToSearchEx);

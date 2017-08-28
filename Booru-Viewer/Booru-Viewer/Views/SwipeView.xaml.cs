@@ -4,6 +4,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media.Imaging;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
@@ -88,7 +89,8 @@ namespace Booru_Viewer.Views
 
 		private void BitmapImage_OnImageFailed(object sender, ExceptionRoutedEventArgs e)
 		{
-			Debug.WriteLine("Failed to open image");
+			var bitmap = sender as BitmapImage;
+			Debug.WriteLine("Failed to open image: " + e.ErrorMessage + ". URL is: " + bitmap.UriSource);
 		}
 	}
 

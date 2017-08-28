@@ -33,6 +33,8 @@ namespace Booru_Viewer.ViewModels
 			Debug.WriteLine("iamges count is " + images.Count + ", globalinfo version is " + GlobalInfo.ImageViewModels.Count);
 		}
 
+		public string CurrentURL { get; set; } = "";
+
 		private string saveImageFailureReason = "";
 
 		public string SaveImageFailureReason
@@ -155,6 +157,8 @@ namespace Booru_Viewer.ViewModels
 					{
 						Images.LoadMoreItemsAsync(Convert.ToUInt32(perPage));
 					}
+					CurrentURL = GlobalInfo.CurrentSearch[value].File_Url;
+					RaisePropertyChanged("CurrentURL");
 				}
 
 				RaisePropertyChanged();

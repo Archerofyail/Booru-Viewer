@@ -69,7 +69,17 @@
 			SelectedIndex="{Binding Index, Mode=TwoWay}"
 			Name="FlipView"
 			Tapped="FlipView_OnTapped"
-			SelectionChanged="FlipView_OnSelectionChanged">
+			SelectionChanged="FlipView_OnSelectionChanged"
+			UseTouchAnimationsForAllNavigation="True"
+			>
+			<FlipView.ItemsPanel>
+				<ItemsPanelTemplate>
+					<VirtualizingStackPanel VirtualizationMode="Standard"
+											Orientation="Horizontal">
+						
+					</VirtualizingStackPanel>
+				</ItemsPanelTemplate>
+			</FlipView.ItemsPanel>
 			<FlipView.ItemTemplate>
 				<DataTemplate>
 					<Grid>
@@ -86,19 +96,15 @@
 								Grid.Row="0"
 								Grid.Column="0"
 							RenderTransformOrigin="0.5,0.5"
-							>
+							PlaceholderSource="../Assets/Placeholder.png"
+							PlaceholderStretch="Uniform"
+							Stretch="Uniform"
+							IsCacheEnabled="False"
+							Source="{Binding FullImageURL}">
 							<controls:ImageEx.RenderTransform>
 								<CompositeTransform TranslateX="0.5" TranslateY="0.5"/>
 							</controls:ImageEx.RenderTransform>
-							<controls:ImageEx.Source>
-								<BitmapImage UriSource="{Binding FullImageWithLoginURL}"
-											 AutoPlay="True"
-											 DecodePixelHeight="{Binding Height}"
-											 ImageOpened="BitmapImage_OnImageOpened"
-											 ImageFailed="BitmapImage_OnImageFailed">
-
-								</BitmapImage>
-							</controls:ImageEx.Source>
+							
 
 						</controls:ImageEx>
 
@@ -110,10 +116,14 @@
 			</FlipView.ItemTemplate>
 
 		</FlipView>
-	
+
+		<StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
 		<TextBlock Text="{Binding ElementName=FlipView, Path=SelectedIndex}"
 				   VerticalAlignment="Bottom"
 				   MaxHeight="20"/>
+			<TextBlock Text="{Binding CurrentURL}"
+					   Margin="4"></TextBlock>
+		</StackPanel>
 	</Grid>
 	<Page.BottomAppBar>
 		<CommandBar Name="AppBar">

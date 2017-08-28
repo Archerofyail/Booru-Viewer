@@ -34,7 +34,8 @@
 								  MaxHeight="250"
 								  MinHeight="160"
 								  MinWidth="160"
-				                 >
+				                 PlaceholderSource="Assets/Placeholder.png"
+								  PlaceholderStretch="Uniform">
 					<controls:ImageEx.ContextFlyout>
 						<MenuFlyout x:Name="ImageContextFlyout">
 							<MenuFlyoutItem Text="Save Image"
@@ -199,8 +200,8 @@
 					SelectionChanged="GridView_SelectionChanged"
 					IsItemClickEnabled="True"
 					ItemClick="ImageGridView_OnItemClick"
-					DesiredWidth="200"
-		                            >
+					DesiredWidth="250"
+		            ShowsScrollingPlaceholders="True">
 			<i:Interaction.Behaviors>
 				<core:EventTriggerBehavior SourceObject="{Binding ElementName=ImageGridView}">
 					<core:InvokeCommandAction Command="{Binding ImageContextOpened}"></core:InvokeCommandAction>
