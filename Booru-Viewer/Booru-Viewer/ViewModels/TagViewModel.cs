@@ -5,7 +5,9 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using System.Windows.Input;
 using Windows.ApplicationModel.DataTransfer;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Input;
 using Booru_Viewer.Types;
 
 namespace Booru_Viewer.ViewModels
@@ -34,6 +36,9 @@ namespace Booru_Viewer.ViewModels
 		public bool IsFavourite => GlobalInfo.FavouriteTags.Contains(tag);
 
 		public Symbol FavouriteIcon => IsFavourite ? Symbol.SolidStar : Symbol.OutlineStar;
+
+		public Visibility Selected { get; set; } = Visibility.Collapsed;
+		
 
 		void RemoveTagExecute()
 		{
@@ -106,6 +111,19 @@ namespace Booru_Viewer.ViewModels
 			parentVM?.RaisePropertyChanged("TotalTagCount");
 			parentVM?.StartSearchExecute();
 		}
+
+		void AddPrefixEx(string prefix)
+		{
+			if (prefix[0] == tag[0])
+			{
+				Tag = tag.Replace("~", "").Replace("-", "");
+				return;
+			}
+			Tag = tag.Replace("~", "").Replace("-", "");
+			Tag = tag.Insert(0, prefix);
+		}
+		public ICommand SelectedTag => new RelayCommand(() => {Selected = (Selected == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible); RaisePropertyChanged("Selected"); });
+		public ICommand AddPrefix => new RelayCommand<string>(AddPrefixEx);
 		public ICommand AddTagToSearch => new RelayCommand(AddTagToSearchEx);
 		public ICommand UnfavouriteTag => new RelayCommand(UnfavouriteTagEx);
 		public ICommand FavouriteTag => new RelayCommand(FavouriteTagEx);

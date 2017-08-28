@@ -67,10 +67,21 @@
 				<StackPanel Orientation="Horizontal"
 							Background="{StaticResource ThemeBrush}"
 							BorderThickness="1"
-							Margin="0">
+							Margin="0"
+							Tapped="TagTapped">
+					
 					<StackPanel.BorderBrush>
 						<SolidColorBrush Color="{ThemeResource SystemBaseLowColor}"/>
 					</StackPanel.BorderBrush>
+					<Button Content="~" Command="{Binding AddPrefix}" Visibility="{Binding Selected}"
+							CommandParameter="~"
+					        Background="#FF7C7C7C"
+					        BorderThickness="1"/>
+					<Button Content="-" Command="{Binding AddPrefix}" Visibility="{Binding Selected}"
+							CommandParameter="-"
+					        Background="#FF7C7C7C"
+							Margin="4, 0"
+					        BorderThickness="1"/>
 					<TextBlock Name="Tag"
 							   Text="{Binding Path=Tag, Mode=TwoWay}" 
 							   MinWidth="20" 
@@ -79,12 +90,14 @@
 							   VerticalAlignment="Center"
 							   />
 					<Button Command="{Binding FavouriteTag, Mode=TwoWay}"
-					        Background="#FF7C7C7C">
+					        Background="#FF7C7C7C"
+					        BorderThickness="1">
 						<SymbolIcon Symbol="{Binding FavouriteIcon}"/>
 					</Button>
 					<Button Command="{Binding RemoveTag, Mode=TwoWay}"
 							Background="#FF7C7C7C"
-					        Margin="4, 0, 0, 0">
+					        Margin="4, 0, 0, 0"
+					        BorderThickness="1">
 						<SymbolIcon Symbol="Cancel"
 									/>
 					</Button>
@@ -106,20 +119,23 @@
 					           VerticalAlignment="Center"
 					/>
 					<Button Command="{Binding UnfavouriteTag, Mode=TwoWay}"
-					        Background="#FF7C7C7C">
+					        Background="#FF7C7C7C"
+					        BorderThickness="1">
 						<SymbolIcon Symbol="Cancel"/>
 					</Button>
 					<Button Command="{Binding AddTagToSearch, Mode=TwoWay}"
 							CommandParameter="{x:Bind Tag}"
 					        Background="#FF7C7C7C"
-					        Margin="4, 0, 0, 0">
+					        Margin="4, 0, 0, 0"
+					        BorderThickness="1">
 						<SymbolIcon Symbol="Add"
 									/>
 					</Button>
 					<Button Command="{Binding StartSearchFromFavourite, Mode=TwoWay}"
 							CommandParameter="{x:Bind Tag}"
 					        Background="#FF7C7C7C"
-							Margin="4, 0, 0, 0">
+							Margin="4, 0, 0, 0"
+					        BorderThickness="1">
 						<SymbolIcon Symbol="Find"/>
 					</Button>
 				</StackPanel>
@@ -317,27 +333,9 @@
 								<StackPanel Orientation="Vertical" MaxWidth="350">
 									<TextBlock Text="Add tags"></TextBlock>
 									<StackPanel Orientation="Horizontal">
-										<StackPanel VerticalAlignment="Top">
-											<TextBlock Text="Prefix"/>
-											<ListBox SelectedIndex="{Binding SelectedPrefixIndex, Mode=TwoWay}"
-												ItemsSource="{Binding Prefixes}"
-												Margin="4, 0"
-												AllowFocusOnInteraction="True">
-												<ListBox.ItemsPanel>
-													<ItemsPanelTemplate>
-														<StackPanel Orientation="Horizontal"></StackPanel>
-													</ItemsPanelTemplate>
-												</ListBox.ItemsPanel>
-												<ListBox.ItemContainerStyle>
-													<Style TargetType="ListBoxItem">
-														<Setter Property="Padding" Value="8"></Setter>
-													</Style>
-												</ListBox.ItemContainerStyle>
-											</ListBox>
-										</StackPanel>
 										<AutoSuggestBox PlaceholderText="Tag"
 													Name="TagTextBox"
-													MinWidth="200"
+													MinWidth="260"
 													Text="{Binding CurrentTag, Mode=TwoWay, 
 														UpdateSourceTrigger=PropertyChanged}"
 													TextChanged="TagTextBox_TextChanged"

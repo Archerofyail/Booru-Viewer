@@ -158,6 +158,11 @@ namespace Booru_Viewer
 
 		}
 
+		private void TagTapped(object sender, TappedRoutedEventArgs e)
+		{
+			((sender as FrameworkElement)?.DataContext as TagViewModel)?.SelectedTag.Execute(null);
+		}
+
 		protected override void OnNavigatedTo(NavigationEventArgs e)
 		{
 			ViewModel?.RaisePropertyChanged("Thumbnails");
@@ -271,5 +276,7 @@ namespace Booru_Viewer
 			ViewModel.TagSuggestionChosen = true;
 			ViewModel.CurrentTag = args.SelectedItem as string;
 		}
+
+		
 	}
 }
