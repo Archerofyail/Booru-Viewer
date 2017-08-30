@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -9,22 +6,19 @@ using Windows.UI.Xaml.Navigation;
 using Booru_Viewer.Types;
 using System.Diagnostics;
 using System.Linq;
-using Windows.Foundation.Collections;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Media;
 using Booru_Viewer.ViewModels;
 using Booru_Viewer.Views;
 using Microsoft.Toolkit.Uwp.UI.Controls;
+using Microsoft.Toolkit.Uwp.UI.Extensions;
+using ListViewBase = Windows.UI.Xaml.Controls.ListViewBase;
 
-
-// The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace Booru_Viewer
 {
 	//TODO:Add navigation pane so you can have multiple searches at the same time Going to need to use code to duplicate the views I think
-	/// <summary>
-	/// An empty page that can be used on its own or navigated to within a Frame.
-	/// </summary>
+	
 	public sealed partial class MainPage : Page
 	{
 		private MainPageViewModel ViewModel { get; set; }
@@ -332,7 +326,11 @@ namespace Booru_Viewer
 
 		private void ImageContextMenuSelectClick(object sender, RoutedEventArgs e)
 		{
-			MultiSelectButtonTapped(ImageGridView, new RoutedEventArgs());
+			var imageViewModel = (sender as FrameworkElement).DataContext as FullImageViewModel;
+			
+			MultiSelectButtonTapped(SelectButton, new RoutedEventArgs());
+			ImageGridView.SelectedItems.Add(imageViewModel);
+
 		}
 
 		private void SaveButton_OnClick(object sender, RoutedEventArgs e)

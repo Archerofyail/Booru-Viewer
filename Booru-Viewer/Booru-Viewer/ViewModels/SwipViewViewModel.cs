@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Input;
-using System.Xml;
 using Booru_Viewer.Types;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;

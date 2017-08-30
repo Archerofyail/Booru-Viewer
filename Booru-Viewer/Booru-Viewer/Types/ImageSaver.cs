@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.AccessCache;
-using Windows.UI.ViewManagement;
 
 namespace Booru_Viewer.Types
 {

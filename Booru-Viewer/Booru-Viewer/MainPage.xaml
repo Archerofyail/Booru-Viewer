@@ -2,19 +2,15 @@
 	x:Class="Booru_Viewer.MainPage"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns:local="using:Booru_Viewer"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:vm1="using:Booru_Viewer.ViewModels"
 	xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
-	xmlns:wrapPanel="using:Microsoft.Toolkit.Uwp.UI.Controls.WrapPanel"
-	xmlns:mvvml="using:GalaSoft.MvvmLight"
 	mc:Ignorable="d"
 	RequestedTheme="Default"
 	x:Name="Page"
 	xmlns:i="using:Microsoft.Xaml.Interactivity"
-	xmlns:core="using:Microsoft.Xaml.Interactions.Core"
-	xmlns:types="using:Booru_Viewer.Types">
+	xmlns:core="using:Microsoft.Xaml.Interactions.Core">
 
 	<Page.DataContext>
 		<vm1:MainPageViewModel></vm1:MainPageViewModel>
@@ -221,7 +217,7 @@
 					IncrementalLoadingTrigger="Edge"
 					SelectionChanged="GridView_SelectionChanged"
 					IsItemClickEnabled="True"
-				
+					ItemClick="ImageGridView_OnItemClick"
 					DesiredWidth="250"
 		            ShowsScrollingPlaceholders="True">
 			<i:Interaction.Behaviors>
