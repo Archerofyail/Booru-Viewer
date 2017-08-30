@@ -9,9 +9,9 @@ namespace Booru_Viewer.Types
 {
 	public class PostSource : IIncrementalSource<FullImageViewModel>
 	{
-		async Task<IEnumerable<FullImageViewModel>> IIncrementalSource<FullImageViewModel>.GetPagedItemsAsync(int pageIndex, int pageSize, CancellationToken cancellationToken)
+		public async Task<IEnumerable<FullImageViewModel>> GetPagedItemsAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = new CancellationToken())
 		{
-			
+
 			var page = BooruAPI.Page++;
 			var result = await BooruAPI.SearchPosts(GlobalInfo.CurrentSearchTags.ToArray(), page, pageSize, GlobalInfo.ContentCheck, false);
 			if (!result.Item1) throw new Exception(result.Item3);
@@ -21,7 +21,7 @@ namespace Booru_Viewer.Types
 				tns.Add(new FullImageViewModel(image.Preview_File_Url, image.Has_Large ? image.Large_File_Url : image.File_Url, image.Large_File_Url, image.image_width, image.image_height));
 			}
 
-			
+
 			return tns;
 
 

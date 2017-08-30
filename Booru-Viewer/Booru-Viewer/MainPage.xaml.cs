@@ -28,6 +28,8 @@ namespace Booru_Viewer
 	public sealed partial class MainPage : Page
 	{
 		private MainPageViewModel ViewModel { get; set; }
+
+		private bool isMultiSelectEnabled = false;
 		public MainPage()
 		{
 			InitializeComponent();
@@ -45,6 +47,8 @@ namespace Booru_Viewer
 				}
 
 			}
+
+
 			this.NavigationCacheMode = NavigationCacheMode.Required;
 			SearchButton.Loaded += (sender, args) => { SearchButton.CommandParameter = SearchAppBarButton; };
 			SearchFavouritesButton.Loaded += (sender, args) => { SearchButton.CommandParameter = SearchAppBarButton; };
@@ -84,7 +88,7 @@ namespace Booru_Viewer
 
 					};
 					ImageGridView.UpdateLayout();
-					
+
 				}
 
 			};
@@ -104,6 +108,12 @@ namespace Booru_Viewer
 				GlobalInfo.SelectedImage = grid.SelectedIndex;
 			}
 			Frame.Navigate(typeof(SwipeView));
+		}
+
+		private void GridView_MultiSelectChanged(object sender, SelectionChangedEventArgs e)
+		{
+			SaveButton.IsEnabled = ImageGridView.SelectedItems.Count > 0;
+			//SaveButton.GetBindingExpression(Button.CommandParameterProperty)?.UpdateSource();
 		}
 
 		private void ImageGridView_OnItemClick(object sender, ItemClickEventArgs e)
@@ -166,9 +176,9 @@ namespace Booru_Viewer
 		protected override void OnNavigatedTo(NavigationEventArgs e)
 		{
 			ViewModel?.RaisePropertyChanged("Thumbnails");
-			
 
-		ViewModel?.RaisePropertyChanged("FavouriteTags");
+
+			ViewModel?.RaisePropertyChanged("FavouriteTags");
 			Frame rootFrame = Window.Current.Content as Frame;
 			if (rootFrame.CanGoBack)
 			{
@@ -264,12 +274,7 @@ namespace Booru_Viewer
 			sender.Hide();
 		}
 
-		async void SaveAllClicked(object sender, RoutedEventArgs e)
-		{
-
-			await SaveAllDialogBox.ShowAsync();
-		}
-
+		
 
 		private void TagTextBox_OnSuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
 		{
@@ -277,6 +282,75 @@ namespace Booru_Viewer
 			ViewModel.CurrentTag = args.SelectedItem as string;
 		}
 
-		
+
+
+		private void MultiSelectButtonTapped(object sender, RoutedEventArgs e)
+		{
+			var selectButton = sender as AppBarButton;
+			if (!isMultiSelectEnabled)
+			{
+
+				ImageGridView.ItemClick -= ImageGridView_OnItemClick;
+				ImageGridView.SelectionChanged -= GridView_SelectionChanged;
+				ImageGridView.SelectionChanged += GridView_MultiSelectChanged;
+				selectButton.Icon = new SymbolIcon(Symbol.Cancel);
+				isMultiSelectEnabled = true;
+				ImageGridView.SelectionMode = ListViewSelectionMode.Multiple;
+				SearchAppBarButton.Visibility = Visibility.Collapsed;
+				SettingsButton.Visibility = Visibility.Collapsed;
+				SelectAllButton.Visibility = Visibility.Visible;
+				SaveButton.Visibility = Visibility.Visible;
+			}
+			else
+			{
+				SaveButton.Visibility = Visibility.Collapsed;
+				Debug.WriteLine(ImageGridView.SelectedRanges);
+				ImageGridView.SelectedItems.Clear();
+				ImageGridView.SelectionChanged -= GridView_MultiSelectChanged;
+				ImageGridView.ItemClick += ImageGridView_OnItemClick;
+				ImageGridView.SelectionChanged += GridView_SelectionChanged;
+
+				SelectAllButton.Visibility = Visibility.Collapsed;
+				SaveButton.Visibility = Visibility.Collapsed;
+				selectButton.Icon = new SymbolIcon(Symbol.Bullets);
+				isMultiSelectEnabled = false;
+				ImageGridView.SelectionMode = ListViewSelectionMode.None;
+				SearchAppBarButton.Visibility = Visibility.Visible;
+				SettingsButton.Visibility = Visibility.Visible;
+			}
+
+
+		}
+
+		private void SelectAllClicked(object sender, RoutedEventArgs e)
+		{
+			foreach (var img in ImageGridView.Items)
+			{
+				ImageGridView.SelectedItems.Add(img);
+			}
+		}
+
+		private void ImageContextMenuSelectClick(object sender, RoutedEventArgs e)
+		{
+			MultiSelectButtonTapped(ImageGridView, new RoutedEventArgs());
+		}
+
+		private void SaveButton_OnClick(object sender, RoutedEventArgs e)
+		{
+			ViewModel.SaveSelectedImages.Execute(ImageGridView.SelectedItems);
+			
+			SelectAllButton.Visibility = Visibility.Collapsed;
+			SaveButton.Visibility = Visibility.Collapsed;
+			isMultiSelectEnabled = false;
+			SelectButton.Icon = new SymbolIcon(Symbol.Bullets);
+			ImageGridView.SelectionMode = ListViewSelectionMode.None;
+			SearchAppBarButton.Visibility = Visibility.Visible;
+			SettingsButton.Visibility = Visibility.Visible;
+			//ImageGridView.SelectedItems.Clear();
+			SaveButton.IsEnabled = false;
+			ImageGridView.SelectionChanged -= GridView_MultiSelectChanged;
+			ImageGridView.ItemClick += ImageGridView_OnItemClick;
+			ImageGridView.SelectionChanged += GridView_SelectionChanged;
+		}
 	}
 }

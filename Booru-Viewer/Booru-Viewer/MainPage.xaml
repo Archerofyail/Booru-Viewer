@@ -13,7 +13,8 @@
 	RequestedTheme="Default"
 	x:Name="Page"
 	xmlns:i="using:Microsoft.Xaml.Interactivity"
-	xmlns:core="using:Microsoft.Xaml.Interactions.Core">
+	xmlns:core="using:Microsoft.Xaml.Interactions.Core"
+	xmlns:types="using:Booru_Viewer.Types">
 
 	<Page.DataContext>
 		<vm1:MainPageViewModel></vm1:MainPageViewModel>
@@ -26,6 +27,7 @@
 			</ResourceDictionary.MergedDictionaries>
 
 			<DataTemplate x:Name="ImageTemplate">
+
 				<controls:ImageEx Name="Image"
 								  Source="{Binding Path=PreviewURL}"
 								  Stretch="Uniform"
@@ -38,6 +40,10 @@
 								  PlaceholderStretch="Uniform">
 					<controls:ImageEx.ContextFlyout>
 						<MenuFlyout x:Name="ImageContextFlyout">
+							<MenuFlyoutItem Text="Select"
+											Click="ImageContextMenuSelectClick">
+
+							</MenuFlyoutItem>
 							<MenuFlyoutItem Text="Save Image"
 							                Command="{Binding ElementName=Page, Path=DataContext.SaveImage}"
 											>
@@ -69,7 +75,7 @@
 							BorderThickness="1"
 							Margin="0"
 							Tapped="TagTapped">
-					
+
 					<StackPanel.BorderBrush>
 						<SolidColorBrush Color="{ThemeResource SystemBaseLowColor}"/>
 					</StackPanel.BorderBrush>
@@ -215,7 +221,7 @@
 					IncrementalLoadingTrigger="Edge"
 					SelectionChanged="GridView_SelectionChanged"
 					IsItemClickEnabled="True"
-					ItemClick="ImageGridView_OnItemClick"
+				
 					DesiredWidth="250"
 		            ShowsScrollingPlaceholders="True">
 			<i:Interaction.Behaviors>
@@ -267,28 +273,6 @@
 				</StackPanel>
 			</Button.Content>
 		</Button>
-
-		<ContentDialog IsPrimaryButtonEnabled="True"
-					   IsSecondaryButtonEnabled="True"
-			PrimaryButtonCommand="{Binding StartImageSave}"
-					   PrimaryButtonClick="SaveAllDialog"
-					   SecondaryButtonClick="SaveAllDialog"
-					   PrimaryButtonCommandParameter="{x:Bind PageToCB.SelectedItem}"
-					   Name="SaveAllDialogBox"
-					   PrimaryButtonText="Save"
-					   SecondaryButtonText="Cancel">
-			<StackPanel>
-
-				<StackPanel Orientation="Horizontal">
-					<TextBlock Text="To Page"></TextBlock>
-					<ComboBox ItemsSource="{Binding TotalPageNumber}" SelectedIndex="{Binding SelectedPageToSave, Mode=TwoWay}"  Name="PageToCB"></ComboBox>
-				</StackPanel>
-
-			</StackPanel>
-
-
-		</ContentDialog>
-
 
 	</Grid>
 	<Page.BottomAppBar>
@@ -408,13 +392,13 @@
 											Name="CurrentTagsList">
 										<ListView.ItemsPanel>
 											<ItemsPanelTemplate>
-												<wrapPanel:WrapPanel Orientation="Horizontal"
+												<controls:WrapPanel Orientation="Horizontal"
 																	   />
 											</ItemsPanelTemplate>
 										</ListView.ItemsPanel>
 									</ListView>
 									<StackPanel Orientation="Horizontal">
-									<TextBlock Text="Total tags:"></TextBlock>
+										<TextBlock Text="Total tags:"></TextBlock>
 										<TextBlock Text="{Binding TotalTagCount}"></TextBlock>
 									</StackPanel>
 									<StackPanel Orientation="Horizontal"
@@ -453,8 +437,23 @@
 						</Flyout>
 					</AppBarButton.Flyout>
 				</AppBarButton>
+				<AppBarButton Visibility="Collapsed"
+							  Icon="Save" 
+							  Name="SaveButton"
+							  IsEnabled="False"
+							  Click="SaveButton_OnClick"
+							  Command="{Binding SaveSelectedImages}"
+							  CommandParameter="{x:Bind ImageGridView.SelectedItems, Mode=OneWay}"></AppBarButton>
+				<AppBarButton Visibility="Collapsed"
+							  Name="SelectAllButton"
+							  Icon="SelectAll"
+							  Click="SelectAllClicked"></AppBarButton>
+				<AppBarButton Label="Select" Icon="Bullets"
+							  Click="MultiSelectButtonTapped"
+							  Name="SelectButton"></AppBarButton>
 				<AppBarButton Label="Settings" Icon="Setting"
-							  Tapped="SettingsTapped">
+							  Tapped="SettingsTapped"
+							  Name="SettingsButton">
 					<AppBarButton.Flyout>
 						<Flyout>
 							<Flyout.FlyoutPresenterStyle>
@@ -569,12 +568,6 @@
 					</AppBarButton.Flyout>
 				</AppBarButton>
 			</CommandBar.PrimaryCommands>
-			<CommandBar.SecondaryCommands>
-				<AppBarButton Click="SaveAllClicked"
-							  Label="Save current search">
-
-				</AppBarButton>
-			</CommandBar.SecondaryCommands>
 		</CommandBar>
 	</Page.BottomAppBar>
 </Page>

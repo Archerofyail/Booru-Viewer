@@ -121,8 +121,8 @@
 		<TextBlock Text="{Binding ElementName=FlipView, Path=SelectedIndex}"
 				   VerticalAlignment="Bottom"
 				   MaxHeight="20"/>
-			<TextBlock Text="{Binding CurrentURL}"
-					   Margin="4"></TextBlock>
+			<!--<TextBlock Text="{Binding CurrentURL}"
+					   Margin="4"></TextBlock>-->
 		</StackPanel>
 	</Grid>
 	<Page.BottomAppBar>

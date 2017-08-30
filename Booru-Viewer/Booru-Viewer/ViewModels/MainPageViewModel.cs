@@ -18,6 +18,7 @@ using Windows.UI.Core;
 using Windows.UI.Notifications;
 using GalaSoft.MvvmLight;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Booru_Viewer.Models;
 using Dropbox.Api;
@@ -491,6 +492,9 @@ namespace Booru_Viewer.ViewModels
 				RaisePropertyChanged();
 			}
 		}
+
+		public ListViewSelectionMode GridViewSelectMode { get; set; }
+
 		public SymbolIcon MultiSelectButtonIcon
 		{
 			get => isMultiSelectOn ? new SymbolIcon(Symbol.Cancel) : new SymbolIcon(Symbol.SelectAll); set
@@ -931,33 +935,26 @@ namespace Booru_Viewer.ViewModels
 			ToastNotificationManager.CreateToastNotifier().Show(not);
 		}
 
-		public ICommand StartImageSave => new RelayCommand<int>(StartImageSaveEx);
-		async void StartImageSaveEx(int pageTo)
+		public ICommand SaveSelectedImages => new RelayCommand<IList<object>>(SaveSelectedImagesEx);
+
+		async void SaveSelectedImagesEx(IList<object> images)
 		{
 
-			int imageCount = Math.Min(GlobalInfo.CurrentSearch.Count, (SelectedPageToSave + 1) * PerPage);
-			for (int i = 0; i < imageCount; i++)
+			var imageList = images;
+			GridViewSelectMode = ListViewSelectionMode.None;
+			RaisePropertyChanged("GridViewSelectionMode");
+			
+			if (imageList == null)
 			{
-				await ImageSaver.SaveImage(string.IsNullOrEmpty(GlobalInfo.CurrentSearch[i].Large_File_Url)
-					? GlobalInfo.CurrentSearch[i].File_Url
-					: GlobalInfo.CurrentSearch[i].Large_File_Url);
+				return;
+			}
+			Debug.WriteLine("imagesToSaveCount = " + imageList.Count);
+			foreach (var image in imageList)
+			{
+				await ImageSaver.SaveImage((image as FullImageViewModel).FullImageURL);
 			}
 		}
-
-		public int SelectedPageToSave { get; set; } = 0;
-
-		public int[] TotalPageNumber
-		{
-			get
-			{
-				int[] pages = new int[BooruAPI.Page];
-				for (int i = 0; i < pages.Length; i++)
-				{
-					pages[i] = i + 1;
-				}
-				return pages;
-			}
-		}
+		
 	}
 
 
