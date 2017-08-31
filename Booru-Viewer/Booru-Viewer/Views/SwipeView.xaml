@@ -76,7 +76,7 @@
 				<ItemsPanelTemplate>
 					<VirtualizingStackPanel VirtualizationMode="Standard"
 											Orientation="Horizontal">
-						
+
 					</VirtualizingStackPanel>
 				</ItemsPanelTemplate>
 			</FlipView.ItemsPanel>
@@ -104,7 +104,7 @@
 							<controls:ImageEx.RenderTransform>
 								<CompositeTransform TranslateX="0.5" TranslateY="0.5"/>
 							</controls:ImageEx.RenderTransform>
-							
+
 
 						</controls:ImageEx>
 
@@ -118,7 +118,7 @@
 		</FlipView>
 
 		<StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
-		<TextBlock Text="{Binding ElementName=FlipView, Path=SelectedIndex}"
+			<TextBlock Text="{Binding ElementName=FlipView, Path=SelectedIndex}"
 				   VerticalAlignment="Bottom"
 				   MaxHeight="20"/>
 			<!--<TextBlock Text="{Binding CurrentURL}"
@@ -127,37 +127,38 @@
 	</Grid>
 	<Page.BottomAppBar>
 		<CommandBar Name="AppBar">
-			<AppBarButton Label="{Binding FavString}" RenderTransformOrigin="0.5,0.5"
+			<CommandBar.PrimaryCommands>
+				<AppBarButton Label="{Binding FavString}" RenderTransformOrigin="0.5,0.5"
 						  Command="{Binding FavouriteImage}">
 
-				<AppBarButton.Icon>
-					<SymbolIcon Symbol="{Binding FavIcon}"></SymbolIcon>
-				</AppBarButton.Icon>
-			</AppBarButton>
-			<AppBarButton Label="Save Image"
+					<AppBarButton.Icon>
+						<SymbolIcon Symbol="{Binding FavIcon}"></SymbolIcon>
+					</AppBarButton.Icon>
+				</AppBarButton>
+				<AppBarButton Label="Save Image"
 						  Icon="Save"
 						  Command="{Binding SaveImage}"
 			              >
-				<AppBarButton.CommandParameter>
-					<x:Boolean>True</x:Boolean>
-				</AppBarButton.CommandParameter>
-				<ToolTip
+					<AppBarButton.CommandParameter>
+						<x:Boolean>True</x:Boolean>
+					</AppBarButton.CommandParameter>
+					<ToolTip
 						 IsOpen="{Binding Saving}">
-					<TextBlock Text="{Binding SaveImageFailureReason}"></TextBlock>
-				</ToolTip>
-			</AppBarButton>
+						<TextBlock Text="{Binding SaveImageFailureReason}"></TextBlock>
+					</ToolTip>
+				</AppBarButton>
 
-			<AppBarButton Label="View GeneralTags"
+				<AppBarButton Label="View GeneralTags"
 						  Icon="List">
-				<AppBarButton.Flyout>
-					<Flyout x:Name="TagFlyout">
+					<AppBarButton.Flyout>
+						<Flyout x:Name="TagFlyout">
 
-						<StackPanel>
-							<StackPanel Orientation="Horizontal">
-								<TextBlock Text="Rating: "></TextBlock>
-								<TextBlock Text="{Binding Rating}"></TextBlock>
-							</StackPanel>
-							<ListView ItemsSource="{Binding CharacterTags}"
+							<StackPanel>
+								<StackPanel Orientation="Horizontal">
+									<TextBlock Text="Rating: "></TextBlock>
+									<TextBlock Text="{Binding Rating}"></TextBlock>
+								</StackPanel>
+								<ListView ItemsSource="{Binding CharacterTags}"
 								  ItemTemplate="{StaticResource Tag}"
 									  Header="Character"
 									  Name="CharTagsList"
@@ -165,7 +166,7 @@
 							          Visibility="{Binding Path=CharacterTags.Count, 
 														Converter={StaticResource CountToVis}}"/>
 
-							<ListView ItemsSource="{Binding ArtistTags}"
+								<ListView ItemsSource="{Binding ArtistTags}"
 								  ItemTemplate="{StaticResource Tag}"
 									  Header="Artist"
 									  Name="ArtistTagList"
@@ -173,7 +174,7 @@
 							          Visibility="{Binding Path=ArtistTags.Count, 
 														Converter={StaticResource CountToVis}}"/>
 
-							<ListView ItemsSource="{Binding CopyrightTags}"
+								<ListView ItemsSource="{Binding CopyrightTags}"
 								  ItemTemplate="{StaticResource Tag}"
 									  Header="Copyright"
 									  Name="CopyrightTagList"
@@ -181,7 +182,7 @@
 							          Visibility="{Binding Path=CopyrightTags.Count, 
 														Converter={StaticResource CountToVis}}"/>
 
-							<ListView ItemsSource="{Binding GeneralTags}"
+								<ListView ItemsSource="{Binding GeneralTags}"
 								  ItemTemplate="{StaticResource Tag}"
 									  Header="General"
 									  Name="GeneralTagList"
@@ -189,10 +190,15 @@
 							          Visibility="{Binding Path=GeneralTags.Count, 
 														Converter={StaticResource CountToVis}}"/>
 
-						</StackPanel>
-					</Flyout>
-				</AppBarButton.Flyout>
-			</AppBarButton>
+							</StackPanel>
+						</Flyout>
+					</AppBarButton.Flyout>
+				</AppBarButton>
+			</CommandBar.PrimaryCommands>
+			<CommandBar.SecondaryCommands>
+				<AppBarButton Label="Open in Website"
+							  Command="{Binding OpenPostInWebsite}"></AppBarButton>
+			</CommandBar.SecondaryCommands>
 		</CommandBar>
 	</Page.BottomAppBar>
 </Page>

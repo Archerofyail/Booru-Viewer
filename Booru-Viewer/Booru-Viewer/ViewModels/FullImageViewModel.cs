@@ -14,7 +14,8 @@ namespace Booru_Viewer.ViewModels
 		public int Width { get; set; }
 		public int Height { get; set; }
 		private RelayCommand<string> saveImageCommand;
-		public FullImageViewModel(string previewURL, string imageURLUrl, string largeImage = null, int width = 0, int height = 0)
+		public string WebsiteURL { get; set; }
+		public FullImageViewModel(string previewURL, string imageURLUrl, string websiteURL, string largeImage = null, int width = 0, int height = 0)
 		{
 			FullImageURL = imageURLUrl;
 			FullImageWithLoginURL = imageURLUrl + "?login=" + BooruAPI.Username + "&api_key=" + BooruAPI.APIKey;
@@ -22,6 +23,7 @@ namespace Booru_Viewer.ViewModels
 			PreviewURL = previewURL;
 			Width = width;
 			Height = height;
+			WebsiteURL = websiteURL;
 			if (saveImageCommand != null)
 			{
 				this.saveImageCommand = saveImageCommand;

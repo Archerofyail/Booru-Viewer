@@ -932,12 +932,26 @@ namespace Booru_Viewer.ViewModels
 			ToastNotificationManager.CreateToastNotifier().Show(not);
 		}
 
+		public bool IsSavingImages { get; set; }
+		private string currentImageSaving = "";
+
+		public string CurrentImageSaving
+		{
+			get => currentImageSaving;
+			set
+			{
+				currentImageSaving = value;
+				RaisePropertyChanged();
+			}
+		}
+
 		public ICommand SaveSelectedImages => new RelayCommand<IList<object>>(SaveSelectedImagesEx);
 
 		async void SaveSelectedImagesEx(IList<object> images)
 		{
-
-			var imageList = images;
+			IsSavingImages = true;
+			RaisePropertyChanged("IsSavingImages");
+			var imageList = images.ToList();
 			GridViewSelectMode = ListViewSelectionMode.None;
 			RaisePropertyChanged("GridViewSelectionMode");
 			
@@ -948,8 +962,11 @@ namespace Booru_Viewer.ViewModels
 			Debug.WriteLine("imagesToSaveCount = " + imageList.Count);
 			foreach (var image in imageList)
 			{
+				CurrentImageSaving = "Saving " + (image as FullImageViewModel).FullImageURL;
 				await ImageSaver.SaveImage((image as FullImageViewModel).FullImageURL);
 			}
+			IsSavingImages = false;
+			RaisePropertyChanged("IsSavingImages");
 		}
 		
 	}

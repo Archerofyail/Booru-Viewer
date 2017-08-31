@@ -206,6 +206,8 @@
 	</Page.Resources>
 	<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
 		  Name="RootGrid" MinHeight="250">
+
+		
 		<controls:AdaptiveGridView   Background="{StaticResource BackgroundThemeBrush}"
 					ItemTemplate="{StaticResource ImageTemplate}"
 					ItemsSource="{Binding Path=Thumbnails}"
@@ -269,7 +271,18 @@
 				</StackPanel>
 			</Button.Content>
 		</Button>
-
+		<controls:Loading IsLoading="{Binding IsSavingImages}" Background="#99FFFFFF" HorizontalAlignment="Stretch"
+		                  VerticalAlignment="Stretch"
+		                  HorizontalContentAlignment="Center"
+		                  VerticalContentAlignment="Center">
+			<StackPanel>
+				<TextBlock Text="Saving Images" HorizontalAlignment="Center"/>
+				<TextBlock Text="{Binding CurrentImageSaving}" HorizontalAlignment="Center"
+						   ></TextBlock>
+				<ProgressBar IsIndeterminate="True"
+				></ProgressBar>
+			</StackPanel>
+		</controls:Loading>
 	</Grid>
 	<Page.BottomAppBar>
 		<CommandBar VerticalAlignment="Bottom">
@@ -438,8 +451,7 @@
 							  Name="SaveButton"
 							  IsEnabled="False"
 							  Click="SaveButton_OnClick"
-							  Command="{Binding SaveSelectedImages}"
-							  CommandParameter="{x:Bind ImageGridView.SelectedItems, Mode=OneWay}"></AppBarButton>
+							 />
 				<AppBarButton Visibility="Collapsed"
 							  Name="SelectAllButton"
 							  Icon="SelectAll"

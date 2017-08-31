@@ -21,7 +21,7 @@ namespace Booru_Viewer.ViewModels
 		public int image_width { get; set; }
 		public int image_height { get; set; }
 		public string Fav_String { get; set; }
-
+		
 		[JsonIgnore]
 		public string[] Favourites => Fav_String.Split(' ');
 

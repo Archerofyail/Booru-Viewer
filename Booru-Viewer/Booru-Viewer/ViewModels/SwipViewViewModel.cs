@@ -7,6 +7,7 @@ using Booru_Viewer.Types;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Windows.Storage;
+using Windows.System;
 using Windows.UI.Notifications;
 using Windows.UI.Xaml.Controls;
 using Microsoft.Toolkit.Uwp;
@@ -295,6 +296,13 @@ namespace Booru_Viewer.ViewModels
 					FavString = "Favourite";
 				}
 			}
+		}
+
+		public ICommand OpenPostInWebsite => new RelayCommand(OpenPostInWebsiteEx);
+
+		async void OpenPostInWebsiteEx()
+		{
+			await Launcher.LaunchUriAsync(new Uri(images[Index].WebsiteURL));
 		}
 
 	}
