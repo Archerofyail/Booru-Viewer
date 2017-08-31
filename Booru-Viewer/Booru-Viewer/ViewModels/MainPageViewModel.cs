@@ -934,13 +934,32 @@ namespace Booru_Viewer.ViewModels
 
 		public bool IsSavingImages { get; set; }
 		private string currentImageSaving = "";
-
 		public string CurrentImageSaving
 		{
 			get => currentImageSaving;
 			set
 			{
 				currentImageSaving = value;
+				RaisePropertyChanged();
+			}
+		}
+
+		private int imageSaveCount = 60;
+
+		public int ImageSaveCount
+		{
+			get => imageSaveCount;
+			set { imageSaveCount = value; RaisePropertyChanged(); }
+		}
+
+		private int currentImageSaveIndex = 0;
+
+		public int CurrentImageSaveIndex
+		{
+			get => currentImageSaveIndex;
+			set
+			{
+				currentImageSaveIndex = value;
 				RaisePropertyChanged();
 			}
 		}
@@ -954,21 +973,23 @@ namespace Booru_Viewer.ViewModels
 			var imageList = images.ToList();
 			GridViewSelectMode = ListViewSelectionMode.None;
 			RaisePropertyChanged("GridViewSelectionMode");
-			
+
 			if (imageList == null)
 			{
 				return;
 			}
 			Debug.WriteLine("imagesToSaveCount = " + imageList.Count);
+			ImageSaveCount = imageList.Count;
 			foreach (var image in imageList)
 			{
-				CurrentImageSaving = "Saving " + (image as FullImageViewModel).FullImageURL;
+				CurrentImageSaving = "Saving " + CurrentImageSaveIndex + " of " + ImageSaveCount;
 				await ImageSaver.SaveImage((image as FullImageViewModel).FullImageURL);
+				CurrentImageSaveIndex++;
 			}
 			IsSavingImages = false;
 			RaisePropertyChanged("IsSavingImages");
 		}
-		
+
 	}
 
 

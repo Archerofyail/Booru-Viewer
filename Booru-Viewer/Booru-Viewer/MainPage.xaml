@@ -278,9 +278,15 @@
 			<StackPanel>
 				<TextBlock Text="Saving Images" HorizontalAlignment="Center"/>
 				<TextBlock Text="{Binding CurrentImageSaving}" HorizontalAlignment="Center"
-						   ></TextBlock>
-				<ProgressBar IsIndeterminate="True"
-				></ProgressBar>
+						   Margin="40"
+						   TextWrapping="Wrap"
+						   Width="340"
+						   TextAlignment="Center"></TextBlock>
+				<ProgressBar IsIndeterminate="False"
+							 Maximum="{Binding ImageSaveCount}"
+							 Value="{Binding CurrentImageSaveIndex}"
+							 Margin="60, 0"
+							 Width="240"></ProgressBar>
 			</StackPanel>
 		</controls:Loading>
 	</Grid>
