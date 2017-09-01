@@ -1,18 +1,17 @@
-﻿<Page
-	x:Class="Booru_Viewer.Views.SwipeView"
-	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns:local="using:Booru_Viewer.Views"
-	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	mc:Ignorable="d"
-	xmlns:vm="using:Booru_Viewer.ViewModels"
-	xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
-	xmlns:interop="using:Windows.UI.Xaml.Interop"
-	Name="Page"
-	xmlns:t="using:Booru_Viewer.Types">
+﻿<Page x:Class="Booru_Viewer.Views.SwipeView"
+	  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	  xmlns:local="using:Booru_Viewer.Views"
+	  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	  mc:Ignorable="d"
+	  xmlns:vm="using:Booru_Viewer.ViewModels"
+	  xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+	  xmlns:interop="using:Windows.UI.Xaml.Interop"
+	  Name="Page"
+	  xmlns:t="using:Booru_Viewer.Types">
 	<Page.DataContext>
-		<vm:SwipViewViewModel/>
+		<vm:SwipViewViewModel />
 	</Page.DataContext>
 
 	<Page.Resources>
@@ -22,35 +21,35 @@
 						 x:Key="AccentColorBrush"></SolidColorBrush>
 		<DataTemplate x:Name="Tag">
 			<StackPanel Orientation="Horizontal"
-							Background="{ThemeResource AccentColorBrush}"
-							BorderThickness="1" Margin="0,0,0,-5"
-							>
+						Background="{ThemeResource AccentColorBrush}"
+						BorderThickness="1"
+						Margin="0,0,0,-5">
 
 				<StackPanel.BorderBrush>
-					<SolidColorBrush Color="{ThemeResource SystemBaseLowColor}"/>
+					<SolidColorBrush Color="{ThemeResource SystemBaseLowColor}" />
 				</StackPanel.BorderBrush>
 				<TextBlock Name="Tag"
-							     Text="{Binding Path=Tag, Mode=TwoWay}" 
-							   MinWidth="20" 
-							   Margin="10" 
-							   HorizontalAlignment="Center" 
-							   VerticalAlignment="Center"
-							   Foreground="White"/>
-				<Button
-					Command="{Binding FavouriteTag}"
-					Background="#FF7C7C7C" VerticalAlignment="Stretch">
+						   Text="{Binding Path=Tag, Mode=TwoWay}"
+						   MinWidth="20"
+						   Margin="10"
+						   HorizontalAlignment="Center"
+						   VerticalAlignment="Center"
+						   Foreground="White" />
+				<Button Command="{Binding FavouriteTag}"
+						Background="#FF7C7C7C"
+						VerticalAlignment="Stretch">
 					<Button.Content>
-						<SymbolIcon Symbol="{Binding FavouriteIcon}"/>
+						<SymbolIcon Symbol="{Binding FavouriteIcon}" />
 					</Button.Content>
 				</Button>
 
-				<Button
-					Command="{Binding CopyTag}"
-					CommandParameter="{Binding ElementName=Tag, Path=Text}"
-					Background="#FF7C7C7C" VerticalAlignment="Stretch"
-					Margin="4, 0, 0, 0">
+				<Button Command="{Binding CopyTag}"
+						CommandParameter="{Binding ElementName=Tag, Path=Text}"
+						Background="#FF7C7C7C"
+						VerticalAlignment="Stretch"
+						Margin="4, 0, 0, 0">
 					<Button.Content>
-						<SymbolIcon Symbol="Copy"/>
+						<SymbolIcon Symbol="Copy" />
 					</Button.Content>
 				</Button>
 
@@ -58,20 +57,19 @@
 		</DataTemplate>
 	</Page.Resources>
 	<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
-		  Name="Grid" VerticalAlignment="Stretch"
+		  Name="Grid"
+		  VerticalAlignment="Stretch"
 		  HorizontalAlignment="Stretch">
 		<ProgressBar IsIndeterminate="True"
 					 VerticalAlignment="Top"
 					 Margin="4"
 					 Visibility="{Binding Saving}"></ProgressBar>
-		<FlipView
-			ItemsSource="{Binding Images}"
-			SelectedIndex="{Binding Index, Mode=TwoWay}"
-			Name="FlipView"
-			Tapped="FlipView_OnTapped"
-			SelectionChanged="FlipView_OnSelectionChanged"
-			UseTouchAnimationsForAllNavigation="True"
-			>
+		<FlipView ItemsSource="{Binding Images}"
+				  SelectedIndex="{Binding Index, Mode=TwoWay}"
+				  Name="FlipView"
+				  Tapped="FlipView_OnTapped"
+				  SelectionChanged="FlipView_OnSelectionChanged"
+				  UseTouchAnimationsForAllNavigation="True">
 			<FlipView.ItemsPanel>
 				<ItemsPanelTemplate>
 					<VirtualizingStackPanel VirtualizationMode="Standard"
@@ -84,25 +82,24 @@
 				<DataTemplate>
 					<Grid>
 						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="*" />
 						</Grid.ColumnDefinitions>
 						<Grid.RowDefinitions>
-							<RowDefinition Height="*"/>
+							<RowDefinition Height="*" />
 						</Grid.RowDefinitions>
 
 
-						<controls:ImageEx
-								
-								Grid.Row="0"
-								Grid.Column="0"
-							RenderTransformOrigin="0.5,0.5"
-							PlaceholderSource="../Assets/Placeholder.png"
-							PlaceholderStretch="Uniform"
-							Stretch="Uniform"
-							IsCacheEnabled="False"
-							Source="{Binding FullImageURL}">
+						<controls:ImageEx Grid.Row="0"
+										  Grid.Column="0"
+										  RenderTransformOrigin="0.5,0.5"
+										  PlaceholderSource="../Assets/Placeholder.png"
+										  PlaceholderStretch="Uniform"
+										  Stretch="Uniform"
+										  IsCacheEnabled="False"
+										  Source="{Binding FullImageURL}">
 							<controls:ImageEx.RenderTransform>
-								<CompositeTransform TranslateX="0.5" TranslateY="0.5"/>
+								<CompositeTransform TranslateX="0.5"
+													TranslateY="0.5" />
 							</controls:ImageEx.RenderTransform>
 
 
@@ -117,10 +114,11 @@
 
 		</FlipView>
 
-		<StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+		<StackPanel Orientation="Horizontal"
+					VerticalAlignment="Bottom">
 			<TextBlock Text="{Binding ElementName=FlipView, Path=SelectedIndex}"
-				   VerticalAlignment="Bottom"
-				   MaxHeight="20"/>
+					   VerticalAlignment="Bottom"
+					   MaxHeight="20" />
 			<!--<TextBlock Text="{Binding CurrentURL}"
 					   Margin="4"></TextBlock>-->
 		</StackPanel>
@@ -128,28 +126,27 @@
 	<Page.BottomAppBar>
 		<CommandBar Name="AppBar">
 			<CommandBar.PrimaryCommands>
-				<AppBarButton Label="{Binding FavString}" RenderTransformOrigin="0.5,0.5"
-						  Command="{Binding FavouriteImage}">
+				<AppBarButton Label="{Binding FavString}"
+							  RenderTransformOrigin="0.5,0.5"
+							  Command="{Binding FavouriteImage}">
 
 					<AppBarButton.Icon>
 						<SymbolIcon Symbol="{Binding FavIcon}"></SymbolIcon>
 					</AppBarButton.Icon>
 				</AppBarButton>
 				<AppBarButton Label="Save Image"
-						  Icon="Save"
-						  Command="{Binding SaveImage}"
-			              >
+							  Icon="Save"
+							  Command="{Binding SaveImage}">
 					<AppBarButton.CommandParameter>
 						<x:Boolean>True</x:Boolean>
 					</AppBarButton.CommandParameter>
-					<ToolTip
-						 IsOpen="{Binding Saving}">
+					<ToolTip IsOpen="{Binding Saving}">
 						<TextBlock Text="{Binding SaveImageFailureReason}"></TextBlock>
 					</ToolTip>
 				</AppBarButton>
 
 				<AppBarButton Label="View GeneralTags"
-						  Icon="List">
+							  Icon="List">
 					<AppBarButton.Flyout>
 						<Flyout x:Name="TagFlyout">
 
@@ -159,36 +156,36 @@
 									<TextBlock Text="{Binding Rating}"></TextBlock>
 								</StackPanel>
 								<ListView ItemsSource="{Binding CharacterTags}"
-								  ItemTemplate="{StaticResource Tag}"
-									  Header="Character"
-									  Name="CharTagsList"
-							          SelectionMode="None"
-							          Visibility="{Binding Path=CharacterTags.Count, 
-														Converter={StaticResource CountToVis}}"/>
+										  ItemTemplate="{StaticResource Tag}"
+										  Header="Character"
+										  Name="CharTagsList"
+										  SelectionMode="None"
+										  Visibility="{Binding Path=CharacterTags.Count, 
+														Converter={StaticResource CountToVis}}" />
 
 								<ListView ItemsSource="{Binding ArtistTags}"
-								  ItemTemplate="{StaticResource Tag}"
-									  Header="Artist"
-									  Name="ArtistTagList"
-							          SelectionMode="None"
-							          Visibility="{Binding Path=ArtistTags.Count, 
-														Converter={StaticResource CountToVis}}"/>
+										  ItemTemplate="{StaticResource Tag}"
+										  Header="Artist"
+										  Name="ArtistTagList"
+										  SelectionMode="None"
+										  Visibility="{Binding Path=ArtistTags.Count, 
+														Converter={StaticResource CountToVis}}" />
 
 								<ListView ItemsSource="{Binding CopyrightTags}"
-								  ItemTemplate="{StaticResource Tag}"
-									  Header="Copyright"
-									  Name="CopyrightTagList"
-							          SelectionMode="None"
-							          Visibility="{Binding Path=CopyrightTags.Count, 
-														Converter={StaticResource CountToVis}}"/>
+										  ItemTemplate="{StaticResource Tag}"
+										  Header="Copyright"
+										  Name="CopyrightTagList"
+										  SelectionMode="None"
+										  Visibility="{Binding Path=CopyrightTags.Count, 
+														Converter={StaticResource CountToVis}}" />
 
 								<ListView ItemsSource="{Binding GeneralTags}"
-								  ItemTemplate="{StaticResource Tag}"
-									  Header="General"
-									  Name="GeneralTagList"
-									  SelectionMode="None"
-							          Visibility="{Binding Path=GeneralTags.Count, 
-														Converter={StaticResource CountToVis}}"/>
+										  ItemTemplate="{StaticResource Tag}"
+										  Header="General"
+										  Name="GeneralTagList"
+										  SelectionMode="None"
+										  Visibility="{Binding Path=GeneralTags.Count, 
+														Converter={StaticResource CountToVis}}" />
 
 							</StackPanel>
 						</Flyout>
