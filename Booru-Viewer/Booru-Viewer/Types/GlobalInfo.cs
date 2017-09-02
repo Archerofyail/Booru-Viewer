@@ -172,6 +172,10 @@ namespace Booru_Viewer.Types
 
 		public static async Task SaveFavouriteTags(StorageFolder baseFolder = null)
 		{
+			if (favouriteTags == null)
+			{
+				await LoadFavouriteTags();
+			}
 			try
 			{
 				StorageFolder folder;

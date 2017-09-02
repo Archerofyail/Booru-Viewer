@@ -806,10 +806,11 @@ namespace Booru_Viewer.ViewModels
 			{
 				SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
 				CommitButtonText = "Select Folder",
-				ViewMode = PickerViewMode.List
+				ViewMode = PickerViewMode.List,
+				FileTypeFilter = { "*" }
 			};
 			var result = await picker.PickSingleFolderAsync();
-			
+
 			if (result != null)
 			{
 				await GlobalInfo.SaveSearches(SavedSearches.ToList(), result);
@@ -844,8 +845,11 @@ namespace Booru_Viewer.ViewModels
 		public ICommand Restore => new RelayCommand(RestoreEx);
 		async void RestoreEx()
 		{
-			var picker = new FolderPicker();
-			picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+			var picker = new FolderPicker
+			{
+				SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
+				FileTypeFilter = { "*" }
+			};
 			var result = await picker.PickSingleFolderAsync();
 			if (result != null)
 			{
