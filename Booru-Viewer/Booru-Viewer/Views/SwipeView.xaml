@@ -160,6 +160,7 @@
 										  Header="Character"
 										  Name="CharTagsList"
 										  SelectionMode="None"
+										  IsItemClickEnabled="False"
 										  Visibility="{Binding Path=CharacterTags.Count, 
 														Converter={StaticResource CountToVis}}" />
 
@@ -168,6 +169,7 @@
 										  Header="Artist"
 										  Name="ArtistTagList"
 										  SelectionMode="None"
+								          IsItemClickEnabled="False"
 										  Visibility="{Binding Path=ArtistTags.Count, 
 														Converter={StaticResource CountToVis}}" />
 
@@ -176,6 +178,7 @@
 										  Header="Copyright"
 										  Name="CopyrightTagList"
 										  SelectionMode="None"
+								          IsItemClickEnabled="False"
 										  Visibility="{Binding Path=CopyrightTags.Count, 
 														Converter={StaticResource CountToVis}}" />
 
@@ -184,6 +187,7 @@
 										  Header="General"
 										  Name="GeneralTagList"
 										  SelectionMode="None"
+								          IsItemClickEnabled="False"
 										  Visibility="{Binding Path=GeneralTags.Count, 
 														Converter={StaticResource CountToVis}}" />
 

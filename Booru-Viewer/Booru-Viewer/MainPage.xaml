@@ -588,7 +588,7 @@
 										   TextWrapping="WrapWholeWords" />
 
 								<StackPanel Margin="4">
-									<TextBlock Text="Back up or restore your settings and saved searches"
+									<TextBlock Text="Back up or restore your settings and favourite tags"
 											   TextWrapping="WrapWholeWords"></TextBlock>
 									<StackPanel Orientation="Horizontal">
 										<Button Content="Backup"

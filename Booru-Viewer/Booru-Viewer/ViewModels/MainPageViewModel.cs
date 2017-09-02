@@ -18,8 +18,8 @@ using GalaSoft.MvvmLight;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Booru_Viewer.Models;
-using Dropbox.Api;
 using Microsoft.Toolkit.Uwp;
+using Microsoft.Toolkit.Uwp.Helpers;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Newtonsoft.Json;
 
@@ -656,6 +656,7 @@ namespace Booru_Viewer.ViewModels
 
 		void SearchFavouritesExecute()
 		{
+
 			CurrentTags.Clear();
 			CurrentTag = "ordfav:" + Username;
 			RaisePropertyChanged("CurrentTags");
@@ -797,26 +798,22 @@ namespace Booru_Viewer.ViewModels
 			});
 		}
 
-		public ICommand SelectDropboxFolder => new RelayCommand(SelectDropboxFolderExec);
-		async void SelectDropboxFolderExec()
-		{
-			StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///DropboxInfo.txt"));
-			string[] dbInfo = (await FileIO.ReadTextAsync(file)).Split('\n');
-			var dBclient = new DropboxAppClient(dbInfo[0], dbInfo[1]);
-			var authURI = DropboxOAuth2Helper.GetAuthorizeUri(OAuthResponseType.Code, dbInfo[0], "https://localhost/authorize");
-
-		}
-
 		public ICommand Backup => new RelayCommand(BackupEx);
 
 		async void BackupEx()
 		{
-			var picker = new FolderPicker();
-			picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+			var picker = new FolderPicker
+			{
+				SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
+				CommitButtonText = "Select Folder",
+				ViewMode = PickerViewMode.List
+			};
 			var result = await picker.PickSingleFolderAsync();
+			
 			if (result != null)
 			{
 				await GlobalInfo.SaveSearches(SavedSearches.ToList(), result);
+				await GlobalInfo.SaveFavouriteTags(result);
 				SettingsData settings = new SettingsData()
 				{
 					PerPage = PerPage,
@@ -854,6 +851,8 @@ namespace Booru_Viewer.ViewModels
 			{
 				await GlobalInfo.LoadSavedSearches(result);
 				await GlobalInfo.SaveSearches(SavedSearches.ToList());
+				await GlobalInfo.LoadFavouriteTags(result);
+				await GlobalInfo.SaveFavouriteTags();
 				var saveFolder = result;
 				if (result.Name != "Booru-Viewer")
 				{

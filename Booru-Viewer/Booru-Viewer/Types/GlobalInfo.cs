@@ -209,7 +209,7 @@ namespace Booru_Viewer.Types
 					SearchesFile = await folder.CreateFileAsync("FavouriteTags.json");
 				}
 
-				var json = JsonConvert.SerializeObject(FavouriteTags.Select(x => x));
+				var json = JsonConvert.SerializeObject(favouriteTags.ToList());
 				await FileIO.WriteTextAsync(SearchesFile, json);
 			}
 			catch (Exception e)
@@ -263,7 +263,7 @@ namespace Booru_Viewer.Types
 				var searchList = JsonConvert.DeserializeObject<List<string>>(json);
 				if (searchList != null)
 				{
-					savedSearches.Clear();
+					favouriteTags.Clear();
 					foreach (var search in searchList)
 					{
 						var tag = search.ToLower();

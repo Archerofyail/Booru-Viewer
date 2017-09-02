@@ -1,6 +1,5 @@
 ﻿{
   "dependencies": {
-    "Dropbox.Api": "4.3.0",
     "HockeySDK.UWP": "4.1.6",
     "Microsoft.NETCore.UniversalWindowsPlatform": "5.4.0",
     "Microsoft.Toolkit.Uwp": "2.0.0",

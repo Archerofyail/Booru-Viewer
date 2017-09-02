@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Booru_Viewer.ViewModels;
-using Microsoft.Toolkit.Uwp;
+using Microsoft.Toolkit.Collections;
 
 namespace Booru_Viewer.Types
 {
