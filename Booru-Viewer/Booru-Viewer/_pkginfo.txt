@@ -1,1 +1,1 @@
-C:\Users\arche\Git Repos\booru-viewer\Booru-Viewer\Booru-Viewer\bin\x64\Release\Upload\Booru-Viewer_1.3.5.0\Booru-Viewer_1.3.5.0_x86_x64_arm.appxbundle
+C:\Users\arche\Git Repos\booru-viewer\Booru-Viewer\Booru-Viewer\bin\ARM\Release\Upload\Booru-Viewer_1.3.6.0\Booru-Viewer_1.3.6.0_x86_x64_arm.appxbundle

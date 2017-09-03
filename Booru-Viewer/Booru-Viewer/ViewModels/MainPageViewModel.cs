@@ -372,7 +372,8 @@ namespace Booru_Viewer.ViewModels
 
 		public int SelectedOrderIndex
 		{
-			get => selectedOrderIndex; set
+			get => selectedOrderIndex;
+			set
 			{
 				selectedOrderIndex = value;
 				RaisePropertyChanged();

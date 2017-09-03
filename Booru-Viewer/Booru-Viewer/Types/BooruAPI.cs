@@ -39,7 +39,7 @@ namespace Booru_Viewer.Types
 			{
 				tagsAsOne += tag;
 			}
-			tagsAsOne += GlobalInfo.CurrentOrdering;
+			tagsAsOne += GlobalInfo.CurrentOrdering + " ";
 			var contentTags = new[] { "rating:s", "rating:q", "rating:e" };
 			if (ratingChecks != null)
 			{

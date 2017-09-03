@@ -22,7 +22,7 @@ namespace Booru_Viewer.Types
 
 		public static string CurrentOrdering
 		{
-			get => currentOrdering; set => currentOrdering = value == "" ? "" : "order:" + value;
+			get => currentOrdering; set => currentOrdering = (value == "" ? "" : "order:" + value);
 		}
 
 		public static bool[] ContentCheck { get; set; } = { true, true, true };
