@@ -68,7 +68,7 @@
 							Background="{StaticResource ThemeBrush}"
 							BorderThickness="1"
 							Margin="0"
-							Tapped="TagTapped">
+							>
 
 					<StackPanel.BorderBrush>
 						<SolidColorBrush Color="{ThemeResource SystemBaseLowColor}" />
@@ -91,7 +91,8 @@
 							   MinWidth="20"
 							   Margin="8,0"
 							   HorizontalAlignment="Center"
-							   VerticalAlignment="Center" />
+							   VerticalAlignment="Center"
+							   Tapped="TagTapped" />
 					<Button Command="{Binding FavouriteTag, Mode=TwoWay}"
 							Background="#FF7C7C7C"
 							BorderThickness="1">
@@ -340,7 +341,7 @@
 									</ListView>
 									<TextBlock Text="You have no favourite tags yet"
 											   FontSize="12"
-											   Visibility="{Binding HaveSavedSearches}" />
+											   Visibility="{Binding DontHaveSavedSearches}" />
 								</StackPanel>
 								<StackPanel Orientation="Vertical"
 											MaxWidth="350">

@@ -37,14 +37,14 @@ namespace Booru_Viewer.ViewModels
 		public Symbol FavouriteIcon => IsFavourite ? Symbol.SolidStar : Symbol.OutlineStar;
 
 		public Visibility Selected { get; set; } = Visibility.Collapsed;
-		
+
 
 		void RemoveTagExecute()
 		{
 
-			parentVM.RemoveTagExec(this);
-			parentVM.RaisePropertyChanged("IsSignedOutWithMoreThan2Tags");
-			parentVM.RaisePropertyChanged("TotalTagCount");
+			parentVM?.RemoveTagExec(this);
+			parentVM?.RaisePropertyChanged("IsSignedOutWithMoreThan2Tags");
+			parentVM?.RaisePropertyChanged("TotalTagCount");
 		}
 
 		bool RemoveTagCanExecute()
@@ -60,7 +60,7 @@ namespace Booru_Viewer.ViewModels
 
 		}
 
-		void FavouriteTagEx()
+		async void FavouriteTagEx()
 		{
 			if (!IsFavourite)
 			{
@@ -68,13 +68,19 @@ namespace Booru_Viewer.ViewModels
 				GlobalInfo.FavouriteTags.Add(tag);
 
 				parentVM?.FavouriteTags.Add(this);
-				var tagList = parentVM?.FavouriteTags.ToList();
+				var tagList = parentVM?.FavouriteTags?.ToList();
 				tagList?.Sort();
-				GlobalInfo.FavouriteTags = new ObservableCollection<string>(tagList.Select(x => x.tag));
-				if (parentVM != null)
+
+				var newTags = tagList?.Select(x => x.tag);
+				if (newTags != null)
 				{
-					parentVM.FavouriteTags = new ObservableCollection<TagViewModel>(tagList);
+					GlobalInfo.FavouriteTags = new ObservableCollection<string>(newTags);
+					if (parentVM != null)
+					{
+						parentVM.FavouriteTags = new ObservableCollection<TagViewModel>(tagList);
+					}
 				}
+				
 			}
 			else
 			{
@@ -84,16 +90,18 @@ namespace Booru_Viewer.ViewModels
 			parentVM?.RaisePropertyChanged("FavouriteTags");
 			RaisePropertyChanged("IsFavourite");
 			RaisePropertyChanged("FavouriteIcon");
-			GlobalInfo.SaveFavouriteTags();
+			parentVM?.RaisePropertyChanged("DontHaveSavedSearches");
+			await GlobalInfo.SaveFavouriteTags();
 		}
 
-		void UnfavouriteTagEx()
+		async void UnfavouriteTagEx()
 		{
 			GlobalInfo.FavouriteTags.Remove(tag);
 			parentVM?.FavouriteTags.Remove(this);
 			RaisePropertyChanged("IsFavourite");
 			RaisePropertyChanged("FavouriteIcon");
-			GlobalInfo.SaveFavouriteTags();
+			parentVM?.RaisePropertyChanged("DontHaveSavedSearches");
+			await GlobalInfo.SaveFavouriteTags();
 		}
 
 		void AddTagToSearchEx()
@@ -121,7 +129,7 @@ namespace Booru_Viewer.ViewModels
 			Tag = tag.Replace("~", "").Replace("-", "");
 			Tag = tag.Insert(0, prefix);
 		}
-		public ICommand SelectedTag => new RelayCommand(() => {Selected = (Selected == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible); RaisePropertyChanged("Selected"); });
+		public ICommand SelectedTag => new RelayCommand(() => { Selected = (Selected == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible); RaisePropertyChanged("Selected"); });
 		public ICommand AddPrefix => new RelayCommand<string>(AddPrefixEx);
 		public ICommand AddTagToSearch => new RelayCommand(AddTagToSearchEx);
 		public ICommand UnfavouriteTag => new RelayCommand(UnfavouriteTagEx);

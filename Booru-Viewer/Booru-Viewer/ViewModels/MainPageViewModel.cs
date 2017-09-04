@@ -103,7 +103,7 @@ namespace Booru_Viewer.ViewModels
 						savedSearches.Add(new SavedSearchViewModel(search, this));
 					}
 					RaisePropertyChanged("SavedSearches");
-					RaisePropertyChanged("HaveSavedSearches");
+					RaisePropertyChanged("DontHaveSavedSearches");
 				}
 			};
 
@@ -116,7 +116,7 @@ namespace Booru_Viewer.ViewModels
 						favouriteTags.Add(new TagViewModel(tag, this));
 					}
 					RaisePropertyChanged("FavouriteTags");
-					RaisePropertyChanged("HaveSavedSearches");
+					RaisePropertyChanged("DontHaveSavedSearches");
 				}
 			};
 
@@ -314,7 +314,7 @@ namespace Booru_Viewer.ViewModels
 					{
 						savedSearches.Add(new SavedSearchViewModel(search, this));
 					}
-					RaisePropertyChanged("HaveSavedSearches");
+					RaisePropertyChanged("DontHaveSavedSearches");
 				}
 				return savedSearches;
 			}
@@ -332,9 +332,7 @@ namespace Booru_Viewer.ViewModels
 				{
 					favouriteTags.Add(new TagViewModel(search, this));
 				}
-				RaisePropertyChanged("HaveSavedSearches");
-
-
+				RaisePropertyChanged("DontHaveSavedSearches");
 				return favouriteTags;
 			}
 			set => favouriteTags = value;
@@ -504,7 +502,7 @@ namespace Booru_Viewer.ViewModels
 
 		public Visibility IsFavButtonVisible => Username != "" && APIKey != "" ? Visibility.Visible : Visibility.Collapsed;
 
-		public Visibility HaveSavedSearches => SavedSearches.Count > 0 ? Visibility.Collapsed : Visibility.Visible;
+		public bool DontHaveSavedSearches => FavouriteTags.Count == 0; 
 
 		private int selectedSavedSearch = 0;
 
@@ -524,7 +522,7 @@ namespace Booru_Viewer.ViewModels
 			try
 			{
 				SavedSearches.Remove(search);
-				RaisePropertyChanged("HaveSavedSearches");
+				RaisePropertyChanged("DontHaveSavedSearches");
 				GlobalInfo.SaveSearches(savedSearches.ToList());
 			}
 			catch (Exception e)
@@ -703,7 +701,7 @@ namespace Booru_Viewer.ViewModels
 					SavedSearches.Add(new SavedSearchViewModel(tags, this));
 				}
 				RaisePropertyChanged("SavedSearches");
-				RaisePropertyChanged("HaveSavedSearches");
+				RaisePropertyChanged("DontHaveSavedSearches");
 			}
 			GlobalInfo.SaveSearches(savedSearches.ToList());
 		}
