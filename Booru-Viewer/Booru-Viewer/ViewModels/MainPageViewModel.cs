@@ -9,6 +9,7 @@ using Windows.UI.Xaml;
 using Windows.Storage;
 using System.Diagnostics;
 using System.Linq;
+using Windows.ApplicationModel;
 using Windows.Foundation.Collections;
 using Windows.Storage.AccessCache;
 using Windows.Storage.Pickers;
@@ -141,9 +142,24 @@ namespace Booru_Viewer.ViewModels
 
 		}
 
+		public string VersionNumber
+		{
+
+			get
+			{
+				var packageVersion = Package.Current.Id.Version;
+				return packageVersion.Major + "." + packageVersion.Minor + "." + packageVersion.Build + "." +
+					   packageVersion.Revision;
+			}
+		}
+
 		public int TotalTagCount
 		{
-			get { return CurrentTags.Count + (checkedList.All(x => x) || checkedList.All(x => !x) ? 0 : 1) + (selectedOrderIndex > 1 ? 1 : 0); }
+			get
+			{
+				return CurrentTags.Count + (checkedList.All(x => x) || checkedList.All(x => !x) ? 0 : 1) +
+					   (selectedOrderIndex > 1 ? 1 : 0);
+			}
 		}
 
 		public bool IsSignedOutWithMoreThan2Tags => TotalTagCount > 2 && Username == "" && APIKey == "";
@@ -220,9 +236,11 @@ namespace Booru_Viewer.ViewModels
 		}
 
 		private int startingPage = 1;
+
 		public int PageNum
 		{
-			get => startingPage; set
+			get => startingPage;
+			set
 			{
 				startingPage = value;
 				RaisePropertyChanged();
@@ -254,18 +272,21 @@ namespace Booru_Viewer.ViewModels
 
 		public int ImageSize
 		{
-			get => imageSize; set
+			get => imageSize;
+			set
 			{
 				imageSize = value;
 				ApplicationData.Current.LocalSettings.Values["ImageSize"] = value;
 				RaisePropertyChanged();
 			}
 		}
+
 		private ObservableCollection<string> suggestedTags = new ObservableCollection<string>();
 
 		public ObservableCollection<string> SuggestedTags
 		{
-			get => suggestedTags; set
+			get => suggestedTags;
+			set
 			{
 				suggestedTags = value;
 				RaisePropertyChanged();
@@ -276,7 +297,8 @@ namespace Booru_Viewer.ViewModels
 
 		public int SuggestedTagIndex
 		{
-			get => suggestedTagIndex; set
+			get => suggestedTagIndex;
+			set
 			{
 				if (value < suggestedTags.Count && value >= 0)
 				{
@@ -347,6 +369,7 @@ namespace Booru_Viewer.ViewModels
 
 		public ObservableCollection<string> Prefixes => new ObservableCollection<string>(new[] { "none", "~", "-" });
 		private string orderPrefix = "order:";
+
 		public ObservableCollection<string> OrderOptions => new ObservableCollection<string>(new[]
 		{
 			"default", "id", "id_desc", "score", "score_asc", "favcount", "favcount_asc", "change", "change_asc", "comment",
@@ -386,6 +409,7 @@ namespace Booru_Viewer.ViewModels
 		private string currentTag = "";
 		private DateTime start;
 		private TimeSpan timeSinceChange;
+
 		public string CurrentTag
 		{
 			get => currentTag;
@@ -424,9 +448,11 @@ namespace Booru_Viewer.ViewModels
 		}
 
 		private string username;
+
 		public string Username
 		{
-			get => BooruAPI.Username; set
+			get => BooruAPI.Username;
+			set
 			{
 				username = value;
 				RaisePropertyChanged("IsSignedOutWithMoreThan2Tags");
@@ -435,9 +461,11 @@ namespace Booru_Viewer.ViewModels
 		}
 
 		private string apiKey;
+
 		public string APIKey
 		{
-			get => BooruAPI.APIKey; set
+			get => BooruAPI.APIKey;
+			set
 			{
 
 				apiKey = value;
@@ -468,9 +496,11 @@ namespace Booru_Viewer.ViewModels
 		}
 
 		private string noImagesText = "Press the search key to get started";
+
 		public string NoImagesText
 		{
-			get => noImagesText; set
+			get => noImagesText;
+			set
 			{
 				noImagesText = value;
 				RaisePropertyChanged();
@@ -479,9 +509,11 @@ namespace Booru_Viewer.ViewModels
 
 
 		private bool isMultiSelectOn = false;
+
 		public ListViewSelectionMode ImageSelectionMode
 		{
-			get => isMultiSelectOn ? ListViewSelectionMode.Multiple : ListViewSelectionMode.Single; set
+			get => isMultiSelectOn ? ListViewSelectionMode.Multiple : ListViewSelectionMode.Single;
+			set
 			{
 				isMultiSelectOn = value == ListViewSelectionMode.Multiple;
 				RaisePropertyChanged("MultiSelectButtonIcon");
@@ -493,7 +525,8 @@ namespace Booru_Viewer.ViewModels
 
 		public SymbolIcon MultiSelectButtonIcon
 		{
-			get => isMultiSelectOn ? new SymbolIcon(Symbol.Cancel) : new SymbolIcon(Symbol.SelectAll); set
+			get => isMultiSelectOn ? new SymbolIcon(Symbol.Cancel) : new SymbolIcon(Symbol.SelectAll);
+			set
 			{
 				isMultiSelectOn = value == new SymbolIcon(Symbol.Cancel);
 				RaisePropertyChanged();
@@ -502,18 +535,22 @@ namespace Booru_Viewer.ViewModels
 
 		public Visibility IsFavButtonVisible => Username != "" && APIKey != "" ? Visibility.Visible : Visibility.Collapsed;
 
-		public bool DontHaveSavedSearches => FavouriteTags.Count == 0; 
+		public bool DontHaveSavedSearches => FavouriteTags.Count == 0;
 
 		private int selectedSavedSearch = 0;
 
 		public int SelectedSavedSearch
 		{
-			get => selectedSavedSearch; set
+			get => selectedSavedSearch;
+			set
 			{
 				selectedSavedSearch = value;
 				RaisePropertyChanged();
 			}
+
+
 		}
+
 
 
 

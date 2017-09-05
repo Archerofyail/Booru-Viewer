@@ -78,14 +78,16 @@
 							Visibility="{Binding Selected}"
 							CommandParameter="~"
 							Background="#FF7C7C7C"
-							BorderThickness="1" />
+							BorderThickness="1" 
+							MinWidth="30"/>
 					<Button Content="-"
 							Command="{Binding AddPrefix}"
 							Visibility="{Binding Selected}"
 							CommandParameter="-"
 							Background="#FF7C7C7C"
 							Margin="4, 0"
-							BorderThickness="1" />
+							BorderThickness="1"
+							MinWidth="30"/>
 					<TextBlock Name="Tag"
 							   Text="{Binding Path=Tag, Mode=TwoWay}"
 							   MinWidth="20"
@@ -599,6 +601,13 @@
 												Command="{Binding Restore}"
 												Margin="4"></Button>
 									</StackPanel>
+								</StackPanel>
+								<StackPanel Orientation="Horizontal"
+											Margin="4, 0, 0, 8">
+									<TextBlock Text="Version "
+											   Margin="0, 0, 4, 0"/>
+									<TextBlock Text="{Binding VersionNumber}"/>
+									
 								</StackPanel>
 								<!--<Button Content="Use a Dropbox Folder"
 										Command="{Binding SelectDropboxFolder}"/>-->
