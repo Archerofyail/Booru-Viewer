@@ -213,7 +213,18 @@
 		  Name="RootGrid"
 		  MinHeight="250">
 
-
+		<ContentDialog VerticalAlignment="Center"
+					   HorizontalAlignment="Center"
+					   IsPrimaryButtonEnabled="True"
+					   IsSecondaryButtonEnabled="True"
+					   PrimaryButtonText="Yes"
+					   SecondaryButtonText="No"
+					   Title="Access mature content"
+					   PrimaryButtonClick="Over18Click"
+					   SecondaryButtonClick="Under18Click"
+					   Name="ConfirmAgeDialog">
+			<TextBlock Text="Are you 18 or older?"/>
+		</ContentDialog>
 		<controls:AdaptiveGridView   Background="{StaticResource BackgroundThemeBrush}"
 									 ItemTemplate="{StaticResource ImageTemplate}"
 									 ItemsSource="{Binding Path=Thumbnails}"
@@ -520,6 +531,11 @@
 											  MinWidth="42"
 											  Margin="4" />
 								</StackPanel>
+								<Button Name="UnlockExplicitContentButton"
+										Content="Unlock Mature Content"
+										HorizontalAlignment="Stretch"
+										Margin="4"
+										Click="UnlockExplicitContentButton_OnClick"/>
 								<Slider Header="Images Per Page"
 										Maximum="100"
 										Minimum="10"

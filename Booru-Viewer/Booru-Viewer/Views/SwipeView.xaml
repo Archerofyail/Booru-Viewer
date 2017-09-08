@@ -88,23 +88,26 @@
 							<RowDefinition Height="*" />
 						</Grid.RowDefinitions>
 
+						<ScrollViewer MinZoomFactor="1"
+									  MaxZoomFactor="4"
+									  DoubleTapped="ImageDoubleTapped"
+									  ZoomMode="Enabled">
+							<controls:ImageEx Grid.Row="0"
+											  Grid.Column="0"
+											  RenderTransformOrigin="0.5,0.5"
+											  PlaceholderSource="../Assets/Placeholder.png"
+											  PlaceholderStretch="Uniform"
+											  Stretch="Uniform"
+											  IsCacheEnabled="False"
+											  Source="{Binding FullImageURL}">
+								<controls:ImageEx.RenderTransform>
+									<CompositeTransform TranslateX="0.5"
+														TranslateY="0.5" />
+								</controls:ImageEx.RenderTransform>
 
-						<controls:ImageEx Grid.Row="0"
-										  Grid.Column="0"
-										  RenderTransformOrigin="0.5,0.5"
-										  PlaceholderSource="../Assets/Placeholder.png"
-										  PlaceholderStretch="Uniform"
-										  Stretch="Uniform"
-										  IsCacheEnabled="False"
-										  Source="{Binding FullImageURL}">
-							<controls:ImageEx.RenderTransform>
-								<CompositeTransform TranslateX="0.5"
-													TranslateY="0.5" />
-							</controls:ImageEx.RenderTransform>
 
-
-						</controls:ImageEx>
-
+							</controls:ImageEx>
+						</ScrollViewer>
 
 					</Grid>
 
@@ -169,7 +172,7 @@
 										  Header="Artist"
 										  Name="ArtistTagList"
 										  SelectionMode="None"
-								          IsItemClickEnabled="False"
+										  IsItemClickEnabled="False"
 										  Visibility="{Binding Path=ArtistTags.Count, 
 														Converter={StaticResource CountToVis}}" />
 
@@ -178,7 +181,7 @@
 										  Header="Copyright"
 										  Name="CopyrightTagList"
 										  SelectionMode="None"
-								          IsItemClickEnabled="False"
+										  IsItemClickEnabled="False"
 										  Visibility="{Binding Path=CopyrightTags.Count, 
 														Converter={StaticResource CountToVis}}" />
 
@@ -187,7 +190,7 @@
 										  Header="General"
 										  Name="GeneralTagList"
 										  SelectionMode="None"
-								          IsItemClickEnabled="False"
+										  IsItemClickEnabled="False"
 										  Visibility="{Binding Path=GeneralTags.Count, 
 														Converter={StaticResource CountToVis}}" />
 

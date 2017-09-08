@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -6,6 +7,7 @@ using Windows.UI.Xaml.Navigation;
 using Booru_Viewer.Types;
 using System.Diagnostics;
 using System.Linq;
+using Windows.Storage;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Media;
 using Booru_Viewer.ViewModels;
@@ -87,7 +89,54 @@ namespace Booru_Viewer
 
 			};
 
-
+			QuestionableCheckbox.Loaded += (sender, args) =>
+			{
+				var isOver18 = ApplicationData.Current.RoamingSettings.Values["IsOver18"];
+				if (isOver18 is bool b)
+				{
+					QuestionableCheckbox.IsEnabled = b;
+				}
+				else
+				{
+					QuestionableCheckbox.IsEnabled = false;
+				}
+			};
+			ExplicitCheckbox.Loaded += (sender, args) =>
+			{
+				var isOver18 = ApplicationData.Current.RoamingSettings.Values["IsOver18"];
+				if (isOver18 is bool b)
+				{
+					ExplicitCheckbox.IsEnabled = b;
+				}
+				else
+				{
+					ExplicitCheckbox.IsEnabled = false;
+				}
+			};
+			SafeCheckbox.Loaded += (sender, args) =>
+			{
+				var isOver18 = ApplicationData.Current.RoamingSettings.Values["IsOver18"];
+				if (isOver18 is bool b)
+				{
+					SafeCheckbox.IsEnabled = b;
+				}
+				else
+				{
+					SafeCheckbox.IsEnabled = false;
+				}
+			};
+			UnlockExplicitContentButton.Loaded += (sender, args) =>
+			{
+				var isOver18 = ApplicationData.Current.RoamingSettings.Values["IsOver18"];
+				if (isOver18 is bool b)
+				{
+					UnlockExplicitContentButton.Visibility = b ? Visibility.Collapsed : Visibility.Visible;
+				}
+				else
+				{
+					UnlockExplicitContentButton.Visibility = Visibility.Visible;
+				}
+			};
 
 		}
 
@@ -349,6 +398,25 @@ namespace Booru_Viewer
 			ImageGridView.SelectionChanged -= GridView_MultiSelectChanged;
 			ImageGridView.ItemClick += ImageGridView_OnItemClick;
 			ImageGridView.SelectionChanged += GridView_SelectionChanged;
+		}
+
+		private async void Over18Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+		{
+			ApplicationData.Current.RoamingSettings.Values["IsOver18"] = true;
+			QuestionableCheckbox.IsEnabled = true;
+			ExplicitCheckbox.IsEnabled = true;
+			UnlockExplicitContentButton.Visibility = Visibility.Collapsed;
+		}
+
+		private async void Under18Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+		{
+			ApplicationData.Current.RoamingSettings.Values["IsOver18"] = false;
+			sender.Hide();
+		}
+
+		private async void UnlockExplicitContentButton_OnClick(object sender, RoutedEventArgs e)
+		{
+			await ConfirmAgeDialog.ShowAsync();
 		}
 	}
 }

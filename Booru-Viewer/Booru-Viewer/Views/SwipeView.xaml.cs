@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
@@ -91,6 +92,28 @@ namespace Booru_Viewer.Views
 		{
 			var bitmap = sender as BitmapImage;
 			Debug.WriteLine("Failed to open image: " + e.ErrorMessage + ". URL is: " + bitmap.UriSource);
+		}
+
+		private async void ImageDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+		{
+			e.Handled = true;
+			var scrollViewer = sender as ScrollViewer;
+			var doubleTapPoint = e.GetPosition(scrollViewer);
+
+			if (scrollViewer.ZoomFactor != 1f)
+			{
+				scrollViewer.ChangeView(null, null, 1);
+			}
+			else if (scrollViewer.ZoomFactor == 1f)
+			{
+				scrollViewer.ChangeView(null, null, 2);
+
+				var dispatcher = Window.Current.CoreWindow.Dispatcher;
+				await dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
+				{
+					scrollViewer.ChangeView(doubleTapPoint.X, doubleTapPoint.Y, null);
+				});
+			}
 		}
 	}
 
