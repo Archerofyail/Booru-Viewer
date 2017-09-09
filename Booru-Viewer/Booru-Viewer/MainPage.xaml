@@ -4,6 +4,7 @@
 	  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	  xmlns:vm1="using:Booru_Viewer.ViewModels"
+	  xmlns:types="using:Booru_Viewer.Types"
 	  xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
 	  mc:Ignorable="d"
 	  RequestedTheme="Default"
@@ -17,9 +18,12 @@
 
 	<Page.Resources>
 		<ResourceDictionary>
+
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary Source="Assets/ColorDict.xaml" />
 			</ResourceDictionary.MergedDictionaries>
+
+			<types:CountToVisibilityConverter x:Name="CountToVisibilityConverter"/>
 
 			<DataTemplate x:Name="ImageTemplate">
 
@@ -67,8 +71,7 @@
 				<StackPanel Orientation="Horizontal"
 							Background="{StaticResource ThemeBrush}"
 							BorderThickness="1"
-							Margin="0"
-							>
+							Margin="0">
 
 					<StackPanel.BorderBrush>
 						<SolidColorBrush Color="{ThemeResource SystemBaseLowColor}" />
@@ -78,8 +81,8 @@
 							Visibility="{Binding Selected}"
 							CommandParameter="~"
 							Background="#FF7C7C7C"
-							BorderThickness="1" 
-							MinWidth="30"/>
+							BorderThickness="1"
+							MinWidth="30" />
 					<Button Content="-"
 							Command="{Binding AddPrefix}"
 							Visibility="{Binding Selected}"
@@ -87,7 +90,7 @@
 							Background="#FF7C7C7C"
 							Margin="4, 0"
 							BorderThickness="1"
-							MinWidth="30"/>
+							MinWidth="30" />
 					<TextBlock Name="Tag"
 							   Text="{Binding Path=Tag, Mode=TwoWay}"
 							   MinWidth="20"
@@ -223,7 +226,7 @@
 					   PrimaryButtonClick="Over18Click"
 					   SecondaryButtonClick="Under18Click"
 					   Name="ConfirmAgeDialog">
-			<TextBlock Text="Are you 18 or older?"/>
+			<TextBlock Text="Are you 18 or older?" />
 		</ContentDialog>
 		<controls:AdaptiveGridView   Background="{StaticResource BackgroundThemeBrush}"
 									 ItemTemplate="{StaticResource ImageTemplate}"
@@ -250,7 +253,7 @@
 			</controls:AdaptiveGridView.Resources>
 		</controls:AdaptiveGridView>
 		<TextBlock Text="{Binding NoImagesText}"
-				   Visibility="{Binding DontHaveImages}"
+				   Visibility="{Binding Items.Count,ElementName=ImageGridView, Converter={StaticResource CountToVisibilityConverter}}"
 				   Margin="20, 40"
 				   TextWrapping="WrapWholeWords"
 				   VerticalAlignment="Center"
@@ -535,7 +538,7 @@
 										Content="Unlock Mature Content"
 										HorizontalAlignment="Stretch"
 										Margin="4"
-										Click="UnlockExplicitContentButton_OnClick"/>
+										Click="UnlockExplicitContentButton_OnClick" />
 								<Slider Header="Images Per Page"
 										Maximum="100"
 										Minimum="10"
@@ -546,7 +549,7 @@
 										PointerExited="{x:Bind ViewModel.PerPageChangedEx}"
 										Loaded="PerPageSlider_OnLoaded"
 										Value="{Binding PerPage, Mode=TwoWay}">
-									
+
 
 									<!--<i:BehaviorCollection>
 										<core:EventTriggerBehavior EventName="PointerReleased">
@@ -559,7 +562,7 @@
 								</Slider>
 								<CheckBox IsChecked="{Binding UseLargerImagesForThumbnails, Mode=TwoWay}"
 										  Content="Use High quality images for thumbnails"
-										  Margin="4"/>
+										  Margin="4" />
 								<TextBlock Text="Login Details"
 										   Margin="0, 0, 0, 5" />
 								<TextBox PlaceholderText="Username"
@@ -625,9 +628,9 @@
 								<StackPanel Orientation="Horizontal"
 											Margin="4, 0, 0, 8">
 									<TextBlock Text="Version "
-											   Margin="0, 0, 4, 0"/>
-									<TextBlock Text="{Binding VersionNumber}"/>
-									
+											   Margin="0, 0, 4, 0" />
+									<TextBlock Text="{Binding VersionNumber}" />
+
 								</StackPanel>
 								<!--<Button Content="Use a Dropbox Folder"
 										Command="{Binding SelectDropboxFolder}"/>-->

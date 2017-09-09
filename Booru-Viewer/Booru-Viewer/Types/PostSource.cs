@@ -26,6 +26,10 @@ namespace Booru_Viewer.Types
 			{
 				tns.Add(new FullImageViewModel(useLargerImagePreviews ? image.File_Url : image.Preview_File_Url, image.Has_Large ? image.Large_File_Url : image.File_Url, "https://danbooru.donmai.us/posts/" + image.id, image.Large_File_Url, image.image_width, image.image_height));
 			}
+			if (page == 2 || page == 3)
+			{
+				await Task.Delay(100 * (page - 1), cancellationToken);
+			}
 
 
 			return tns;

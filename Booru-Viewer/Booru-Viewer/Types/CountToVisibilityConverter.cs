@@ -4,7 +4,7 @@ using Windows.UI.Xaml.Data;
 
 namespace Booru_Viewer.Types
 {
-	class CountToVisibilityConverter : IValueConverter
+	public class CountToVisibilityConverter : IValueConverter
 	{
 		public object Convert(object value, Type targetType, object parameter, string language)
 		{

@@ -153,11 +153,20 @@ namespace Booru_Viewer.ViewModels
 			set
 			{
 				useLargerImagesForThumbnails = value;
+				appSettings["UseLargerImagesForThumbnails"] = value;
 				if (value)
 				{
 					foreach (var image in Thumbnails)
 					{
 						image.PreviewURL = image.FullImageURL;
+						image.RaisePropertyChanged("PreviewURL");
+					}
+				}
+				else
+				{
+					foreach (var image in Thumbnails)
+					{
+						image.PreviewURL = image.PreviewURL;
 						image.RaisePropertyChanged("PreviewURL");
 					}
 				}
@@ -387,7 +396,15 @@ namespace Booru_Viewer.ViewModels
 
 		public IncrementalLoadingCollection<PostSource, FullImageViewModel> Thumbnails
 		{
-			get => thumbnails;
+			get
+			{
+				if (thumbnails.Count == 0)
+				{
+					NoImagesText = "No Images found with those tags, try a different search";
+					DontHaveImages = true;
+				}
+				return thumbnails;
+			}
 		}
 
 		public ObservableCollection<string> Prefixes => new ObservableCollection<string>(new[] { "none", "~", "-" });
