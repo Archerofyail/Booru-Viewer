@@ -104,14 +104,19 @@
 									  ZoomMode="Enabled"
 									  Grid.Row="1"
 									  Height="Auto"
-									  Name="ImageScrollViewer">
+									  Name="ImageScrollViewer"
+									  HorizontalScrollMode="Auto"
+									  VerticalScrollMode="Auto"
+									  HorizontalScrollBarVisibility="Auto"
+									  VerticalScrollBarVisibility="Auto">
 							<controls:ImageEx RenderTransformOrigin="0.5,0.5"
 											  PlaceholderSource="../Assets/Placeholder.png"
 											  PlaceholderStretch="Uniform"
 											  Stretch="Uniform"
 											  IsCacheEnabled="False"
 											  Source="{Binding FullImageURL}"
-											  MaxHeight="{Binding ViewportHeight, ElementName=ImageScrollViewer}">
+											  MaxHeight="{Binding ViewportHeight, ElementName=ImageScrollViewer}"
+							                  MaxWidth="{Binding ViewportWidth, ElementName=ImageScrollViewer}">
 								<controls:ImageEx.RenderTransform>
 									<CompositeTransform TranslateX="0.5"
 														TranslateY="0.5" />
