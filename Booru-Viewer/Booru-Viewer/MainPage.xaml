@@ -546,6 +546,7 @@
 										PointerExited="{x:Bind ViewModel.PerPageChangedEx}"
 										Loaded="PerPageSlider_OnLoaded"
 										Value="{Binding PerPage, Mode=TwoWay}">
+									
 
 									<!--<i:BehaviorCollection>
 										<core:EventTriggerBehavior EventName="PointerReleased">
@@ -556,6 +557,9 @@
 									</i:BehaviorCollection>-->
 
 								</Slider>
+								<CheckBox IsChecked="{Binding UseLargerImagesForThumbnails, Mode=TwoWay}"
+										  Content="Use High quality images for thumbnails"
+										  Margin="4"/>
 								<TextBlock Text="Login Details"
 										   Margin="0, 0, 0, 5" />
 								<TextBox PlaceholderText="Username"

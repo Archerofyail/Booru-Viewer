@@ -405,6 +405,7 @@ namespace Booru_Viewer
 			ApplicationData.Current.RoamingSettings.Values["IsOver18"] = true;
 			QuestionableCheckbox.IsEnabled = true;
 			ExplicitCheckbox.IsEnabled = true;
+			SafeCheckbox.IsEnabled = true;
 			UnlockExplicitContentButton.Visibility = Visibility.Collapsed;
 		}
 

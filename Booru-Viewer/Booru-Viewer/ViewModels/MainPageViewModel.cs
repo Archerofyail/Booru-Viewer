@@ -54,7 +54,10 @@ namespace Booru_Viewer.ViewModels
 			{
 				explicitChecked = (bool)appSettings["ExplicitChecked"];
 			}
-
+			if (appSettings["UseLargerImagesForThumbnails"] != null)
+			{
+				useLargerImagesForThumbnails = (bool)appSettings["UseLargerImagesForThumbnails"];
+			}
 
 
 			GlobalInfo.ContentCheck[0] = safeChecked;
@@ -140,6 +143,26 @@ namespace Booru_Viewer.ViewModels
 			Thumbnails.RefreshAsync();
 			BooruAPI.GetUser();
 
+		}
+
+		private bool useLargerImagesForThumbnails;
+
+		public bool UseLargerImagesForThumbnails
+		{
+			get => useLargerImagesForThumbnails;
+			set
+			{
+				useLargerImagesForThumbnails = value;
+				if (value)
+				{
+					foreach (var image in Thumbnails)
+					{
+						image.PreviewURL = image.FullImageURL;
+						image.RaisePropertyChanged("PreviewURL");
+					}
+				}
+				RaisePropertyChanged();
+			}
 		}
 
 		public string VersionNumber
@@ -1033,4 +1056,6 @@ namespace Booru_Viewer.ViewModels
 
 
 }
+
+
 

@@ -9,7 +9,8 @@
 	  xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
 	  xmlns:interop="using:Windows.UI.Xaml.Interop"
 	  Name="Page"
-	  xmlns:t="using:Booru_Viewer.Types">
+	  xmlns:t="using:Booru_Viewer.Types"
+	  Height="Auto">
 	<Page.DataContext>
 		<vm:SwipViewViewModel />
 	</Page.DataContext>
@@ -59,7 +60,13 @@
 	<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
 		  Name="Grid"
 		  VerticalAlignment="Stretch"
-		  HorizontalAlignment="Stretch">
+		  HorizontalAlignment="Stretch"
+		  Height="Auto">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="Auto"/>
+		</Grid.RowDefinitions>
 		<ProgressBar IsIndeterminate="True"
 					 VerticalAlignment="Top"
 					 Margin="4"
@@ -69,7 +76,8 @@
 				  Name="FlipView"
 				  Tapped="FlipView_OnTapped"
 				  SelectionChanged="FlipView_OnSelectionChanged"
-				  UseTouchAnimationsForAllNavigation="True">
+				  UseTouchAnimationsForAllNavigation="True"
+				  Grid.Row="1">
 			<FlipView.ItemsPanel>
 				<ItemsPanelTemplate>
 					<VirtualizingStackPanel VirtualizationMode="Standard"
@@ -80,26 +88,30 @@
 			</FlipView.ItemsPanel>
 			<FlipView.ItemTemplate>
 				<DataTemplate>
+
 					<Grid>
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="*" />
 						</Grid.ColumnDefinitions>
 						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto" />
 							<RowDefinition Height="*" />
+							<RowDefinition Height="Auto" />
 						</Grid.RowDefinitions>
-
 						<ScrollViewer MinZoomFactor="1"
 									  MaxZoomFactor="4"
 									  DoubleTapped="ImageDoubleTapped"
-									  ZoomMode="Enabled">
-							<controls:ImageEx Grid.Row="0"
-											  Grid.Column="0"
-											  RenderTransformOrigin="0.5,0.5"
+									  ZoomMode="Enabled"
+									  Grid.Row="1"
+									  Height="Auto"
+									  Name="ImageScrollViewer">
+							<controls:ImageEx RenderTransformOrigin="0.5,0.5"
 											  PlaceholderSource="../Assets/Placeholder.png"
 											  PlaceholderStretch="Uniform"
 											  Stretch="Uniform"
 											  IsCacheEnabled="False"
-											  Source="{Binding FullImageURL}">
+											  Source="{Binding FullImageURL}"
+											  MaxHeight="{Binding ViewportHeight, ElementName=ImageScrollViewer}">
 								<controls:ImageEx.RenderTransform>
 									<CompositeTransform TranslateX="0.5"
 														TranslateY="0.5" />
@@ -107,6 +119,7 @@
 
 
 							</controls:ImageEx>
+
 						</ScrollViewer>
 
 					</Grid>
