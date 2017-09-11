@@ -68,7 +68,7 @@ namespace Booru_Viewer.ViewModels
 			{
 				Debug.WriteLine("username not empty it's " + appSettings["Username"] + ". APIKey is " + appSettings["APIKey"]);
 
-				Username = savedUN;
+				username = savedUN;
 				if (!string.IsNullOrEmpty(savedAPIKey))
 				{
 
@@ -1012,16 +1012,6 @@ namespace Booru_Viewer.ViewModels
 		}
 
 		public bool IsSavingImages { get; set; }
-		private string currentImageSaving = "";
-		public string CurrentImageSaving
-		{
-			get => currentImageSaving;
-			set
-			{
-				currentImageSaving = value;
-				RaisePropertyChanged();
-			}
-		}
 
 		private int imageSaveCount = 60;
 
@@ -1032,7 +1022,7 @@ namespace Booru_Viewer.ViewModels
 		}
 
 		private int currentImageSaveIndex = 0;
-
+		 
 		public int CurrentImageSaveIndex
 		{
 			get => currentImageSaveIndex;
@@ -1057,18 +1047,25 @@ namespace Booru_Viewer.ViewModels
 			{
 				return;
 			}
-			Debug.WriteLine("imagesToSaveCount = " + imageList.Count);
-			ImageSaveCount = imageList.Count;
-			foreach (var image in imageList)
-			{
-				CurrentImageSaving = "Saving " + CurrentImageSaveIndex + " of " + ImageSaveCount;
-				await ImageSaver.SaveImage((image as FullImageViewModel).FullImageURL);
-				CurrentImageSaveIndex++;
-			}
+			ImageSaver.ImageFinishedSavingEvent += ImageFinishedSave;
+			
+			ImageSaver.SaveImagesFromList(imageList.Select(x=> (x as FullImageViewModel).FullImageURL).ToList());
 			IsSavingImages = false;
 			RaisePropertyChanged("IsSavingImages");
 		}
 
+
+		void ImageFinishedSave(int index, int count, bool lastImage)
+		{
+			CurrentImageSaveIndex = index;
+			ImageSaveCount = count;
+			IsSavingImages = !lastImage;
+			if (lastImage)
+			{
+				ImageSaver.ImageFinishedSavingEvent -= ImageFinishedSave;
+			}
+			RaisePropertyChanged("IsSavingImages");
+		}
 	}
 
 

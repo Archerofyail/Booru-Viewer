@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -11,7 +12,14 @@ namespace Booru_Viewer.Types
 	{
 		public static HttpClient client = new HttpClient();
 		private static StorageFolder imageFolder;
-		private static int currSaveCount = 0;
+		public static bool IsSavingImageList { get; private set; }
+		public static int TotalImageSaveCount { get; private set; }
+		public static int CurrentImageSaveIndex { get; private set; }
+
+		public delegate void ImageFinishedSavingEventHandler(int currentIndex, int totalCount, bool isLastImage);
+
+		public static event ImageFinishedSavingEventHandler ImageFinishedSavingEvent;
+
 		public static StorageFolder ImageFolder
 		{
 			get
@@ -42,7 +50,7 @@ namespace Booru_Viewer.Types
 				return;
 
 			}
-			
+
 			var item = KnownFolders.PicturesLibrary.TryGetItemAsync("Booru-Viewer").GetResults();
 			if (item != null)
 			{
@@ -78,11 +86,8 @@ namespace Booru_Viewer.Types
 		}
 		public static async Task<string> SaveImage(string ImageURL)
 		{
-			while (currSaveCount >= 4)
-			{
-				Debug.WriteLine("Save Count is:" + currSaveCount);
-			}
-			currSaveCount++;
+			
+			
 			var baseURLLength = (BooruAPI.BaseURL + "/data/").Length;
 			if (ImageFolder == null)
 			{
@@ -93,9 +98,7 @@ namespace Booru_Viewer.Types
 				catch (Exception e)
 				{
 					Debug.WriteLine(e);
-					currSaveCount--;
 					return "Could not open Save Folder";
-					throw;
 				}
 
 			}
@@ -103,9 +106,8 @@ namespace Booru_Viewer.Types
 			imageName = imageName.Replace("/", "").Replace("__", "").Replace("_", " ");
 			imageName = imageName.Remove(imageName.Length - 37, 32);
 			var imageItem = await ImageFolder.TryGetItemAsync(imageName);
-			if (imageItem != null)
+			if (imageItem != null && (await imageItem.GetBasicPropertiesAsync()).Size > 0)
 			{
-				currSaveCount--;
 				return "Already saved image";
 			}
 			try
@@ -117,18 +119,30 @@ namespace Booru_Viewer.Types
 					var bytes = await response.Content.ReadAsByteArrayAsync();
 					await FileIO.WriteBytesAsync(file, bytes);
 				}
-				currSaveCount--;
 				return "Image Saved";
-				
+
 			}
 			catch (Exception e)
 			{
 				Debug.WriteLine(e);
-				currSaveCount--;
 				return "An error ocurred when saving, please try again";
 			}
-			
 
+
+		}
+
+		public static async void SaveImagesFromList(List<string> urls)
+		{
+			IsSavingImageList = true;
+			CurrentImageSaveIndex = 0;
+			TotalImageSaveCount = urls.Count;
+			foreach (var url in urls)
+			{
+				await SaveImage(url);
+				ImageFinishedSavingEvent?.Invoke(CurrentImageSaveIndex++, TotalImageSaveCount,
+					CurrentImageSaveIndex == TotalImageSaveCount - 1);
+			}
+			IsSavingImageList = false;
 		}
 	}
 }
