@@ -30,7 +30,7 @@
 					<SolidColorBrush Color="{ThemeResource SystemBaseLowColor}" />
 				</StackPanel.BorderBrush>
 				<TextBlock Name="Tag"
-						   Text="{Binding Path=Tag, Mode=TwoWay}"
+						   Text="{Binding Path=Name, Mode=TwoWay}"
 						   MinWidth="20"
 						   Margin="10"
 						   HorizontalAlignment="Center"

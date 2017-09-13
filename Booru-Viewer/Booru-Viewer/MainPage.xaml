@@ -18,11 +18,13 @@
 
 	<Page.Resources>
 		<ResourceDictionary>
-
+			
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary Source="Assets/ColorDict.xaml" />
 			</ResourceDictionary.MergedDictionaries>
-
+			<CollectionViewSource Source="{Binding FavouriteTags}"
+								  IsSourceGrouped="True"
+								  x:Name="FavouriteTagsGroupedList"/>
 			<types:CountToVisibilityConverter x:Name="CountToVisibilityConverter" />
 
 			<DataTemplate x:Name="ImageTemplate">
@@ -92,7 +94,7 @@
 							BorderThickness="1"
 							MinWidth="30" />
 					<TextBlock Name="Tag"
-							   Text="{Binding Path=Tag, Mode=TwoWay}"
+							   Text="{Binding Path=Name, Mode=TwoWay}"
 							   MinWidth="20"
 							   Margin="8,0"
 							   HorizontalAlignment="Center"
@@ -121,7 +123,7 @@
 						<SolidColorBrush Color="{ThemeResource SystemBaseLowColor}" />
 					</StackPanel.BorderBrush>
 					<TextBlock Name="Tag"
-							   Text="{Binding Path=Tag, Mode=TwoWay}"
+							   Text="{Binding Path=Name, Mode=TwoWay}"
 							   MinWidth="20"
 							   Margin="8,0"
 							   HorizontalAlignment="Center"
@@ -132,14 +134,14 @@
 						<SymbolIcon Symbol="Cancel" />
 					</Button>
 					<Button Command="{Binding AddTagToSearch, Mode=TwoWay}"
-							CommandParameter="{x:Bind Tag}"
+							CommandParameter="{x:Bind Name}"
 							Background="#FF7C7C7C"
 							Margin="4, 0, 0, 0"
 							BorderThickness="1">
 						<SymbolIcon Symbol="Add" />
 					</Button>
 					<Button Command="{Binding StartSearchFromFavourite, Mode=TwoWay}"
-							CommandParameter="{x:Bind Tag}"
+							CommandParameter="{x:Bind Name}"
 							Background="#FF7C7C7C"
 							Margin="4, 0, 0, 0"
 							BorderThickness="1">
@@ -220,28 +222,28 @@
 			<RowDefinition Height="Auto"></RowDefinition>
 			<RowDefinition Height="*"></RowDefinition>
 			<RowDefinition Height="Auto"></RowDefinition>
-			
+
 		</Grid.RowDefinitions>
 		<StackPanel VerticalAlignment="Top"
-		            HorizontalAlignment="Stretch"
-		            Visibility="{Binding IsSavingImages}">
+					HorizontalAlignment="Stretch"
+					Visibility="{Binding IsSavingImages}">
 			<StackPanel Orientation="Horizontal"
-			            Margin="0, 4">
+						Margin="0, 4">
 				<TextBlock Text="Saving"
-				           Margin="4, 0"></TextBlock>
+						   Margin="4, 0"></TextBlock>
 				<TextBlock Text="{Binding CurrentImageSaveIndex}" />
 				<TextBlock Margin="4, 0"
-				           Text=" of " />
+						   Text=" of " />
 				<TextBlock Text="{Binding ImageSaveCount}" />
 
 			</StackPanel>
 			<ProgressBar Maximum="{Binding ImageSaveCount}"
-			             Value="{Binding CurrentImageSaveIndex}" />
+						 Value="{Binding CurrentImageSaveIndex}" />
 			<TextBlock Text="Please don't exit the app while saving"
-			           FontSize="12"
-			           FontStyle="Italic"
-			           FontWeight="SemiLight" 
-					   Margin="4, 0"/>
+					   FontSize="12"
+					   FontStyle="Italic"
+					   FontWeight="SemiLight"
+					   Margin="4, 0" />
 
 		</StackPanel>
 		<ContentDialog VerticalAlignment="Center"
@@ -289,8 +291,8 @@
 				   Visibility="{Binding Items.Count,ElementName=ImageGridView, Converter={StaticResource CountToVisibilityConverter}}"
 				   TextWrapping="WrapWholeWords"
 				   VerticalAlignment="Center"
-				   HorizontalAlignment="Center" 
-				   Grid.Row="1"/>
+				   HorizontalAlignment="Center"
+				   Grid.Row="1" />
 
 
 		<Button VerticalAlignment="Bottom"
@@ -328,7 +330,7 @@
 				</StackPanel>
 			</Button.Content>
 		</Button>
-		
+
 		<!--<controls:Loading IsLoading="{Binding IsSavingImages}"
 						  Background="#99FFFFFF"
 						  HorizontalAlignment="Stretch"
@@ -374,7 +376,7 @@
 											MaxHeight="250"
 											MinHeight="80">
 									<TextBlock Text="Favourite Tags" />
-									<ListView ItemsSource="{Binding FavouriteTags}"
+									<ListView ItemsSource="{Binding Source={StaticResource FavouriteTagsGroupedList}}"
 											  ItemTemplate="{StaticResource FavouriteTag}"
 											  SelectionChanged="SavedSearchSelection"
 											  SelectedIndex="{Binding SelectedSavedSearch, Mode=TwoWay}"
@@ -388,7 +390,19 @@
 											  CanReorderItems="True"
 											  AllowDrop="True"
 											  DragItemsCompleted="SavedSearchesList_OnDragItemsCompleted">
-
+										<ListView.GroupStyle>
+											<GroupStyle>
+												<GroupStyle.HeaderTemplate>
+													<DataTemplate>
+														<StackPanel>
+															<TextBlock Text="{Binding Key}"
+																	   FontSize="14"/>
+															<Line HorizontalAlignment="Stretch"/>
+														</StackPanel>
+													</DataTemplate>
+												</GroupStyle.HeaderTemplate>
+											</GroupStyle>
+										</ListView.GroupStyle>
 									</ListView>
 									<TextBlock Text="You have no favourite tags yet"
 											   FontSize="12"

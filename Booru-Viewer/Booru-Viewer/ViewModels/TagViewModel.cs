@@ -7,6 +7,7 @@ using System.Windows.Input;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Booru_Viewer.Models;
 using Booru_Viewer.Types;
 
 namespace Booru_Viewer.ViewModels
@@ -14,25 +15,53 @@ namespace Booru_Viewer.ViewModels
 	public class TagViewModel : ViewModelBase, IComparable
 	{
 		private MainPageViewModel parentVM;
-
-		public TagViewModel(string tag, MainPageViewModel pageVM)
+		public Tag Tag;
+		public TagViewModel(Tag tag, MainPageViewModel pageVM)
 		{
-			this.tag = tag;
+			Tag = tag;
 			parentVM = pageVM;
+			_type = tag.category;
 		}
 
-		public TagViewModel(string tag)
+		public TagViewModel(Tag tag)
 		{
-			this.tag = tag;
+			Tag = tag;
 		}
 
 		public TagViewModel()
 		{
 		}
 
-		private string tag;
-		public string Tag { get => tag; set { tag = value; RaisePropertyChanged(); } }
-		public bool IsFavourite => GlobalInfo.FavouriteTags.Contains(tag);
+		private TagType _type;
+		public string Type
+		{
+			get => _type.ToString();
+			set
+			{
+				if (Enum.TryParse(value, out TagType result))
+				{
+					_type = result;
+				}
+				RaisePropertyChanged();
+			}
+		}
+
+		public string Name { get => Tag.Name; set { Tag.Name = value; RaisePropertyChanged(); } }
+
+		public bool IsFavourite
+		{
+			get
+			{
+				foreach (var tag in GlobalInfo.FavouriteTags)
+				{
+					if (tag.Name == Name)
+					{
+						return true;
+					}
+				}
+				return false;
+			}
+		} 
 
 		public Symbol FavouriteIcon => IsFavourite ? Symbol.SolidStar : Symbol.OutlineStar;
 
@@ -64,28 +93,25 @@ namespace Booru_Viewer.ViewModels
 		{
 			if (!IsFavourite)
 			{
-
-				GlobalInfo.FavouriteTags.Add(tag);
-
-				parentVM?.FavouriteTags.Add(this);
-				var tagList = parentVM?.FavouriteTags?.ToList();
-				tagList?.Sort();
-
-				var newTags = tagList?.Select(x => x.tag);
-				if (newTags != null)
+				if (Tag.category == TagType.Unknown || Tag.category == TagType.General)
 				{
-					GlobalInfo.FavouriteTags = new ObservableCollection<string>(newTags);
-					if (parentVM != null)
+					var taginf = (await BooruAPI.GetTagInfo(Tag.Name));
+					if (taginf != null)
 					{
-						parentVM.FavouriteTags = new ObservableCollection<TagViewModel>(tagList);
+						Tag.Category = taginf.category;
 					}
 				}
+				GlobalInfo.FavouriteTags.Add(Tag);
+
+				parentVM?.FavouriteTags.First(x => x.Key == Tag.category).Add(this);
 				
+				parentVM?.FavouriteTags.First(x => x.Key == Tag.category).Sort();
+				parentVM?.RaisePropertyChanged("FavouriteTags");
 			}
 			else
 			{
-				GlobalInfo.FavouriteTags.Remove(tag);
-				parentVM?.FavouriteTags.Remove(this);
+				GlobalInfo.FavouriteTags.Remove(Tag);
+				parentVM?.FavouriteTags.First(x => x.Key == Tag.category).Remove(this);
 			}
 			parentVM?.RaisePropertyChanged("FavouriteTags");
 			RaisePropertyChanged("IsFavourite");
@@ -96,17 +122,17 @@ namespace Booru_Viewer.ViewModels
 
 		async void UnfavouriteTagEx()
 		{
-			GlobalInfo.FavouriteTags.Remove(tag);
-			parentVM?.FavouriteTags.Remove(this);
+			GlobalInfo.FavouriteTags.Remove(Tag);
+			parentVM?.FavouriteTags.First(x => x.Key == Tag.category).Remove(this);
 			RaisePropertyChanged("IsFavourite");
 			RaisePropertyChanged("FavouriteIcon");
 			parentVM?.RaisePropertyChanged("DontHaveSavedSearches");
 			await GlobalInfo.SaveFavouriteTags();
 		}
 
-		void AddTagToSearchEx()
+		async void AddTagToSearchEx()
 		{
-			parentVM?.CurrentTags.Add(new TagViewModel(tag, parentVM));
+			parentVM?.CurrentTags.Add(new TagViewModel(Tag, parentVM));
 			parentVM?.RaisePropertyChanged("TotalTagCount");
 		}
 
@@ -121,13 +147,13 @@ namespace Booru_Viewer.ViewModels
 
 		void AddPrefixEx(string prefix)
 		{
-			if (prefix[0] == tag[0])
+			if (prefix[0] == Name[0])
 			{
-				Tag = tag.Replace("~", "").Replace("-", "");
+				Name = Name.Replace("~", "").Replace("-", "");
 				return;
 			}
-			Tag = tag.Replace("~", "").Replace("-", "");
-			Tag = tag.Insert(0, prefix);
+			Name = Name.Replace("~", "").Replace("-", "");
+			Name = Name.Insert(0, prefix);
 		}
 		public ICommand SelectedTag => new RelayCommand(() => { Selected = (Selected == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible); RaisePropertyChanged("Selected"); });
 		public ICommand AddPrefix => new RelayCommand<string>(AddPrefixEx);
@@ -141,7 +167,7 @@ namespace Booru_Viewer.ViewModels
 		{
 			if (obj != null && obj.GetType() == typeof(TagViewModel))
 			{
-				return String.Compare(tag, ((TagViewModel)obj).tag, StringComparison.CurrentCultureIgnoreCase);
+				return String.Compare(Name, ((TagViewModel)obj).Name, StringComparison.CurrentCultureIgnoreCase);
 			}
 			return 1;
 		}

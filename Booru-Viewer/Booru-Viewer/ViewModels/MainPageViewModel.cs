@@ -20,7 +20,6 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Booru_Viewer.Models;
 using Microsoft.Toolkit.Uwp;
-using Microsoft.Toolkit.Uwp.Helpers;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Newtonsoft.Json;
 
@@ -117,7 +116,16 @@ namespace Booru_Viewer.ViewModels
 				{
 					foreach (var tag in GlobalInfo.FavouriteTags)
 					{
-						favouriteTags.Add(new TagViewModel(tag, this));
+						favouriteTags.First(x => x.Key == tag.category).Add(new TagViewModel(tag, this));
+						
+					}
+					foreach (GroupInfoList t1 in favouriteTags)
+					{
+						var tagList = t1;
+						var result = from t in tagList
+							orderby t.Name
+							select t;
+						tagList = new GroupInfoList(result.ToList());
 					}
 					RaisePropertyChanged("FavouriteTags");
 					RaisePropertyChanged("DontHaveSavedSearches");
@@ -374,17 +382,26 @@ namespace Booru_Viewer.ViewModels
 			}
 		}
 
-		private ObservableCollection<TagViewModel> favouriteTags = new ObservableCollection<TagViewModel>();
+		private ObservableCollection<GroupInfoList> favouriteTags = new ObservableCollection<GroupInfoList>();
 
-		public ObservableCollection<TagViewModel> FavouriteTags
+		public ObservableCollection<GroupInfoList> FavouriteTags
 		{
 			get
 			{
 				favouriteTags.Clear();
+				favouriteTags.Add(new GroupInfoList { Key = TagType.General });
+				favouriteTags.Add(new GroupInfoList { Key = TagType.Artist });
+				favouriteTags.Add(new GroupInfoList { Key = TagType.Character });
+				favouriteTags.Add(new GroupInfoList { Key = TagType.Copyright });
+				favouriteTags.Add(new GroupInfoList { Key = TagType.Unknown });
 
 				foreach (var search in GlobalInfo.FavouriteTags)
 				{
-					favouriteTags.Add(new TagViewModel(search, this));
+					favouriteTags.First(x => x.Key == search.category).Add(new TagViewModel(search, this));
+				}
+				foreach (var tagList in favouriteTags)
+				{
+					tagList.Sort();
 				}
 				RaisePropertyChanged("DontHaveSavedSearches");
 				return favouriteTags;
@@ -575,7 +592,7 @@ namespace Booru_Viewer.ViewModels
 
 		public Visibility IsFavButtonVisible => Username != "" && APIKey != "" ? Visibility.Visible : Visibility.Collapsed;
 
-		public bool DontHaveSavedSearches => FavouriteTags.Count == 0;
+		public bool DontHaveSavedSearches => FavouriteTags.All(x => x.Count == 0);
 
 		private int selectedSavedSearch = 0;
 
@@ -624,7 +641,7 @@ namespace Booru_Viewer.ViewModels
 			{
 				prefix = Prefixes[selectedPrefixIndex];
 			}
-			CurrentTags.Add(new TagViewModel(prefix + CurrentTag.Trim().ToLower(), this));
+			CurrentTags.Add(new TagViewModel(new Tag(prefix + CurrentTag.Trim().ToLower()), this));
 			CurrentTag = "";
 			suggestedTagIndex = -1;
 			SuggestedTags.Clear();
@@ -717,9 +734,9 @@ namespace Booru_Viewer.ViewModels
 				var i = 0;
 				foreach (var tag in tagModels)
 				{
-					if (!string.IsNullOrEmpty(tag.Tag))
+					if (!string.IsNullOrEmpty(tag.Name))
 					{
-						tags[i] = tag.Tag.Replace(" ", "_") + " ";
+						tags[i] = tag.Name.Replace(" ", "_") + " ";
 					}
 					i++;
 				}
@@ -769,7 +786,7 @@ namespace Booru_Viewer.ViewModels
 			{
 				for (int i = 0; i < tags.Length; i++)
 				{
-					tags[i] = CurrentTags[i].Tag;
+					tags[i] = CurrentTags[i].Name;
 				}
 				var count = SavedSearches.Count;
 				GlobalInfo.SavedSearches.Add(tags);
@@ -789,7 +806,7 @@ namespace Booru_Viewer.ViewModels
 
 			foreach (var tag in tags)
 			{
-				CurrentTags.Add(new TagViewModel(tag, this));
+				CurrentTags.Add(new TagViewModel(new Tag(tag), this));
 			}
 			RaisePropertyChanged("CurrentTags");
 			StartSearchExecute();
@@ -1022,7 +1039,7 @@ namespace Booru_Viewer.ViewModels
 		}
 
 		private int currentImageSaveIndex = 0;
-		 
+
 		public int CurrentImageSaveIndex
 		{
 			get => currentImageSaveIndex;
@@ -1048,8 +1065,8 @@ namespace Booru_Viewer.ViewModels
 				return;
 			}
 			ImageSaver.ImageFinishedSavingEvent += ImageFinishedSave;
-			
-			ImageSaver.SaveImagesFromList(imageList.Select(x=> (x as FullImageViewModel).FullImageURL).ToList());
+
+			ImageSaver.SaveImagesFromList(imageList.Select(x => (x as FullImageViewModel).FullImageURL).ToList());
 			IsSavingImages = false;
 			RaisePropertyChanged("IsSavingImages");
 		}

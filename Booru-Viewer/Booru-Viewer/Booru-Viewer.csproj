@@ -113,6 +113,7 @@
     <Compile Include="Types\CountToVisibilityConverter.cs" />
     <Compile Include="Types\GlobalInfo.cs" />
     <Compile Include="Models\ImageModel.cs" />
+    <Compile Include="Types\GroupInfoList.cs" />
     <Compile Include="Types\ImageSaver.cs" />
     <Compile Include="Types\PostSource.cs" />
     <Compile Include="ViewModels\FullImageViewModel.cs" />
@@ -220,7 +221,14 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

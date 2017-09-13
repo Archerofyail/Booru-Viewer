@@ -24,10 +24,6 @@ namespace Booru_Viewer.ViewModels
 			Width = width;
 			Height = height;
 			WebsiteURL = websiteURL;
-			if (saveImageCommand != null)
-			{
-				this.saveImageCommand = saveImageCommand;
-			}
 		}
 
 		public ICommand SaveImage => new RelayCommand(SaveImageExec);

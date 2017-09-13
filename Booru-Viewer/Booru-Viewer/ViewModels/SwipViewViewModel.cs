@@ -10,6 +10,7 @@ using Windows.Storage;
 using Windows.System;
 using Windows.UI.Notifications;
 using Windows.UI.Xaml.Controls;
+using Booru_Viewer.Models;
 using Microsoft.Toolkit.Uwp;
 using Microsoft.Toolkit.Uwp.Notifications;
 
@@ -77,22 +78,22 @@ namespace Booru_Viewer.ViewModels
 					GeneralTags.Clear();
 					foreach (var tag in genTags)
 					{
-						GeneralTags.Add(new TagViewModel(tag));
+						GeneralTags.Add(new TagViewModel(new Tag(tag)));
 					}
 					CharacterTags.Clear();
 					foreach (var tag in charTags)
 					{
-						CharacterTags.Add(new TagViewModel(tag));
+						CharacterTags.Add(new TagViewModel(new Tag(tag)));
 					}
 					ArtistTags.Clear();
 					foreach (var tag in artistTags)
 					{
-						ArtistTags.Add(new TagViewModel(tag));
+						ArtistTags.Add(new TagViewModel(new Tag(tag)));
 					}
 					CopyrightTags.Clear();
 					foreach (var tag in copyTags)
 					{
-						CopyrightTags.Add(new TagViewModel(tag));
+						CopyrightTags.Add(new TagViewModel(new Tag(tag)));
 					}
 
 				}
@@ -125,22 +126,22 @@ namespace Booru_Viewer.ViewModels
 					RaisePropertyChanged("CharacterTags");
 					foreach (var tag in genTags)
 					{
-						GeneralTags.Add(new TagViewModel(tag));
+						GeneralTags.Add(new TagViewModel(new Tag(tag)));
 					}
 
 					foreach (var tag in charTags)
 					{
-						CharacterTags.Add(new TagViewModel(tag));
+						CharacterTags.Add(new TagViewModel(new Tag(tag)));
 					}
 
 					foreach (var tag in artistTags)
 					{
-						ArtistTags.Add(new TagViewModel(tag));
+						ArtistTags.Add(new TagViewModel(new Tag(tag)));
 					}
 
 					foreach (var tag in copyTags)
 					{
-						CopyrightTags.Add(new TagViewModel(tag));
+						CopyrightTags.Add(new TagViewModel(new Tag(tag)));
 					}
 
 					if (favourites.Contains("fav:" + BooruAPI.UserModel.ID))

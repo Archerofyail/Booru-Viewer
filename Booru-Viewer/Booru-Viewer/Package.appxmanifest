@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
-  <Identity Name="53562ScottDaniels.BooruViewer" Publisher="CN=102635D7-A2F0-4BA1-855A-F0B7D060F5D4" Version="1.4.2.0" />
-  <mp:PhoneIdentity PhoneProductId="1eb33852-f711-4afd-af5b-3ac2053303d5" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
+  <Identity Name="Archerofyail.BooruViewer" Publisher="CN=102635D7-A2F0-4BA1-855A-F0B7D060F5D4" Version="1.5.0.0" />
+  <mp:PhoneIdentity PhoneProductId="f1eb607a-bbe2-4302-b41d-c4e9dd4ae8a1" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>Booru Viewer</DisplayName>
     <PublisherDisplayName>Archerofyail</PublisherDisplayName>

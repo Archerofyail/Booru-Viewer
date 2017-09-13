@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Storage;
+using Booru_Viewer.Models;
 using Microsoft.Toolkit.Uwp;
 using Newtonsoft.Json;
 
@@ -29,14 +30,14 @@ namespace Booru_Viewer.Types
 
 		private static ObservableCollection<string[]> savedSearches;
 
-		private static ObservableCollection<string> favouriteTags;
-		public static ObservableCollection<string> FavouriteTags
+		private static ObservableCollection<Tag> favouriteTags;
+		public static ObservableCollection<Tag> FavouriteTags
 		{
 			get
 			{
 				if (favouriteTags == null)
 				{
-					favouriteTags = new ObservableCollection<string>();
+					favouriteTags = new ObservableCollection<Tag>();
 					LoadFavouriteTags();
 				}
 				return favouriteTags;
@@ -145,7 +146,7 @@ namespace Booru_Viewer.Types
 					savedSearches.Clear();
 					foreach (var search in searchList)
 					{
-						
+
 						savedSearches.Add(search);
 					}
 				}
@@ -163,7 +164,7 @@ namespace Booru_Viewer.Types
 			SavedSearchesLoadedEventHandler?.Invoke(typeof(GlobalInfo), EventArgs.Empty);
 		}
 
-		public static async Task<ObservableCollection<string>> GetFavouriteTags()
+		public static async Task<ObservableCollection<Tag>> GetFavouriteTags()
 		{
 			await LoadFavouriteTags();
 			return favouriteTags;
@@ -264,13 +265,19 @@ namespace Booru_Viewer.Types
 			var json = await FileIO.ReadTextAsync(SearchesFile);
 			try
 			{
-				var searchList = JsonConvert.DeserializeObject<List<string>>(json);
+				var searchList = JsonConvert.DeserializeObject<List<Tag>>(json, new JsonSerializerSettings
+				{
+					Error = (sender, args) =>
+					{
+						args.ErrorContext.Handled = true;
+					}
+				});
 				if (searchList != null)
 				{
 					favouriteTags.Clear();
 					foreach (var search in searchList)
 					{
-						var tag = search.ToLower();
+						var tag = search;
 						favouriteTags.Add(tag);
 					}
 				}

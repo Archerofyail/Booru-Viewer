@@ -131,9 +131,12 @@ namespace Booru_Viewer.Types
 
 				if (img.File_Url == null && img.Preview_File_Url == null && img.Large_File_Url == null)
 				{ continue; }
-
+				if (!img.Preview_File_Url.Contains("amazonaws"))
+				{
+					img.Preview_File_Url = img.Preview_File_Url?.Insert(0, BaseURL);
+					
+				}
 				img.File_Url = img.File_Url?.Insert(0, BaseURL);
-				img.Preview_File_Url = img.Preview_File_Url?.Insert(0, BaseURL);
 				img.Large_File_Url = img.Large_File_Url?.Insert(0, BaseURL);
 				GlobalInfo.CurrentSearch.Add(img);
 				index++;
@@ -246,6 +249,31 @@ namespace Booru_Viewer.Types
 			}
 
 			return true;
+		}
+
+		public static async Task<Tag> GetTagInfo(string tagName)
+		{
+			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(new[]
+			{
+				new KeyValuePair<string, string>("search[name]",tagName.Replace(" ", "_")), 
+			});
+			var requestURI = BaseURL + "/tags.json?" + content.ToString();
+			var response = await (booruClient.GetAsync(new Uri(requestURI)));
+			if (response == null)
+			{
+				return null;
+			}
+			var json = await response.Content.ReadAsStringAsync();
+			var tag = JsonConvert.DeserializeObject<List<Tag>>(json, new JsonSerializerSettings{Error = (sender, args) =>
+			{
+				Debug.WriteLine(args.ErrorContext.Error.Message);
+				args.ErrorContext.Handled = true;
+			}});
+			if (tag.Count >= 1)
+			{
+				return tag[0];
+			}
+			return null;
 		}
 
 		public static async Task<bool> UnfavouriteImage(ImageModel im)

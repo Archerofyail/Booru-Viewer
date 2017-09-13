@@ -7,13 +7,14 @@ using Windows.UI.Xaml.Navigation;
 using Booru_Viewer.Types;
 using System.Diagnostics;
 using System.Linq;
+using Windows.Foundation.Collections;
 using Windows.Storage;
 using Windows.UI.Core;
+using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media;
 using Booru_Viewer.ViewModels;
 using Booru_Viewer.Views;
 using Microsoft.Toolkit.Uwp.UI.Controls;
-using Microsoft.Toolkit.Uwp.UI.Extensions;
 using ListViewBase = Windows.UI.Xaml.Controls.ListViewBase;
 
 
@@ -49,10 +50,10 @@ namespace Booru_Viewer
 			SearchButton.Loaded += (sender, args) => { SearchButton.CommandParameter = SearchAppBarButton; };
 			SearchFavouritesButton.Loaded += (sender, args) => { SearchButton.CommandParameter = SearchAppBarButton; };
 
-			SavedSearchesList.Loaded += (sender, args) =>
-			{
-				SavedSearchesList.GetBindingExpression(ListView.ItemsSourceProperty).UpdateSource();
-			};
+			//SavedSearchesList.Loaded += (sender, args) =>
+			//{
+			//	SavedSearchesList.GetBindingExpression(ListView.ItemsSourceProperty).UpdateSource();
+			//};
 			Loaded += (sender, args) =>
 			{
 				ViewModel = DataContext as MainPageViewModel;
@@ -137,7 +138,6 @@ namespace Booru_Viewer
 					UnlockExplicitContentButton.Visibility = Visibility.Visible;
 				}
 			};
-
 		}
 
 
