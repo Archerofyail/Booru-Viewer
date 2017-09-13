@@ -9,9 +9,9 @@ namespace Booru_Viewer.Types
 		public object Convert(object value, Type targetType, object parameter, string language)
 		{
 			int count = 0;
-			if (value is int)
+			if (value is int i)
 			{
-				count = (int) value;
+				count = i;
 			}
 			return count == 0 ? Visibility.Collapsed : Visibility.Visible;
 		}

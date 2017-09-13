@@ -419,5 +419,10 @@ namespace Booru_Viewer
 		{
 			await ConfirmAgeDialog.ShowAsync();
 		}
+
+		private void NoImagestextSizeChanged(object sender, SizeChangedEventArgs e)
+		{
+			Debug.WriteLine("no image text visibility is " + (sender as TextBlock).Visibility);
+		}
 	}
 }

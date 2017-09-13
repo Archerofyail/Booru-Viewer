@@ -117,14 +117,14 @@ namespace Booru_Viewer.ViewModels
 					foreach (var tag in GlobalInfo.FavouriteTags)
 					{
 						favouriteTags.First(x => x.Key == tag.category).Add(new TagViewModel(tag, this));
-						
+
 					}
 					foreach (GroupInfoList t1 in favouriteTags)
 					{
 						var tagList = t1;
 						var result = from t in tagList
-							orderby t.Name
-							select t;
+									 orderby t.Name
+									 select t;
 						tagList = new GroupInfoList(result.ToList());
 					}
 					RaisePropertyChanged("FavouriteTags");
@@ -544,7 +544,7 @@ namespace Booru_Viewer.ViewModels
 
 		public bool DontHaveImages
 		{
-			get => dontHaveImages;
+			get => Thumbnails.Count == 0;
 			private set
 			{
 				dontHaveImages = value;
@@ -694,7 +694,6 @@ namespace Booru_Viewer.ViewModels
 			}
 			else
 			{
-				NoImagesText = "";
 				DontHaveImages = false;
 				IsLoading = false;
 			}

@@ -288,11 +288,12 @@
 			</controls:AdaptiveGridView.Resources>
 		</controls:AdaptiveGridView>
 		<TextBlock Text="{Binding NoImagesText}"
-				   Visibility="{Binding Items.Count,ElementName=ImageGridView, Converter={StaticResource CountToVisibilityConverter}}"
+				   Visibility="{Binding DontHaveImages}"
 				   TextWrapping="WrapWholeWords"
 				   VerticalAlignment="Center"
 				   HorizontalAlignment="Center"
-				   Grid.Row="1" />
+				   Grid.Row="1" 
+				   SizeChanged="NoImagestextSizeChanged"/>
 
 
 		<Button VerticalAlignment="Bottom"
