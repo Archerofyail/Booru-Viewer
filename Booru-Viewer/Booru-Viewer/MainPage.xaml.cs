@@ -161,19 +161,13 @@ namespace Booru_Viewer
 
 		private void ImageGridView_OnItemClick(object sender, ItemClickEventArgs e)
 		{
-			var grid = sender as GridView;
-			if (grid != null)
+			if (sender is GridView grid)
 			{
 				var index = grid.Items.IndexOf(e.ClickedItem);
 				Debug.WriteLine("Index is " + index);
 				GlobalInfo.SelectedImage = index;
 				Frame.Navigate(typeof(SwipeView));
 			}
-		}
-
-		private void SearchClicked(object sender, RoutedEventArgs e)
-		{
-
 		}
 
 		private void AddTagClicked(object sender, RoutedEventArgs e)
@@ -423,6 +417,16 @@ namespace Booru_Viewer
 		private void NoImagestextSizeChanged(object sender, SizeChangedEventArgs e)
 		{
 			Debug.WriteLine("no image text visibility is " + (sender as TextBlock).Visibility);
+		}
+
+		private async void SearchButtonClicked(object sender, RoutedEventArgs e)
+		{
+			await SearchDialog.ShowAsync();
+		}
+
+		private void SearchClicked(object sender, RoutedEventArgs e)
+		{
+			SearchDialog.Hide();
 		}
 	}
 }
