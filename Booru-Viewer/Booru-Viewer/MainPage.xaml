@@ -149,14 +149,14 @@
 							VerticalAlignment="Stretch">
 						<SymbolIcon Symbol="Add" />
 					</Button>
-					<Button Command="{Binding StartSearchFromFavourite, Mode=TwoWay}"
+					<!--<Button Command="{Binding StartSearchFromFavourite, Mode=TwoWay}"
 							CommandParameter="{x:Bind Name}"
 							Background="#FF7C7C7C"
 							Margin="4, 0, 0, 0"
 							BorderThickness="1"
 							VerticalAlignment="Stretch">
 						<SymbolIcon Symbol="Find" />
-					</Button>
+					</Button>-->
 				</StackPanel>
 			</DataTemplate>
 			<DataTemplate x:Key="SavedSearch">
@@ -317,7 +317,7 @@
 					   Grid.Column="0"
 					   Name="SearchDialog"
 					   HorizontalAlignment="Stretch"
-					   VerticalAlignment="Stretch">
+					   VerticalAlignment="Top">
 			<StackPanel>
 				<ScrollViewer MaxHeight="600">
 					<StackPanel>

@@ -288,7 +288,7 @@ namespace Booru_Viewer
 		{
 			var img = sender as ImageEx;
 			img.SetValue(ImageEx.SourceProperty, img.Source);
-			Debug.WriteLine("Failed to open " + (sender as ImageEx).Source + ".\nError message: " + e.ErrorMessage + ".\nException: " + e.ErrorException);
+			Debug.WriteLine("Failed to open " + (sender as ImageEx).Source + ".\nError message: " + e.ErrorMessage + ". \nException: " + e.ErrorException.Message);
 		}
 
 		private void PerPageSlider_OnLoaded(object sender, RoutedEventArgs e)

@@ -108,7 +108,9 @@
 									  HorizontalScrollMode="Auto"
 									  VerticalScrollMode="Auto"
 									  HorizontalScrollBarVisibility="Auto"
-									  VerticalScrollBarVisibility="Auto">
+									  VerticalScrollBarVisibility="Auto"
+									  BorderBrush="Orange"
+									  BorderThickness="1">
 							<controls:ImageEx RenderTransformOrigin="0.5,0.5"
 											  PlaceholderSource="../Assets/Placeholder.png"
 											  PlaceholderStretch="Uniform"
@@ -116,11 +118,15 @@
 											  IsCacheEnabled="False"
 											  Source="{Binding FullImageURL}"
 											  MaxHeight="{Binding ViewportHeight, ElementName=ImageScrollViewer}"
-							                  MaxWidth="{Binding ViewportWidth, ElementName=ImageScrollViewer}">
-								<controls:ImageEx.RenderTransform>
+							                  MaxWidth="{Binding ViewportWidth, ElementName=ImageScrollViewer}"
+							                  BorderBrush="Fuchsia"
+							                  BorderThickness="1"
+											  VerticalAlignment="Center"
+											  HorizontalAlignment="Center">
+								<!--<controls:ImageEx.RenderTransform>
 									<CompositeTransform TranslateX="0.5"
 														TranslateY="0.5" />
-								</controls:ImageEx.RenderTransform>
+								</controls:ImageEx.RenderTransform>-->
 
 
 							</controls:ImageEx>
