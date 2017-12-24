@@ -10,6 +10,7 @@ using Windows.Storage;
 using System.Diagnostics;
 using System.Linq;
 using Windows.ApplicationModel;
+using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage.AccessCache;
 using Windows.Storage.Pickers;
@@ -876,9 +877,16 @@ namespace Booru_Viewer.ViewModels
 		{
 			await b.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
 			{
-				FolderPicker picker = new FolderPicker { CommitButtonText = "Select" };
 
+				FolderPicker picker = new FolderPicker
+				{
+					SuggestedStartLocation = PickerLocationId.PicturesLibrary,
+					FileTypeFilter = { "*"}
+				};
+
+				
 				var folder = await picker.PickSingleFolderAsync();
+				
 				if (folder != null)
 				{
 

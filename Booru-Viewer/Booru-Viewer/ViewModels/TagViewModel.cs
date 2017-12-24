@@ -25,7 +25,7 @@ namespace Booru_Viewer.ViewModels
 
 		public TagViewModel(Tag tag)
 		{
-			Tag = tag;
+			Tag = new Tag(tag.Name.Substring(0), tag.category);
 		}
 
 		public TagViewModel()
@@ -91,8 +91,9 @@ namespace Booru_Viewer.ViewModels
 
 		async void FavouriteTagEx()
 		{
-			if (!IsFavourite)
+			if (!IsFavourite && GlobalInfo.FavouriteTags.All(x => x.Name.Replace("~", "").Replace("-","") != Tag.Name.Replace("~", "").Replace("-", "")))
 			{
+
 				if (Tag.category == TagType.Unknown || Tag.category == TagType.General)
 				{
 					var taginf = (await BooruAPI.GetTagInfo(Tag.Name));
@@ -101,6 +102,7 @@ namespace Booru_Viewer.ViewModels
 						Tag.Category = taginf.category;
 					}
 				}
+				
 				GlobalInfo.FavouriteTags.Add(Tag);
 
 				parentVM?.FavouriteTags.First(x => x.Key == Tag.category).Add(this);

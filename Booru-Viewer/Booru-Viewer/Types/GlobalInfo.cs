@@ -146,7 +146,7 @@ namespace Booru_Viewer.Types
 					savedSearches.Clear();
 					foreach (var search in searchList)
 					{
-
+						
 						savedSearches.Add(search);
 					}
 				}
@@ -278,6 +278,7 @@ namespace Booru_Viewer.Types
 					foreach (var search in searchList)
 					{
 						var tag = search;
+						tag.Name = tag.Name.Replace("~", "").Replace("-", "");
 						favouriteTags.Add(tag);
 					}
 				}
