@@ -136,8 +136,17 @@ namespace Booru_Viewer.Types
 					img.Preview_File_Url = img.Preview_File_Url?.Insert(0, BaseURL);
 					
 				}
-				img.File_Url = img.File_Url?.Insert(0, BaseURL);
-				img.Large_File_Url = img.Large_File_Url?.Insert(0, BaseURL);
+
+				if (img.File_Url != null && !img.File_Url.StartsWith("http"))
+				{
+					img.File_Url = img.File_Url?.Insert(0, BaseURL);
+				}
+				
+				if (img.File_Url != null && !img.Large_File_Url.StartsWith("http"))
+				{
+					img.Large_File_Url = img.Large_File_Url?.Insert(0, BaseURL);
+				}
+				
 				GlobalInfo.CurrentSearch.Add(img);
 				index++;
 			}

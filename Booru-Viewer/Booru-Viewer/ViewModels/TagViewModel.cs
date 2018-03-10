@@ -91,7 +91,7 @@ namespace Booru_Viewer.ViewModels
 
 		async void FavouriteTagEx()
 		{
-			if (!IsFavourite && GlobalInfo.FavouriteTags.All(x => x.Name.Replace("~", "").Replace("-","") != Tag.Name.Replace("~", "").Replace("-", "")))
+			if (!IsFavourite && GlobalInfo.FavouriteTags.All(x => x.Name.TrimStart('~','-') != Tag.Name.TrimStart('~','-')))
 			{
 
 				if (Tag.category == TagType.Unknown || Tag.category == TagType.General)
@@ -151,10 +151,10 @@ namespace Booru_Viewer.ViewModels
 		{
 			if (prefix[0] == Name[0])
 			{
-				Name = Name.Replace("~", "").Replace("-", "");
+				Name = Name.TrimStart('~', '-');
 				return;
 			}
-			Name = Name.Replace("~", "").Replace("-", "");
+			Name = Name.TrimStart('-', '~');
 			Name = Name.Insert(0, prefix);
 		}
 		public ICommand SelectedTag => new RelayCommand(() => { Selected = (Selected == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible); RaisePropertyChanged("Selected"); });

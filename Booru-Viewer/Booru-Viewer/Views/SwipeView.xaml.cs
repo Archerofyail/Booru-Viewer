@@ -81,6 +81,12 @@ namespace Booru_Viewer.Views
 		private void ImageEx_OnImageExFailed(object sender, ImageExFailedEventArgs e)
 		{
 			Debug.WriteLine("Failed to open image: " + e.ErrorMessage);
+			if (sender is ImageEx img)
+			{
+				var source = img.Source;
+				img.Source = "";
+				img.Source = source;
+			}
 		}
 
 		private void BitmapImage_OnImageOpened(object sender, RoutedEventArgs e)
