@@ -16,12 +16,12 @@ using Microsoft.Toolkit.Uwp.Notifications;
 
 namespace Booru_Viewer.ViewModels
 {
-	class SwipViewViewModel : ViewModelBase
+	class SwipeViewViewModel : ViewModelBase
 	{
 
 		private int perPage = 20;
 
-		public SwipViewViewModel()
+		public SwipeViewViewModel()
 		{
 			var settings = ApplicationData.Current.RoamingSettings.Values;
 			if (settings["PerPage"] != null)

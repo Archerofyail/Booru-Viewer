@@ -50,10 +50,6 @@ namespace Booru_Viewer
 			SearchButton.Loaded += (sender, args) => { SearchButton.CommandParameter = SearchAppBarButton; };
 			SearchFavouritesButton.Loaded += (sender, args) => { SearchButton.CommandParameter = SearchAppBarButton; };
 
-			//SavedSearchesList.Loaded += (sender, args) =>
-			//{
-			//	SavedSearchesList.GetBindingExpression(ListView.ItemsSourceProperty).UpdateSource();
-			//};
 			Loaded += (sender, args) =>
 			{
 				ViewModel = DataContext as MainPageViewModel;
@@ -62,7 +58,6 @@ namespace Booru_Viewer
 			{
 				ImageGridView.RightTapped += (o, eventArgs) =>
 				{
-					//ImageContextFlyout.ShowAt(o as UIElement, eventArgs.GetPosition(null));
 					eventArgs.Handled = false;
 					var elements = VisualTreeHelper.FindElementsInHostCoordinates(eventArgs.GetPosition(o as UIElement), ImageGridView);
 					var imageView = elements.First((x) => x.GetType() == typeof(ImageEx)) as ImageEx;
@@ -311,7 +306,7 @@ namespace Booru_Viewer
 			sender.Hide();
 		}
 
-		
+
 
 		private void TagTextBox_OnSuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
 		{
@@ -370,7 +365,7 @@ namespace Booru_Viewer
 		private void ImageContextMenuSelectClick(object sender, RoutedEventArgs e)
 		{
 			var imageViewModel = (sender as FrameworkElement).DataContext as FullImageViewModel;
-			
+
 			MultiSelectButtonTapped(SelectButton, new RoutedEventArgs());
 			ImageGridView.SelectedItems.Add(imageViewModel);
 
@@ -379,7 +374,7 @@ namespace Booru_Viewer
 		private void SaveButton_OnClick(object sender, RoutedEventArgs e)
 		{
 			ViewModel.SaveSelectedImages.Execute(ImageGridView.SelectedItems);
-			
+
 			SelectAllButton.Visibility = Visibility.Collapsed;
 			SaveButton.Visibility = Visibility.Collapsed;
 			isMultiSelectEnabled = false;
