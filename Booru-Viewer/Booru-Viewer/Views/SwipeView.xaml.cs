@@ -83,10 +83,9 @@ namespace Booru_Viewer.Views
 			Debug.WriteLine("Failed to open image: " + e.ErrorMessage);
 			if (sender is ImageEx img)
 			{
-				//var source = img.Source as string;
-				//source = source?.ToLower()?.Replace("danbooru", "hijiribe");
-				//img.Source = "";
-				//img.Source = source;
+				var source = img.Source;
+				img.Source = "";
+				img.Source = source;
 			}
 		}
 

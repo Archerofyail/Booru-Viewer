@@ -51,8 +51,22 @@
 									<x:Boolean>True</x:Boolean>
 								</MenuFlyoutItem.CommandParameter>
 							</MenuFlyoutItem>
+							<!--<MenuFlyoutItem Text="Select"
+											Command="{Binding EnableMultiSelect}"/>-->
 						</MenuFlyout>
 					</controls:ImageEx.ContextFlyout>
+					<controls:ImageEx.Resources>
+
+					</controls:ImageEx.Resources>
+
+					<!--<i:Interaction.Behaviors>
+						<core:EventTriggerBehavior EventName="RightTapped" x:Name="RightTappedEventBehavior"
+												   >
+							<core:InvokeCommandAction Command="{Binding ElementName=Page, Path=DataContext.ImageContextOpened}"
+							                          CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=SourceObject}"
+							/>
+						</core:EventTriggerBehavior>
+					</i:Interaction.Behaviors>-->
 				</controls:ImageEx>
 			</DataTemplate>
 			<DataTemplate x:Name="Tag">
@@ -357,7 +371,7 @@
 									   Visibility="{Binding DontHaveSavedSearches}" />
 						</StackPanel>
 
-
+						
 					</StackPanel>
 				</ScrollViewer>
 				<StackPanel Orientation="Vertical"
@@ -510,7 +524,10 @@
 					<core:InvokeCommandAction Command="{Binding ImageContextOpened}"></core:InvokeCommandAction>
 				</core:EventTriggerBehavior>
 			</i:Interaction.Behaviors>
+			<controls:AdaptiveGridView.Resources>
 
+
+			</controls:AdaptiveGridView.Resources>
 		</controls:AdaptiveGridView>
 		<TextBlock Text="{Binding NoImagesText}"
 				   Visibility="{Binding DontHaveImages}"
@@ -561,7 +578,7 @@
 			</Button.Content>
 		</Button>
 
-		<controls:Loading IsLoading="{Binding IsSavingImages}"
+		<!--<controls:Loading IsLoading="{Binding IsSavingImages}"
 						  Background="#99FFFFFF"
 						  HorizontalAlignment="Stretch"
 						  VerticalAlignment="Stretch"
@@ -582,7 +599,7 @@
 							 Margin="60, 0"
 							 Width="240"></ProgressBar>
 			</StackPanel>
-		</controls:Loading>
+		</controls:Loading>-->
 		<VisualStateManager.VisualStateGroups>
 			<VisualStateGroup>
 				<VisualState x:Name="Below640">
@@ -630,7 +647,179 @@
 							  Icon="Find"
 							  Name="SearchAppBarButton"
 							  Click="SearchButtonClicked">
-					
+					<!--<AppBarButton.Flyout>
+						--><!--<Flyout x:Name="SearchFlyout">
+
+							<Flyout.FlyoutPresenterStyle>
+								<Style TargetType="FlyoutPresenter"
+									   x:Name="SearchFlyoutStyle">
+									<Setter Property="ScrollViewer.HorizontalScrollMode"
+											Value="Disabled" />
+									<Setter Property="ScrollViewer.HorizontalScrollBarVisibility"
+											Value="Disabled" />
+								
+									<Setter Property="VerticalAlignment"
+											Value="Stretch" />
+								</Style>
+							</Flyout.FlyoutPresenterStyle>
+							<StackPanel Orientation="Vertical">
+								<StackPanel Margin="0, 0, 12, 0"
+											MinHeight="200">
+									<TextBlock Text="Favourite Tags" />
+									<ListView ItemsSource="{Binding Source={StaticResource FavouriteTagsGroupedList}}"
+											  ItemTemplate="{StaticResource FavouriteTag}"
+											  SelectionChanged="SavedSearchSelection"
+											  SelectedIndex="{Binding SelectedSavedSearch, Mode=TwoWay}"
+											  Name="SavedSearchesList"
+											  ItemContainerStyle="{StaticResource TagStyleNoMargin}"
+											  IsItemClickEnabled="False"
+											  SelectionMode="None"
+											  ItemClick="SavedSearchesList_OnItemClick"
+											  ReorderMode="Enabled"
+											  CanReorderItems="True"
+											  AllowDrop="True"
+											  DragItemsCompleted="SavedSearchesList_OnDragItemsCompleted"
+											  MaxHeight="500">
+										<ListView.GroupStyle>
+											<GroupStyle>
+												<GroupStyle.HeaderTemplate>
+													<DataTemplate>
+														<StackPanel>
+															<TextBlock Text="{Binding Key}"
+																	   FontSize="14"
+																	   Margin="0" />
+															<Line HorizontalAlignment="Stretch"
+																  Margin="0" />
+														</StackPanel>
+													</DataTemplate>
+												</GroupStyle.HeaderTemplate>
+											</GroupStyle>
+										</ListView.GroupStyle>
+									</ListView>
+									<TextBlock Text="You have no favourite tags yet"
+											   FontSize="12"
+											   Visibility="{Binding DontHaveSavedSearches}" />
+								</StackPanel>
+								<StackPanel Orientation="Vertical"
+											MaxWidth="350">
+									<TextBlock Text="Add tags"></TextBlock>
+									<StackPanel Orientation="Horizontal">
+										<AutoSuggestBox PlaceholderText="Tag"
+														Name="TagTextBox"
+														MinWidth="260"
+														Text="{Binding CurrentTag, Mode=TwoWay, 
+														UpdateSourceTrigger=PropertyChanged}"
+														TextChanged="TagTextBox_TextChanged"
+														AllowFocusOnInteraction="True"
+														KeyUp="TagTextBox_KeyUp"
+														ItemsSource="{Binding SuggestedTags}"
+														UpdateTextOnSelect="False"
+														VerticalAlignment="Center"
+														SuggestionChosen="TagTextBox_OnSuggestionChosen">
+											<AutoSuggestBox.TextBoxStyle>
+												<Style TargetType="TextBox">
+													<Setter Property="IsTextPredictionEnabled"
+															Value="False" />
+												</Style>
+											</AutoSuggestBox.TextBoxStyle>
+										</AutoSuggestBox>
+
+										<Button Name="AddTagButton"
+												Margin="4, 0, 0, 0"
+												Background="{StaticResource ThemeBrush}"
+												Foreground="White"
+												Click="AddTagClicked"
+												Command="{Binding AddTag}">
+											<Button.Content>
+												<SymbolIcon>Add</SymbolIcon>
+											</Button.Content>
+										</Button>
+
+									</StackPanel>
+
+									<StackPanel Orientation="Horizontal"
+												Margin="0, 4">
+										<Button Command="{Binding DecrementPage}"
+												Margin="4, 0, 2, 0">
+											<Button.Content>
+												<StackPanel>
+													<SymbolIcon Symbol="Remove" />
+												</StackPanel>
+											</Button.Content>
+										</Button>
+										<TextBox Text="{Binding PageNum, Mode=TwoWay}"
+												 HorizontalAlignment="Left"
+												 Margin="4, 0"
+												 PlaceholderText="Page"
+												 AllowFocusOnInteraction="True"
+												 Name="StartPageTextBox"
+												 InputScope="Number" />
+
+										<Button Command="{Binding IncrementPage}"
+												Margin="2, 0, 4, 0">
+											<Button.Content>
+												<StackPanel>
+													<SymbolIcon Symbol="Add" />
+												</StackPanel>
+											</Button.Content>
+										</Button>
+										<ComboBox ItemsSource="{Binding OrderOptions}"
+												  SelectedIndex="{Binding SelectedOrderIndex, Mode=TwoWay}"
+												  AllowFocusOnInteraction="True"
+												  PlaceholderText="Order by" />
+									</StackPanel>
+									<ListView ItemsSource="{Binding CurrentTags, Mode=TwoWay}"
+											  ItemTemplate="{StaticResource Tag}"
+											  MinHeight="20"
+											  SelectionMode="None"
+											  ItemContainerStyle="{StaticResource TagStyleNoMargin}"
+											  HorizontalContentAlignment="Left"
+											  MaxWidth="{Binding ElementName=RootGrid, Path=ActualWidth}"
+											  Name="CurrentTagsList">
+										<ListView.ItemsPanel>
+											<ItemsPanelTemplate>
+												<controls:WrapPanel Orientation="Horizontal" />
+											</ItemsPanelTemplate>
+										</ListView.ItemsPanel>
+									</ListView>
+									<StackPanel Orientation="Horizontal">
+										<TextBlock Text="Total tags:"></TextBlock>
+										<TextBlock Text="{Binding TotalTagCount}"></TextBlock>
+									</StackPanel>
+									<StackPanel Orientation="Horizontal"
+												FlowDirection="RightToLeft"
+												Margin="8">
+										<Button Content="Search Your Favourites"
+												Command="{Binding SearchFavourites}"
+												Visibility="{Binding IsFavButtonVisible}"
+												Name="SearchFavouritesButton"
+												Margin="8, 0"></Button>
+										<Button Content="Clear Search"
+												Command="{Binding ClearSearch}"
+												Name="ClearSearchButton"
+												Margin="8, 0"></Button>
+
+									</StackPanel>
+									<TextBlock Text="This search will return empty because you
+											   have more than 2 tags and are not signed in"
+											   TextWrapping="WrapWholeWords"
+											   Visibility="{Binding IsSignedOutWithMoreThan2Tags}" />
+									<Button MinWidth="290"
+											HorizontalAlignment="Center"
+											Background="{StaticResource ThemeBrush}"
+											Foreground="White"
+											Command="{Binding StartSearch}"
+											Name="SearchButton"
+											Tapped="SearchButton_OnTapped">
+
+										<Button.Content>
+											<SymbolIcon>Find</SymbolIcon>
+										</Button.Content>
+									</Button>
+								</StackPanel>
+							</StackPanel>
+						</Flyout>--><!--
+					</AppBarButton.Flyout>-->
 				</AppBarButton>
 				<AppBarButton Visibility="Collapsed"
 							  Icon="Save"

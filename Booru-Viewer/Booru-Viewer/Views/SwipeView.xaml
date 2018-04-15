@@ -1,14 +1,15 @@
 ﻿<Page x:Class="Booru_Viewer.Views.SwipeView"
 	  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	  xmlns:local="using:Booru_Viewer.Views"
 	  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	  xmlns:viewModels="using:Booru_Viewer.ViewModels"
-	  xmlns:types="using:Booru_Viewer.Types"
-	  xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
 	  mc:Ignorable="d"
-	 Name="Page"
-	 
+	  xmlns:vm="using:Booru_Viewer.ViewModels"
+	  xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+	  xmlns:interop="using:Windows.UI.Xaml.Interop"
+	  Name="Page"
+	  xmlns:t="using:Booru_Viewer.Types"
 	  Height="Auto">
 	<Page.DataContext>
 		<vm:SwipViewViewModel />
@@ -44,7 +45,7 @@
 				</Button>
 
 				<Button Command="{Binding CopyTag}"
-						CommandParameter="{Binding Path=Name}"
+						CommandParameter="{Binding ElementName=Tag, Path=Text}"
 						Background="#FF7C7C7C"
 						VerticalAlignment="Stretch"
 						Margin="4, 0, 0, 0">
@@ -122,7 +123,14 @@
 							                  BorderThickness="1"
 											  VerticalAlignment="Center"
 											  HorizontalAlignment="Center"
-							                  ImageExFailed="ImageEx_OnImageExFailed" />
+							                  ImageExFailed="ImageEx_OnImageExFailed">
+								<!--<controls:ImageEx.RenderTransform>
+									<CompositeTransform TranslateX="0.5"
+														TranslateY="0.5" />
+								</controls:ImageEx.RenderTransform>-->
+
+
+							</controls:ImageEx>
 
 						</ScrollViewer>
 
@@ -181,7 +189,8 @@
 										  Name="CharTagsList"
 										  SelectionMode="None"
 										  IsItemClickEnabled="False"
-										  />
+										  Visibility="{Binding Path=CharacterTags.Count, 
+														Converter={StaticResource CountToVis}}" />
 
 								<ListView ItemsSource="{Binding ArtistTags}"
 										  ItemTemplate="{StaticResource Tag}"
@@ -189,7 +198,8 @@
 										  Name="ArtistTagList"
 										  SelectionMode="None"
 										  IsItemClickEnabled="False"
-										  />
+										  Visibility="{Binding Path=ArtistTags.Count, 
+														Converter={StaticResource CountToVis}}" />
 
 								<ListView ItemsSource="{Binding CopyrightTags}"
 										  ItemTemplate="{StaticResource Tag}"
@@ -197,7 +207,8 @@
 										  Name="CopyrightTagList"
 										  SelectionMode="None"
 										  IsItemClickEnabled="False"
-										 />
+										  Visibility="{Binding Path=CopyrightTags.Count, 
+														Converter={StaticResource CountToVis}}" />
 
 								<ListView ItemsSource="{Binding GeneralTags}"
 										  ItemTemplate="{StaticResource Tag}"
@@ -205,7 +216,8 @@
 										  Name="GeneralTagList"
 										  SelectionMode="None"
 										  IsItemClickEnabled="False"
-										  />
+										  Visibility="{Binding Path=GeneralTags.Count, 
+														Converter={StaticResource CountToVis}}" />
 
 							</StackPanel>
 						</Flyout>
