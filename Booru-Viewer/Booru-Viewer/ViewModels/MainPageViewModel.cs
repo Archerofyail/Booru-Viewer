@@ -382,6 +382,25 @@ namespace Booru_Viewer.ViewModels
 			}
 		}
 
+		private ObservableCollection<TagViewModel> excludedTags = null;
+
+		public ObservableCollection<TagViewModel> ExcludedTags
+		{
+			get
+			{
+				if (excludedTags == null)
+				{
+					excludedTags = new ObservableCollection<TagViewModel>();
+					foreach (var tag in GlobalInfo.ExcludedTags)
+					{
+						excludedTags.Add(new TagViewModel(tag));
+					}
+				}
+
+				return excludedTags;
+			}
+		}
+
 		private ObservableCollection<GroupInfoList> favouriteTags = new ObservableCollection<GroupInfoList>();
 
 		public ObservableCollection<GroupInfoList> FavouriteTags
@@ -462,6 +481,8 @@ namespace Booru_Viewer.ViewModels
 		}
 
 		public ObservableCollection<TagViewModel> CurrentTags => GlobalInfo.CurrentTags;
+
+		
 
 		private string currentTag = "";
 		private DateTime start;

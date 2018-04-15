@@ -29,7 +29,19 @@ namespace Booru_Viewer.Types
 		public static bool[] ContentCheck { get; set; } = { true, true, true };
 
 		private static ObservableCollection<string[]> savedSearches;
+		private static ObservableCollection<Tag> excludedTags;
 
+		public static ObservableCollection<Tag> ExcludedTags
+		{
+			get
+			{
+				if (excludedTags == null)
+				{
+					excludedTags = new ObservableCollection<Tag>();
+
+				}
+			}
+		}
 		private static ObservableCollection<Tag> favouriteTags;
 		public static ObservableCollection<Tag> FavouriteTags
 		{
@@ -162,6 +174,135 @@ namespace Booru_Viewer.Types
 
 
 			SavedSearchesLoadedEventHandler?.Invoke(typeof(GlobalInfo), EventArgs.Empty);
+		}
+
+		public static async Task SaveExcludedTags(StorageFolder baseFolder = null)
+		{
+			if (favouriteTags == null)
+			{
+				await LoadFavouriteTags();
+			}
+			try
+			{
+				StorageFolder folder;
+				if (baseFolder != null)
+				{
+					if (baseFolder.DisplayName != "Booru-Viewer")
+					{
+						var potFold = await baseFolder.TryGetItemAsync("Booru-Viewer");
+						if (potFold != null)
+						{
+							folder = await baseFolder.GetFolderAsync("Booru-Viewer");
+						}
+						else
+						{
+							folder = await baseFolder.CreateFolderAsync("Booru-Viewer");
+						}
+					}
+					else
+					{
+						folder = baseFolder;
+					}
+				}
+				else
+				{
+					folder = ApplicationData.Current.RoamingFolder;
+				}
+
+				var item = await folder.TryGetItemAsync("ExcludedTags.json");
+				if (item != null)
+				{
+					SearchesFile = await folder.GetFileAsync("ExcludedTags.json");
+				}
+				else
+				{
+					SearchesFile = await folder.CreateFileAsync("ExcludedTags.json");
+				}
+
+				var json = JsonConvert.SerializeObject(favouriteTags.ToList());
+				await FileIO.WriteTextAsync(SearchesFile, json);
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
+
+			}
+
+		}
+
+		public static async Task LoadExcludedTags(StorageFolder tagsFolder = null)
+		{
+			StorageFolder folder;
+			if (tagsFolder != null)
+			{
+				if (tagsFolder.DisplayName != "Booru-Viewer")
+				{
+					var potFold = await tagsFolder.TryGetItemAsync("Booru-Viewer");
+					if (potFold != null)
+					{
+						folder = await tagsFolder.GetFolderAsync("Booru-Viewer");
+					}
+					else
+					{
+						folder = await tagsFolder.CreateFolderAsync("Booru-Viewer");
+					}
+				}
+				else
+				{
+					folder = tagsFolder;
+				}
+			}
+			else
+			{
+				folder = ApplicationData.Current.RoamingFolder;
+			}
+			if (tagsFolder != null)
+			{
+				folder = tagsFolder;
+			}
+			var item = await folder.TryGetItemAsync("ExcludedTags.json");
+			if (item == null)
+			{
+				Debug.WriteLine("File was null");
+				return;
+			}
+			SearchesFile = await folder.GetFileAsync("ExcludedTags.json");
+			var json = await FileIO.ReadTextAsync(SearchesFile);
+			try
+			{
+				var searchList = JsonConvert.DeserializeObject<List<Tag>>(json, new JsonSerializerSettings
+				{
+					Error = (sender, args) =>
+					{
+						args.ErrorContext.Handled = true;
+					}
+				});
+				if (searchList != null)
+				{
+					excludedTags.Clear();
+					foreach (var search in searchList)
+					{
+						var tag = search;
+						
+						tag.Name = tag.Name.TrimStart('-', '~');
+
+						excludedTags.Add(tag);
+					}
+				}
+				else
+				{
+					Debug.WriteLine("ExcludedTagslist was null");
+				}
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
+			}
+
+
+			FavouriteTagsLoadedEventHandler?.Invoke(typeof(GlobalInfo), EventArgs.Empty);
+
+			
 		}
 
 		public static async Task<ObservableCollection<Tag>> GetFavouriteTags()

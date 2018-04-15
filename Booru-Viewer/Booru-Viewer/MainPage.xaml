@@ -880,27 +880,20 @@
 										HorizontalAlignment="Stretch"
 										Margin="4"
 										Click="UnlockExplicitContentButton_OnClick" />
-								<Slider Header="Images Per Page"
-										Maximum="100"
-										Minimum="10"
-										StepFrequency="1"
-										SnapsTo="StepValues"
-										Name="PerPageSlider"
-										PointerReleased="{x:Bind ViewModel.PerPageChangedEx}"
-										PointerExited="{x:Bind ViewModel.PerPageChangedEx}"
-										Loaded="PerPageSlider_OnLoaded"
-										Value="{Binding PerPage, Mode=TwoWay}">
-
-
-									<!--<i:BehaviorCollection>
-										<core:EventTriggerBehavior EventName="PointerReleased">
-											<core:InvokeCommandAction Command="{Binding PerPageChanged}"
-																	  CommandParameter="{Binding ElementName=PerPageSlider,
-												Path=Value}"></core:InvokeCommandAction>
-										</core:EventTriggerBehavior>
-									</i:BehaviorCollection>-->
-
-								</Slider>
+								<ListView ItemsSource="{Binding ExcludedTags, Mode=TwoWay}"
+								          ItemTemplate="{StaticResource Tag}"
+								          MinHeight="100"
+								          MaxHeight="100"
+								          SelectionMode="None"
+								          ItemContainerStyle="{StaticResource TagStyleNoMargin}"
+								          HorizontalContentAlignment="Left"
+								          Name="ExcludedTagsList">
+									<ListView.ItemsPanel>
+										<ItemsPanelTemplate>
+											<controls:WrapPanel Orientation="Horizontal" />
+										</ItemsPanelTemplate>
+									</ListView.ItemsPanel>
+								</ListView>
 								<CheckBox IsChecked="{Binding UseLargerImagesForThumbnails, Mode=TwoWay}"
 										  Content="Use High quality images for thumbnails"
 										  Margin="4" />
