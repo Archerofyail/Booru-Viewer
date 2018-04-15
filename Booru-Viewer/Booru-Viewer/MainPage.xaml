@@ -69,6 +69,49 @@
 					</i:Interaction.Behaviors>-->
 				</controls:ImageEx>
 			</DataTemplate>
+			<DataTemplate x:Name="ExcludedTag">
+				<StackPanel Orientation="Horizontal"
+				            Background="{StaticResource ThemeBrush}"
+				            BorderThickness="1"
+				            Margin="0">
+
+					<StackPanel.BorderBrush>
+						<SolidColorBrush Color="{ThemeResource SystemBaseLowColor}" />
+					</StackPanel.BorderBrush>
+					<Button Content="~"
+					        Command="{Binding AddPrefix}"
+					        Visibility="{Binding Selected}"
+					        CommandParameter="~"
+					        Background="#FF7C7C7C"
+					        BorderThickness="1"
+					        MinWidth="30" />
+					<Button Content="-"
+					        Command="{Binding AddPrefix}"
+					        Visibility="{Binding Selected}"
+					        CommandParameter="-"
+					        Background="#FF7C7C7C"
+					        Margin="4, 0"
+					        BorderThickness="1"
+					        MinWidth="30" />
+					<TextBlock Name="Tag"
+					           Text="{Binding Path=Name, Mode=TwoWay}"
+					           MinWidth="20"
+					           Margin="8,0"
+					           HorizontalAlignment="Center"
+					           VerticalAlignment="Center"
+					           Tapped="TagTapped"
+					           MaxLines="2"
+					           TextTrimming="WordEllipsis"
+					           TextWrapping="WrapWholeWords" />
+				
+					<Button Command="{Binding RemoveExcludedTag, Mode=TwoWay}"
+					        Background="#FF7C7C7C"
+					        Margin="4, 0, 0, 0"
+					        BorderThickness="1">
+						<SymbolIcon Symbol="Cancel" />
+					</Button>
+				</StackPanel>
+			</DataTemplate>
 			<DataTemplate x:Name="Tag">
 				<StackPanel Orientation="Horizontal"
 							Background="{StaticResource ThemeBrush}"
@@ -104,8 +147,8 @@
 							   TextTrimming="WordEllipsis"
 							   TextWrapping="WrapWholeWords" />
 					<Button Command="{Binding FavouriteTag, Mode=TwoWay}"
-							Background="#FF7C7C7C"
-							BorderThickness="1">
+					        Background="#FF7C7C7C"
+					        BorderThickness="1">
 						<SymbolIcon Symbol="{Binding FavouriteIcon}" />
 					</Button>
 					<Button Command="{Binding RemoveTag, Mode=TwoWay}"
@@ -880,14 +923,49 @@
 										HorizontalAlignment="Stretch"
 										Margin="4"
 										Click="UnlockExplicitContentButton_OnClick" />
+								
+								<StackPanel Orientation="Horizontal" MinWidth="300">
+									<AutoSuggestBox PlaceholderText="Tag"
+									                Name="ExcludedTagTextBox"
+									                MinWidth="260"
+									                Text="{Binding CurrentExcludedTag, Mode=TwoWay, 
+														UpdateSourceTrigger=PropertyChanged}"
+									                TextChanged="TagTextBox_TextChanged"
+									                AllowFocusOnInteraction="True"
+									                KeyUp="ExcludedTagTextBox_KeyUp"
+									                ItemsSource="{Binding SuggestedTags}"
+									                UpdateTextOnSelect="False"
+									                VerticalAlignment="Center"
+									                SuggestionChosen="ExcludedTagTextBox_OnSuggestionChosen">
+										<AutoSuggestBox.TextBoxStyle>
+											<Style TargetType="TextBox">
+												<Setter Property="IsTextPredictionEnabled"
+												        Value="False" />
+											</Style>
+										</AutoSuggestBox.TextBoxStyle>
+									</AutoSuggestBox>
+
+									<Button Name="AddExcludedTagButton"
+									        Margin="4, 0, 0, 0"
+									        Background="{StaticResource ThemeBrush}"
+									        Foreground="White"
+									        Click="AddTagClicked"
+									        Command="{Binding AddExcludedTag}">
+										<Button.Content>
+											<SymbolIcon>Add</SymbolIcon>
+										</Button.Content>
+									</Button>
+
+								</StackPanel>
 								<ListView ItemsSource="{Binding ExcludedTags, Mode=TwoWay}"
-								          ItemTemplate="{StaticResource Tag}"
-								          MinHeight="100"
+								          ItemTemplate="{StaticResource ExcludedTag}"
+								          MinHeight="30"
 								          MaxHeight="100"
 								          SelectionMode="None"
 								          ItemContainerStyle="{StaticResource TagStyleNoMargin}"
 								          HorizontalContentAlignment="Left"
-								          Name="ExcludedTagsList">
+								          Name="ExcludedTagsList"
+								          MinWidth="300">
 									<ListView.ItemsPanel>
 										<ItemsPanelTemplate>
 											<controls:WrapPanel Orientation="Horizontal" />

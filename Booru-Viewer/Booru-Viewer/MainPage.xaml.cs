@@ -174,6 +174,11 @@ namespace Booru_Viewer
 			TagTextBox.GetBindingExpression(AutoSuggestBox.TextProperty).UpdateSource();
 		}
 
+		private void AddExcludedTagClicked(object sender, RoutedEventArgs e)
+		{
+			ExcludedTagTextBox.GetBindingExpression(AutoSuggestBox.TextProperty).UpdateSource();
+		}
+
 		private void SaveLoginDataButtonTapped(object sender, TappedRoutedEventArgs e)
 		{
 			UsernameTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
@@ -198,6 +203,19 @@ namespace Booru_Viewer
 				if (AddTagButton.Command.CanExecute(AddTagButton))
 				{
 					AddTagButton.Command.Execute(AddTagButton);
+				}
+			}
+
+		}
+
+		private void ExcludedTagTextBox_KeyUp(object sender, KeyRoutedEventArgs e)
+		{
+
+			if (e.Key == Windows.System.VirtualKey.Enter && e.KeyStatus.IsKeyReleased)
+			{
+				if (AddExcludedTagButton.Command.CanExecute(AddTagButton))
+				{
+					AddExcludedTagButton.Command.Execute(AddTagButton);
 				}
 			}
 
@@ -317,7 +335,11 @@ namespace Booru_Viewer
 			ViewModel.CurrentTag = args.SelectedItem as string;
 		}
 
-
+		private void ExcludedTagTextBox_OnSuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+		{
+			ViewModel.ExcludedTagSuggestionChosen = true;
+			ViewModel.CurrentExcludedTag = args.SelectedItem as string;
+		}
 
 		private void MultiSelectButtonTapped(object sender, RoutedEventArgs e)
 		{

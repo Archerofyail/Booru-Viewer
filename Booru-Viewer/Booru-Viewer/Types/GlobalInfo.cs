@@ -38,9 +38,12 @@ namespace Booru_Viewer.Types
 				if (excludedTags == null)
 				{
 					excludedTags = new ObservableCollection<Tag>();
-
+					LoadExcludedTags();
 				}
+
+				return excludedTags;
 			}
+			set => excludedTags = value;
 		}
 		private static ObservableCollection<Tag> favouriteTags;
 		public static ObservableCollection<Tag> FavouriteTags
@@ -56,6 +59,8 @@ namespace Booru_Viewer.Types
 			}
 			set => favouriteTags = value;
 		}
+
+		public static EventHandler ExcludedTagsLoadedEventHandler;
 		public static EventHandler SavedSearchesLoadedEventHandler;
 		public static EventHandler FavouriteTagsLoadedEventHandler;
 		public static ObservableCollection<string[]> SavedSearches
@@ -219,7 +224,7 @@ namespace Booru_Viewer.Types
 					SearchesFile = await folder.CreateFileAsync("ExcludedTags.json");
 				}
 
-				var json = JsonConvert.SerializeObject(favouriteTags.ToList());
+				var json = JsonConvert.SerializeObject(excludedTags.ToList());
 				await FileIO.WriteTextAsync(SearchesFile, json);
 			}
 			catch (Exception e)
@@ -300,7 +305,7 @@ namespace Booru_Viewer.Types
 			}
 
 
-			FavouriteTagsLoadedEventHandler?.Invoke(typeof(GlobalInfo), EventArgs.Empty);
+			ExcludedTagsLoadedEventHandler?.Invoke(typeof(GlobalInfo), EventArgs.Empty);
 
 			
 		}
