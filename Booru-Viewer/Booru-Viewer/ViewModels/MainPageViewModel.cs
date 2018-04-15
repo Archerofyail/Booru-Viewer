@@ -10,7 +10,6 @@ using Windows.Storage;
 using System.Diagnostics;
 using System.Linq;
 using Windows.ApplicationModel;
-using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage.AccessCache;
 using Windows.Storage.Pickers;

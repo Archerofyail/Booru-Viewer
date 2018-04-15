@@ -1,8 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
 using Booru_Viewer.Models;
 using Booru_Viewer.ViewModels;
 

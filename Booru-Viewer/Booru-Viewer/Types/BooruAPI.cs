@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Windows.Web.Http;
 using System.Threading.Tasks;
 using Booru_Viewer.ViewModels;
@@ -129,25 +130,18 @@ namespace Booru_Viewer.Types
 			foreach (var img in imageLinks)
 			{
 
-				if (img.File_Url == null && img.Preview_File_Url == null && img.Large_File_Url == null)
-				{ continue; }
-				if (!img.Preview_File_Url.Contains("amazonaws"))
+				if (img.File_Url == null && img.Preview_File_Url == null && img.Large_File_Url == null ||
+				    (img.GeneralTags.Contains("video") || img.GeneralTags.Contains("flash")))
 				{
-					img.Preview_File_Url = img.Preview_File_Url?.Insert(0, BaseURL);
-					
+					continue;
 				}
 
-				if (img.File_Url != null && !img.File_Url.StartsWith("http"))
+				if (img.File_Url.EndsWith(".mp4") || img.File_Url.EndsWith(".swf"))
 				{
-					img.File_Url = img.File_Url?.Insert(0, BaseURL);
+					continue;
 				}
-				
-				if (img.File_Url != null && !img.Large_File_Url.StartsWith("http"))
-				{
-					img.Large_File_Url = img.Large_File_Url?.Insert(0, BaseURL);
-				}
-				
-				GlobalInfo.CurrentSearch.Add(img);
+
+			GlobalInfo.CurrentSearch.Add(img);
 				index++;
 			}
 			Debug.WriteLine("Page is: " + page + ". URL: " + requestURI);

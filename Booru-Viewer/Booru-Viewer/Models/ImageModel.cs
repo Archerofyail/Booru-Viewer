@@ -13,6 +13,7 @@ namespace Booru_Viewer.ViewModels
 		public string Tag_String_Artist { get; set; }
 		public string Tag_String_Copyright { get; set; }
 		public string Tag_String_General { get; set; }
+		public string Tag_String_Meta { get; set; }
 		public bool Has_Large { get; set; }
 		public bool Is_Pending { get; set; }
 		public bool Is_Flagged { get; set; }
@@ -20,13 +21,8 @@ namespace Booru_Viewer.ViewModels
 		public bool Is_Banned { get; set; }
 		public int image_width { get; set; }
 		public int image_height { get; set; }
-		public string Fav_String { get; set; }
 		
-		[JsonIgnore]
-		public string[] Favourites => Fav_String.Split(' ');
-
-
-
+		
 		public string rating { get; set; }
 		[JsonIgnore]
 		public string Rating
@@ -106,6 +102,25 @@ namespace Booru_Viewer.ViewModels
 				if (Tag_String_Copyright.Length == 0)
 				{ return new string[0]; }
 				var tags = Tag_String_Copyright.Split(' ');
+
+				for (var i = 0; i < tags.Length; i++)
+				{
+
+					tags[i] = tags[i].Replace('_', ' ');
+				}
+
+				return tags;
+			}
+		}
+
+		[JsonIgnore]
+		public string[] MetaTags
+		{
+			get
+			{
+				if (Tag_String_Meta.Length == 0)
+				{ return new string[0]; }
+				var tags = Tag_String_Meta.Split(' ');
 
 				for (var i = 0; i < tags.Length; i++)
 				{

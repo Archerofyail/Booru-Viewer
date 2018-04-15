@@ -209,7 +209,13 @@
 										  IsItemClickEnabled="False"
 										  Visibility="{Binding Path=CopyrightTags.Count, 
 														Converter={StaticResource CountToVis}}" />
-
+								<ListView ItemsSource="{Binding MetaTags}"
+								          ItemTemplate="{StaticResource Tag}"
+								          Header="Meta"
+								          Name="MetaTagList"
+								          SelectionMode="None"
+								          IsItemClickEnabled="False"
+								          Visibility="{Binding Path=MetaTags.Count, Converter={StaticResource CountToVis}}"/>
 								<ListView ItemsSource="{Binding GeneralTags}"
 										  ItemTemplate="{StaticResource Tag}"
 										  Header="General"

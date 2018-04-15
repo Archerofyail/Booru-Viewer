@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Windows.Input;
 using Booru_Viewer.Types;
 using GalaSoft.MvvmLight;
@@ -114,16 +113,18 @@ namespace Booru_Viewer.ViewModels
 					var charTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].CharacterTags;
 					var artistTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].ArtistTags;
 					var copyTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].CopyrightTags;
+					var metaTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].MetaTags;
 					Rating = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].Rating;
-					var favourites = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].Favourites;
 					GeneralTags.Clear();
 					CharacterTags.Clear();
 					ArtistTags.Clear();
 					CopyrightTags.Clear();
+					MetaTags.Clear();
 					RaisePropertyChanged("GeneralTags");
 					RaisePropertyChanged("ArtistTags");
 					RaisePropertyChanged("CopyrightTags");
 					RaisePropertyChanged("CharacterTags");
+					RaisePropertyChanged("MetaTags");
 					foreach (var tag in genTags)
 					{
 						GeneralTags.Add(new TagViewModel(new Tag(tag)));
@@ -144,7 +145,12 @@ namespace Booru_Viewer.ViewModels
 						CopyrightTags.Add(new TagViewModel(new Tag(tag)));
 					}
 
-					if (favourites.Contains("fav:" + BooruAPI.UserModel.ID))
+					foreach (var metaTag in metaTags)
+					{
+						MetaTags.Add(new TagViewModel(new Tag(metaTag)));
+					}
+
+					if (GlobalInfo.CurrentSearchTags.Contains("fav:archerofyail") || GlobalInfo.CurrentSearchTags.Contains("ordfav:archerofyail"))
 					{
 						FavIcon = Symbol.Favorite;
 						FavString = "Unfavourite";
@@ -196,13 +202,15 @@ namespace Booru_Viewer.ViewModels
 
 		public ObservableCollection<TagViewModel> CopyrightTags { get; set; } = new ObservableCollection<TagViewModel>();
 
+		public ObservableCollection<TagViewModel> MetaTags { get; set; } = new ObservableCollection<TagViewModel>();
+
 		private Symbol favIcon = Symbol.OutlineStar;
 
 		public Symbol FavIcon
 		{
 			get
 			{
-				if (GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].Favourites.Contains("fav:" + BooruAPI.UserModel.ID))
+				if (GlobalInfo.CurrentSearchTags.Contains("fav:archerofyail") || GlobalInfo.CurrentSearchTags.Contains("ordfav:archerofyail"))
 				{
 					favIcon = Symbol.Favorite;
 				}
@@ -221,7 +229,7 @@ namespace Booru_Viewer.ViewModels
 		{
 			get
 			{
-				if (GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].Favourites.Contains("fav:" + BooruAPI.UserModel.ID))
+				if (GlobalInfo.CurrentSearchTags.Contains("fav:archerofyail") || GlobalInfo.CurrentSearchTags.Contains("ordfav:archerofyail"))
 				{
 					favString = "Unfavourite";
 				}
@@ -281,7 +289,6 @@ namespace Booru_Viewer.ViewModels
 			{
 				if (await BooruAPI.FavouriteImage(GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage]))
 				{
-					GlobalInfo.CurrentSearch[postIndex].Fav_String += " fav:" + BooruAPI.UserModel.ID;
 					FavIcon = Symbol.Favorite;
 					FavString = "Unfavourite";
 				}
@@ -292,7 +299,7 @@ namespace Booru_Viewer.ViewModels
 				if (await BooruAPI.UnfavouriteImage(GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage]))
 				{
 					var im = GlobalInfo.CurrentSearch[postIndex];
-					im.Fav_String = im.Fav_String.Replace(" fav:" + BooruAPI.UserModel.ID, "");
+					
 					FavIcon = Symbol.OutlineStar;
 					FavString = "Favourite";
 				}
