@@ -506,7 +506,7 @@ namespace Booru_Viewer.ViewModels
 
 		public ObservableCollection<TagViewModel> CurrentTags => GlobalInfo.CurrentTags;
 
-		
+
 
 		private string currentTag = "";
 		private DateTime start;
@@ -676,13 +676,13 @@ namespace Booru_Viewer.ViewModels
 		{
 			CurrentTags.Remove(tag);
 			RaisePropertyChanged("CurrentTags");
-			
+
 		}
 
 		public void RemoveExcludedTagEx(TagViewModel tag)
 		{
 			ExcludedTags.Remove(tag);
-			GlobalInfo.ExcludedTags.Remove(tag.Tag);
+			GlobalInfo.ExcludedTags.Remove(GlobalInfo.ExcludedTags.First(x => x.Name == tag.Name));
 			GlobalInfo.SaveExcludedTags();
 			RaisePropertyChanged("ExcludedTags");
 		}
@@ -767,11 +767,14 @@ namespace Booru_Viewer.ViewModels
 				GlobalInfo.CurrentSearchTags.Clear();
 
 				GlobalInfo.CurrentSearchTags.AddRange(tags);
-				foreach (var tag in excludedTags)
+				if (excludedTags != null)
 				{
-					GlobalInfo.CurrentSearchTags.Add(tag.Name.Insert(0,"-"));
+					foreach (var tag in excludedTags)
+					{
+						GlobalInfo.CurrentSearchTags.Add(tag.Name.Insert(0, "-"));
+					}
 				}
-			
+
 				BooruAPI.Page = 1;
 				await Thumbnails.RefreshAsync();
 			}
@@ -952,12 +955,12 @@ namespace Booru_Viewer.ViewModels
 				FolderPicker picker = new FolderPicker
 				{
 					SuggestedStartLocation = PickerLocationId.PicturesLibrary,
-					FileTypeFilter = { "*"}
+					FileTypeFilter = { "*" }
 				};
 
-				
+
 				var folder = await picker.PickSingleFolderAsync();
-				
+
 				if (folder != null)
 				{
 

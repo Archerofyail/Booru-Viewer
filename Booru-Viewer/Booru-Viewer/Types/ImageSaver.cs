@@ -104,7 +104,7 @@ namespace Booru_Viewer.Types
 			}
 			var imageName = ImageURL.Substring(baseURLLength);
 			imageName = imageName.Replace("/", "").Replace("__", "").Replace("_", " ");
-			imageName = imageName.Remove(imageName.Length - 37, 32);
+			imageName = imageName.Remove(Math.Max(imageName.Length - 37, 0), 32);
 			var imageItem = await ImageFolder.TryGetItemAsync(imageName);
 			if (imageItem != null && (await imageItem.GetBasicPropertiesAsync()).Size > 0)
 			{

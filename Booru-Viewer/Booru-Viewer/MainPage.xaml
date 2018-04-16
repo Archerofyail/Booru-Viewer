@@ -923,7 +923,7 @@
 										HorizontalAlignment="Stretch"
 										Margin="4"
 										Click="UnlockExplicitContentButton_OnClick" />
-								
+								<TextBlock Text="Excluded tags"></TextBlock>
 								<StackPanel Orientation="Horizontal" MinWidth="300">
 									<AutoSuggestBox PlaceholderText="Tag"
 									                Name="ExcludedTagTextBox"

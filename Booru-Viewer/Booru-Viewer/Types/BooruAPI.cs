@@ -24,7 +24,8 @@ namespace Booru_Viewer.Types
 
 		public static UserModel UserModel;
 		//GeneralTags must have a space added to them when they are passed to this function. This returns a null list if failed
-		public static async Task<Tuple<bool, List<ImageModel>, string>> SearchPosts(string[] tags, int page, int limit, bool[] ratingChecks = null, bool restartSearch = true)
+		public static async Task<Tuple<bool, List<ImageModel>, string>> SearchPosts(string[] tags, int page, int limit,
+			bool[] ratingChecks = null, bool restartSearch = true)
 		{
 
 
