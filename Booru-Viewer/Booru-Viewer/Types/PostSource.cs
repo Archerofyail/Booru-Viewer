@@ -28,7 +28,10 @@ namespace Booru_Viewer.Types
 			var tns = new List<FullImageViewModel>();
 			foreach (var image in result.Item2)
 			{
-				tns.Add(new FullImageViewModel(useLargerImagePreviews ? image.File_Url : image.Preview_File_Url, image.Has_Large ? image.Large_File_Url : image.File_Url, "https://danbooru.donmai.us/posts/" + image.id, image.Large_File_Url, image.image_width, image.image_height));
+				bool shouldUseLargeImage = image.Has_Large;// && !image.Large_File_Url.EndsWith(".webm");
+				tns.Add(new FullImageViewModel(useLargerImagePreviews ? image.File_Url : image.Preview_File_Url,
+					shouldUseLargeImage ? image.Large_File_Url : image.File_Url, "https://danbooru.donmai.us/posts/" + image.id,
+					image.Large_File_Url, image.image_width, image.image_height));
 			}
 			
 

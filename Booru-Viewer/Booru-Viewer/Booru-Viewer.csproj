@@ -116,6 +116,8 @@
     <Compile Include="Types\GroupInfoList.cs" />
     <Compile Include="Types\ImageSaver.cs" />
     <Compile Include="Types\PostSource.cs" />
+    <Compile Include="Types\SourceToStreamConverter.cs" />
+    <Compile Include="Types\SourceToVisibilityConverter.cs" />
     <Compile Include="ViewModels\FullImageViewModel.cs" />
     <Compile Include="ViewModels\MainPageViewModel.cs" />
     <Compile Include="ViewModels\SavedSearchViewModel.cs" />

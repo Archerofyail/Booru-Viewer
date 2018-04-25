@@ -164,7 +164,7 @@ namespace Booru_Viewer.ViewModels
 					{
 						Images.LoadMoreItemsAsync(Convert.ToUInt32(perPage));
 					}
-					CurrentURL = GlobalInfo.CurrentSearch[value].File_Url;
+					CurrentURL = GlobalInfo.CurrentSearch[value].Large_File_Url;
 					RaisePropertyChanged("CurrentURL");
 				}
 

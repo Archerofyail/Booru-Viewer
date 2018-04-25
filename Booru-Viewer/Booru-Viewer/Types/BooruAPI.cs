@@ -131,17 +131,22 @@ namespace Booru_Viewer.Types
 			foreach (var img in imageLinks)
 			{
 
-				if (img.File_Url == null && img.Preview_File_Url == null && img.Large_File_Url == null ||
-				    (img.GeneralTags.Contains("video") || img.GeneralTags.Contains("flash")))
-				{
-					continue;
-				}
+				//if (img.File_Url == null && img.Preview_File_Url == null && img.Large_File_Url == null ||
+				//    (img.GeneralTags.Contains("video") || img.GeneralTags.Contains("flash")))
+				//{
+				//	continue;
+				//}
 
-				if (img.File_Url.EndsWith(".mp4") || img.File_Url.EndsWith(".swf"))
-				{
-					continue;
-				}
-
+				//if (img.File_Url.EndsWith(".mp4") || img.File_Url.EndsWith(".swf") || img.File_Url.EndsWith(".zip") ||
+				//    img.File_Url.EndsWith(".webm") || img.Large_File_Url.EndsWith(".mp4") || img.Large_File_Url.EndsWith(".swf") ||
+				//    img.Large_File_Url.EndsWith(".zip") || img.Large_File_Url.EndsWith(".webm"))
+				//{
+				//	if (!img.File_Url.EndsWith(".gif") || !img.Large_File_Url.EndsWith(".gif"))
+				//	{
+				//		continue;
+				//	}
+				//}
+				//img.File_Url = img.File_Url.Replace(".zip", ".gif");
 			GlobalInfo.CurrentSearch.Add(img);
 				index++;
 			}

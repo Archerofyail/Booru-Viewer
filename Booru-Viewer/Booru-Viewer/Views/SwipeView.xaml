@@ -16,7 +16,8 @@
 	</Page.DataContext>
 
 	<Page.Resources>
-
+		<t:SourceToStreamConverter x:Key="SourceToStreamConverter"></t:SourceToStreamConverter>
+		<t:SourceToVisibilityConverter x:Key="SourceToVisibilityConverter"></t:SourceToVisibilityConverter>
 		<t:CountToVisibilityConverter x:Key="CountToVis"></t:CountToVisibilityConverter>
 		<SolidColorBrush Color="{ThemeResource SystemAccentColor}"
 						 x:Key="AccentColorBrush"></SolidColorBrush>
@@ -111,26 +112,59 @@
 									  VerticalScrollBarVisibility="Auto"
 									  BorderBrush="Orange"
 									  BorderThickness="1">
-							<controls:ImageEx RenderTransformOrigin="0.5,0.5"
+							<StackPanel VerticalAlignment="Center"
+							            HorizontalAlignment="Center">
+
+
+								<controls:ImageEx RenderTransformOrigin="0.5,0.5"
 											  PlaceholderSource="../Assets/Placeholder.png"
 											  PlaceholderStretch="Uniform"
 											  Stretch="Uniform"
-											  IsCacheEnabled="False"
+											  IsCacheEnabled="True"
 											  Source="{Binding FullImageURL}"
 											  MaxHeight="{Binding ViewportHeight, ElementName=ImageScrollViewer}"
 							                  MaxWidth="{Binding ViewportWidth, ElementName=ImageScrollViewer}"
-							                  BorderBrush="Fuchsia"
-							                  BorderThickness="1"
-											  VerticalAlignment="Center"
+							                  VerticalAlignment="Center"
 											  HorizontalAlignment="Center"
-							                  ImageExFailed="ImageEx_OnImageExFailed">
-								<!--<controls:ImageEx.RenderTransform>
+							                  ImageExFailed="ImageEx_OnImageExFailed"
+								              Visibility="{Binding Path=FullImageURL, Converter={StaticResource SourceToVisibilityConverter}, ConverterParameter=True}"
+								                  BorderBrush="Fuchsia"
+								                  BorderThickness="1">
+									<!--<controls:ImageEx.RenderTransform>
 									<CompositeTransform TranslateX="0.5"
 														TranslateY="0.5" />
 								</controls:ImageEx.RenderTransform>-->
 
 
-							</controls:ImageEx>
+								</controls:ImageEx>
+								<!--<StackPanel BorderBrush="Blue"
+								            BorderThickness="1">
+								<WebView Source="{Binding FullImageURL}"
+								         Visibility="{Binding Path=FullImageURL, Converter={StaticResource SourceToVisibilityConverter}, ConverterParameter=False}"
+								         MaxHeight="{Binding ViewportHeight, ElementName=ImageScrollViewer}"
+								         MaxWidth="{Binding ViewportWidth, ElementName=ImageScrollViewer}"
+								         VerticalAlignment="Center"
+								         HorizontalAlignment="Center"
+								         Height="{Binding ViewportHeight, ElementName=ImageScrollViewer}"
+								         Width="{Binding ViewportWidth, ElementName=ImageScrollViewer}"
+								         >
+
+								</WebView>
+								</StackPanel>-->
+								<MediaPlayerElement Source="{Binding FullImageURL, Converter={StaticResource SourceToStreamConverter}}"
+													AutoPlay="True"
+													Stretch="Uniform"
+													Visibility="{Binding Path=FullImageURL, Converter={StaticResource SourceToVisibilityConverter}, ConverterParameter=False}"
+								                    MaxHeight="{Binding ViewportHeight, ElementName=ImageScrollViewer}"
+								                    MaxWidth="{Binding ViewportWidth, ElementName=ImageScrollViewer}"
+								                    VerticalAlignment="Center"
+								                    HorizontalAlignment="Center"
+								                    AreTransportControlsEnabled="True"
+								                    Height="{Binding ViewportHeight, ElementName=ImageScrollViewer}"
+								                    Width="{Binding ViewportWidth, ElementName=ImageScrollViewer}"
+								                    BorderBrush="Blue"
+								                    BorderThickness="5"/>
+							</StackPanel>
 
 						</ScrollViewer>
 
@@ -237,6 +271,14 @@
 		</CommandBar>
 	</Page.BottomAppBar>
 </Page>
+
+
+
+
+
+
+
+
 
 
 

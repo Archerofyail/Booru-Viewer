@@ -83,7 +83,12 @@ namespace Booru_Viewer.Views
 			Debug.WriteLine("Failed to open image: " + e.ErrorMessage);
 			if (sender is ImageEx img)
 			{
+				
 				var source = img.Source;
+				if (source.ToString().EndsWith(".webm") || source.ToString().EndsWith(".mp4"))
+				{
+					return;
+				}
 				img.Source = "";
 				img.Source = source;
 			}
