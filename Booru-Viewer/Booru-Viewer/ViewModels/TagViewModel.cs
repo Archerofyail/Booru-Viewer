@@ -84,8 +84,7 @@ namespace Booru_Viewer.ViewModels
 		}
 		void CopyTagExec(string value)
 		{
-			DataPackage dp = new DataPackage();
-			dp.RequestedOperation = DataPackageOperation.Copy;
+			var dp = new DataPackage {RequestedOperation = DataPackageOperation.Copy};
 			dp.SetText(value);
 			Clipboard.SetContent(dp);
 
@@ -134,7 +133,7 @@ namespace Booru_Viewer.ViewModels
 			await GlobalInfo.SaveFavouriteTags();
 		}
 
-		async void AddTagToSearchEx()
+		void AddTagToSearchEx()
 		{
 			parentVM?.CurrentTags.Add(new TagViewModel(Tag, parentVM));
 			parentVM?.RaisePropertyChanged("TotalTagCount");

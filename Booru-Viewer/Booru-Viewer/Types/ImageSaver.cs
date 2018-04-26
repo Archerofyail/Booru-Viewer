@@ -41,9 +41,7 @@ namespace Booru_Viewer.Types
 
 		private static void GetFolder()
 		{
-
-			var folderToken = ApplicationData.Current.LocalSettings.Values["SaveFolderToken"] as string;
-			if (folderToken != null)
+			if (ApplicationData.Current.LocalSettings.Values["SaveFolderToken"] is string folderToken)
 			{
 				var folder = StorageApplicationPermissions.FutureAccessList.GetFolderAsync(folderToken).GetResults();
 				ImageFolder = folder;
@@ -64,8 +62,7 @@ namespace Booru_Viewer.Types
 		}
 		public static async Task GetFolderAsync()
 		{
-			var folderToken = ApplicationData.Current.LocalSettings.Values["SaveFolderToken"] as string;
-			if (folderToken != null)
+			if (ApplicationData.Current.LocalSettings.Values["SaveFolderToken"] is string folderToken)
 			{
 				var folder = await StorageApplicationPermissions.FutureAccessList.GetFolderAsync(folderToken);
 				ImageFolder = folder;
@@ -132,7 +129,7 @@ namespace Booru_Viewer.Types
 
 		}
 
-		public static async void SaveImagesFromList(List<string> urls)
+		public static async Task SaveImagesFromList(List<string> urls)
 		{
 			IsSavingImageList = true;
 			CurrentImageSaveIndex = 0;

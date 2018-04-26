@@ -28,57 +28,57 @@ namespace Booru_Viewer.ViewModels
 {
 	public class MainPageViewModel : ViewModelBase
 	{
-		private IPropertySet appSettings;
+		private IPropertySet _appSettings;
 
 		public MainPageViewModel()
 		{
 			GetSaveFolder();
 
-			appSettings = ApplicationData.Current.RoamingSettings.Values;
-			var savedUN = appSettings["Username"] as string;
-			var savedAPIKey = appSettings["APIKey"] as string;
-			if (appSettings["PerPage"] != null)
+			_appSettings = ApplicationData.Current.RoamingSettings.Values;
+			var savedUn = _appSettings["Username"] as string;
+			var savedApiKey = _appSettings["APIKey"] as string;
+			if (_appSettings["PerPage"] != null)
 			{
-				perPage = (int)appSettings["PerPage"];
+				_perPage = (int)_appSettings["PerPage"];
 				RaisePropertyChanged("PerPage");
 			}
-			if (appSettings["SafeChecked"] != null)
+			if (_appSettings["SafeChecked"] != null)
 			{
-				safeChecked = (bool)appSettings["SafeChecked"];
+				_safeChecked = (bool)_appSettings["SafeChecked"];
 			}
-			if (appSettings["QuestionableChecked"] != null)
+			if (_appSettings["QuestionableChecked"] != null)
 			{
-				questionableChecked = (bool)appSettings["QuestionableChecked"];
+				_questionableChecked = (bool)_appSettings["QuestionableChecked"];
 			}
-			if (appSettings["ExplicitChecked"] != null)
+			if (_appSettings["ExplicitChecked"] != null)
 			{
-				explicitChecked = (bool)appSettings["ExplicitChecked"];
+				_explicitChecked = (bool)_appSettings["ExplicitChecked"];
 			}
-			if (appSettings["UseLargerImagesForThumbnails"] != null)
+			if (_appSettings["UseLargerImagesForThumbnails"] != null)
 			{
-				useLargerImagesForThumbnails = (bool)appSettings["UseLargerImagesForThumbnails"];
+				_useLargerImagesForThumbnails = (bool)_appSettings["UseLargerImagesForThumbnails"];
 			}
 
 
-			GlobalInfo.ContentCheck[0] = safeChecked;
-			GlobalInfo.ContentCheck[1] = questionableChecked;
-			GlobalInfo.ContentCheck[2] = explicitChecked;
+			GlobalInfo.ContentCheck[0] = _safeChecked;
+			GlobalInfo.ContentCheck[1] = _questionableChecked;
+			GlobalInfo.ContentCheck[2] = _explicitChecked;
 
-			if (!string.IsNullOrEmpty(savedUN))
+			if (!string.IsNullOrEmpty(savedUn))
 			{
-				Debug.WriteLine("username not empty it's " + appSettings["Username"] + ". APIKey is " + appSettings["APIKey"]);
+				Debug.WriteLine("username not empty it's " + _appSettings["Username"] + ". APIKey is " + _appSettings["APIKey"]);
 
-				username = savedUN;
-				if (!string.IsNullOrEmpty(savedAPIKey))
+				_username = savedUn;
+				if (!string.IsNullOrEmpty(savedApiKey))
 				{
 
-					APIKey = savedAPIKey;
-					BooruAPI.SetLogin(savedUN, savedAPIKey);
+					ApiKey = savedApiKey;
+					BooruAPI.SetLogin(savedUn, savedApiKey);
 				}
 				else
 				{
-					APIKey = "";
-					BooruAPI.SetLogin(savedUN, "");
+					ApiKey = "";
+					BooruAPI.SetLogin(savedUn, "");
 				}
 
 			}
@@ -87,12 +87,12 @@ namespace Booru_Viewer.ViewModels
 			Debug.WriteLine("Count for saved Searches is " + SavedSearches.Count);
 			BooruAPI.TagSearchCompletedHandler += (sender, tuple) =>
 			{
-				if (tuple.Item1 && currentTag.Length > 0)
+				if (tuple.Item1 && _currentTag.Length > 0)
 				{
 
 					foreach (var tag in tuple.Item2)
 					{
-						suggestedTags.Add(tag.Name);
+						_suggestedTags.Add(tag.Name);
 
 					}
 					RaisePropertyChanged("SuggestedTags");
@@ -104,7 +104,7 @@ namespace Booru_Viewer.ViewModels
 				{
 					foreach (var search in GlobalInfo.SavedSearches)
 					{
-						savedSearches.Add(new SavedSearchViewModel(search, this));
+						_savedSearches.Add(new SavedSearchViewModel(search, this));
 					}
 					RaisePropertyChanged("SavedSearches");
 					RaisePropertyChanged("DontHaveSavedSearches");
@@ -117,10 +117,10 @@ namespace Booru_Viewer.ViewModels
 				{
 					foreach (var tag in GlobalInfo.FavouriteTags)
 					{
-						favouriteTags.First(x => x.Key == tag.category).Add(new TagViewModel(tag, this));
+						_favouriteTags.First(x => x.Key == tag.category).Add(new TagViewModel(tag, this));
 
 					}
-					foreach (GroupInfoList t1 in favouriteTags)
+					foreach (GroupInfoList t1 in _favouriteTags)
 					{
 						var tagList = t1;
 						var result = from t in tagList
@@ -138,10 +138,10 @@ namespace Booru_Viewer.ViewModels
 			RaisePropertyChanged("SelectedPrefixIndex");
 
 
-			thumbnails = new IncrementalLoadingCollection<PostSource, FullImageViewModel>(perPage);
+			_thumbnails = new IncrementalLoadingCollection<PostSource, FullImageViewModel>(_perPage);
 			foreach (var model in GlobalInfo.ImageViewModels)
 			{
-				thumbnails.Add(model);
+				_thumbnails.Add(model);
 			}
 			Thumbnails.OnStartLoading = () =>
 			{
@@ -170,15 +170,15 @@ namespace Booru_Viewer.ViewModels
 			BooruAPI.GetUser();
 		}
 
-		private bool useLargerImagesForThumbnails;
+		private bool _useLargerImagesForThumbnails;
 
 		public bool UseLargerImagesForThumbnails
 		{
-			get => useLargerImagesForThumbnails;
+			get => _useLargerImagesForThumbnails;
 			set
 			{
-				useLargerImagesForThumbnails = value;
-				appSettings["UseLargerImagesForThumbnails"] = value;
+				_useLargerImagesForThumbnails = value;
+				_appSettings["UseLargerImagesForThumbnails"] = value;
 				if (value)
 				{
 					foreach (var image in Thumbnails)
@@ -214,35 +214,35 @@ namespace Booru_Viewer.ViewModels
 		{
 			get
 			{
-				return CurrentTags.Count + (checkedList.All(x => x) || checkedList.All(x => !x) ? 0 : 1) +
-					   (selectedOrderIndex > 1 ? 1 : 0);
+				return CurrentTags.Count + (CheckedList.All(x => x) || CheckedList.All(x => !x) ? 0 : 1) +
+					   (_selectedOrderIndex > 1 ? 1 : 0);
 			}
 		}
 
-		public bool IsSignedOutWithMoreThan2Tags => TotalTagCount > 2 && Username == "" && APIKey == "";
+		public bool IsSignedOutWithMoreThan2Tags => TotalTagCount > 2 && Username == "" && ApiKey == "";
 
-		private bool safeChecked = true;
-		private bool questionableChecked = false;
-		private bool explicitChecked = false;
+		private bool _safeChecked = true;
+		private bool _questionableChecked = false;
+		private bool _explicitChecked = false;
 
-		private bool[] checkedList => new[] { safeChecked, questionableChecked, explicitChecked };
+		private bool[] CheckedList => new[] { _safeChecked, _questionableChecked, _explicitChecked };
 
 		public bool SafeChecked
 		{
 			get
 			{
-				if (appSettings["SafeChecked"] != null)
+				if (_appSettings["SafeChecked"] != null)
 				{
-					safeChecked = (bool)appSettings["SafeChecked"];
+					_safeChecked = (bool)_appSettings["SafeChecked"];
 				}
-				return safeChecked;
+				return _safeChecked;
 			}
 			set
 			{
-				safeChecked = value;
+				_safeChecked = value;
 				GlobalInfo.ContentCheck[0] = value;
 
-				appSettings["SafeChecked"] = value;
+				_appSettings["SafeChecked"] = value;
 
 				RaisePropertyChanged();
 				StartSearchExecute();
@@ -253,18 +253,18 @@ namespace Booru_Viewer.ViewModels
 		{
 			get
 			{
-				if (appSettings["QuestionableChecked"] != null)
+				if (_appSettings["QuestionableChecked"] != null)
 				{
-					questionableChecked = (bool)appSettings["QuestionableChecked"];
+					_questionableChecked = (bool)_appSettings["QuestionableChecked"];
 				}
-				return questionableChecked;
+				return _questionableChecked;
 			}
 			set
 			{
-				questionableChecked = value;
+				_questionableChecked = value;
 				GlobalInfo.ContentCheck[1] = value;
 
-				appSettings["QuestionableChecked"] = value;
+				_appSettings["QuestionableChecked"] = value;
 
 				RaisePropertyChanged();
 				StartSearchExecute();
@@ -275,46 +275,46 @@ namespace Booru_Viewer.ViewModels
 		{
 			get
 			{
-				if (appSettings["ExplicitChecked"] != null)
+				if (_appSettings["ExplicitChecked"] != null)
 				{
-					explicitChecked = (bool)appSettings["ExplicitChecked"];
+					_explicitChecked = (bool)_appSettings["ExplicitChecked"];
 				}
-				return explicitChecked;
+				return _explicitChecked;
 			}
 			set
 			{
-				explicitChecked = value;
+				_explicitChecked = value;
 				GlobalInfo.ContentCheck[2] = value;
-				appSettings["ExplicitChecked"] = value;
+				_appSettings["ExplicitChecked"] = value;
 
 				RaisePropertyChanged();
 				StartSearchExecute();
 			}
 		}
 
-		private int startingPage = 1;
+		private int _startingPage = 1;
 
 		public int PageNum
 		{
-			get => startingPage;
+			get => _startingPage;
 			set
 			{
-				startingPage = value;
+				_startingPage = value;
 				RaisePropertyChanged();
 			}
 		}
 
-		private int perPage = 20;
+		private int _perPage = 20;
 
 		public int PerPage
 		{
 			get
 			{
-				if (appSettings["PerPage"] != null)
+				if (_appSettings["PerPage"] != null)
 				{
-					perPage = (int)appSettings["PerPage"];
+					_perPage = (int)_appSettings["PerPage"];
 				}
-				return perPage;
+				return _perPage;
 			}
 			set
 			{
@@ -325,42 +325,42 @@ namespace Booru_Viewer.ViewModels
 			}
 		}
 
-		private int imageSize = 250;
+		private int _imageSize = 250;
 
 		public int ImageSize
 		{
-			get => imageSize;
+			get => _imageSize;
 			set
 			{
-				imageSize = value;
+				_imageSize = value;
 				ApplicationData.Current.LocalSettings.Values["ImageSize"] = value;
 				RaisePropertyChanged();
 			}
 		}
 
-		private ObservableCollection<string> suggestedTags = new ObservableCollection<string>();
+		private ObservableCollection<string> _suggestedTags = new ObservableCollection<string>();
 
 		public ObservableCollection<string> SuggestedTags
 		{
-			get => suggestedTags;
+			get => _suggestedTags;
 			set
 			{
-				suggestedTags = value;
+				_suggestedTags = value;
 				RaisePropertyChanged();
 			}
 		}
 
-		private int suggestedTagIndex = -1;
+		private int _suggestedTagIndex = -1;
 
 		public int SuggestedTagIndex
 		{
-			get => suggestedTagIndex;
+			get => _suggestedTagIndex;
 			set
 			{
-				if (value < suggestedTags.Count && value >= 0)
+				if (value < _suggestedTags.Count && value >= 0)
 				{
-					suggestedTagIndex = value;
-					CurrentTag = suggestedTags[suggestedTagIndex];
+					_suggestedTagIndex = value;
+					CurrentTag = _suggestedTags[_suggestedTagIndex];
 					RaisePropertyChanged();
 				}
 			}
@@ -368,97 +368,97 @@ namespace Booru_Viewer.ViewModels
 
 		public bool TagSuggestionChosen { get; set; } = false;
 		public bool ExcludedTagSuggestionChosen { get; set; } = false;
-		private bool isLoading = false;
+		private bool _isLoading = false;
 
 		public bool IsLoading
 		{
-			get => isLoading;
+			get => _isLoading;
 			set
 			{
-				isLoading = value;
+				_isLoading = value;
 				RaisePropertyChanged();
 			}
 		}
 
-		private ObservableCollection<SavedSearchViewModel> savedSearches = new ObservableCollection<SavedSearchViewModel>();
+		private ObservableCollection<SavedSearchViewModel> _savedSearches = new ObservableCollection<SavedSearchViewModel>();
 
 		public ObservableCollection<SavedSearchViewModel> SavedSearches
 		{
 			get
 			{
-				if (savedSearches.Count == 0)
+				if (_savedSearches.Count == 0)
 				{
 
 					foreach (var search in GlobalInfo.SavedSearches)
 					{
-						savedSearches.Add(new SavedSearchViewModel(search, this));
+						_savedSearches.Add(new SavedSearchViewModel(search, this));
 					}
 					RaisePropertyChanged("DontHaveSavedSearches");
 				}
-				return savedSearches;
+				return _savedSearches;
 			}
 		}
 
-		private ObservableCollection<TagViewModel> excludedTags = null;
+		private ObservableCollection<TagViewModel> _excludedTags = null;
 
 		public ObservableCollection<TagViewModel> ExcludedTags
 		{
 			get
 			{
-				if (excludedTags == null)
+				if (_excludedTags == null)
 				{
-					excludedTags = new ObservableCollection<TagViewModel>();
+					_excludedTags = new ObservableCollection<TagViewModel>();
 
 				}
 
-				return excludedTags;
+				return _excludedTags;
 			}
 		}
 
-		private ObservableCollection<GroupInfoList> favouriteTags = new ObservableCollection<GroupInfoList>();
+		private ObservableCollection<GroupInfoList> _favouriteTags = new ObservableCollection<GroupInfoList>();
 
 		public ObservableCollection<GroupInfoList> FavouriteTags
 		{
 			get
 			{
-				favouriteTags.Clear();
-				favouriteTags.Add(new GroupInfoList { Key = TagType.General });
-				favouriteTags.Add(new GroupInfoList { Key = TagType.Artist });
-				favouriteTags.Add(new GroupInfoList { Key = TagType.Character });
-				favouriteTags.Add(new GroupInfoList { Key = TagType.Copyright });
-				favouriteTags.Add(new GroupInfoList { Key = TagType.Unknown });
+				_favouriteTags.Clear();
+				_favouriteTags.Add(new GroupInfoList { Key = TagType.General });
+				_favouriteTags.Add(new GroupInfoList { Key = TagType.Artist });
+				_favouriteTags.Add(new GroupInfoList { Key = TagType.Character });
+				_favouriteTags.Add(new GroupInfoList { Key = TagType.Copyright });
+				_favouriteTags.Add(new GroupInfoList { Key = TagType.Unknown });
 
 				foreach (var search in GlobalInfo.FavouriteTags)
 				{
-					favouriteTags.First(x => x.Key == search.category).Add(new TagViewModel(search, this));
+					_favouriteTags.First(x => x.Key == search.category).Add(new TagViewModel(search, this));
 				}
-				foreach (var tagList in favouriteTags)
+				foreach (var tagList in _favouriteTags)
 				{
 					tagList.Sort();
 				}
 				RaisePropertyChanged("DontHaveSavedSearches");
-				return favouriteTags;
+				return _favouriteTags;
 			}
-			set => favouriteTags = value;
+			set => _favouriteTags = value;
 		}
 
-		private IncrementalLoadingCollection<PostSource, FullImageViewModel> thumbnails;
+		private IncrementalLoadingCollection<PostSource, FullImageViewModel> _thumbnails;
 
 		public IncrementalLoadingCollection<PostSource, FullImageViewModel> Thumbnails
 		{
 			get
 			{
-				if (thumbnails.Count == 0)
+				if (_thumbnails.Count == 0)
 				{
 					NoImagesText = "No Images found with those tags, try a different search";
 					DontHaveImages = true;
 				}
-				return thumbnails;
+				return _thumbnails;
 			}
 		}
 
 		public ObservableCollection<string> Prefixes => new ObservableCollection<string>(new[] { "none", "~", "-" });
-		private string orderPrefix = "order:";
+		private string _orderPrefix = "order:";
 
 		public ObservableCollection<string> OrderOptions => new ObservableCollection<string>(new[]
 		{
@@ -467,26 +467,26 @@ namespace Booru_Viewer.ViewModels
 			"filesize_asc", "rank", "random"
 		});
 
-		private int selectedPrefixIndex;
+		private int _selectedPrefixIndex;
 
 		public int SelectedPrefixIndex
 		{
-			get => selectedPrefixIndex;
+			get => _selectedPrefixIndex;
 			set
 			{
-				selectedPrefixIndex = value;
+				_selectedPrefixIndex = value;
 				RaisePropertyChanged();
 			}
 		}
 
-		private int selectedOrderIndex;
+		private int _selectedOrderIndex;
 
 		public int SelectedOrderIndex
 		{
-			get => selectedOrderIndex;
+			get => _selectedOrderIndex;
 			set
 			{
-				selectedOrderIndex = value;
+				_selectedOrderIndex = value;
 				RaisePropertyChanged();
 				GlobalInfo.CurrentOrdering = SelectedOrderIndex > 0 ? OrderOptions[SelectedOrderIndex] : "";
 				RaisePropertyChanged("IsSignedOutWithMoreThan2Tags");
@@ -498,36 +498,36 @@ namespace Booru_Viewer.ViewModels
 
 
 
-		private string currentTag = "";
-		private DateTime start;
-		private TimeSpan timeSinceChange;
+		private string _currentTag = "";
+		private DateTime _start;
+		private TimeSpan _timeSinceChange;
 
 		public string CurrentTag
 		{
-			get => currentTag;
+			get => _currentTag;
 			set
 			{
 				if (TagSuggestionChosen)
 				{
 					TagSuggestionChosen = false;
-					suggestedTags.Clear();
-					currentTag = value;
+					_suggestedTags.Clear();
+					_currentTag = value;
 					AddTagExecute();
-					currentTag = "";
+					_currentTag = "";
 				}
-				timeSinceChange = DateTime.Now - start;
+				_timeSinceChange = DateTime.Now - _start;
 				RaisePropertyChanged();
-				if (!string.IsNullOrEmpty(value) && timeSinceChange.TotalSeconds > 0.10f)
+				if (!string.IsNullOrEmpty(value) && _timeSinceChange.TotalSeconds > 0.10f)
 				{
-					start = DateTime.Now;
-					timeSinceChange = TimeSpan.Zero;
+					_start = DateTime.Now;
+					_timeSinceChange = TimeSpan.Zero;
 					SearchForCurrentTag(value);
 				}
 				if (string.IsNullOrEmpty(value))
 				{
 					SuggestedTags.Clear();
 				}
-				currentTag = value;
+				_currentTag = value;
 			}
 		}
 
@@ -539,28 +539,28 @@ namespace Booru_Viewer.ViewModels
 			SuggestedTags = new ObservableCollection<string>(SuggestedTags.Distinct());
 		}
 
-		private string username;
+		private string _username;
 
 		public string Username
 		{
 			get => BooruAPI.Username;
 			set
 			{
-				username = value;
+				_username = value;
 				RaisePropertyChanged("IsSignedOutWithMoreThan2Tags");
 				RaisePropertyChanged();
 			}
 		}
 
-		private string apiKey;
+		private string _apiKey;
 
-		public string APIKey
+		public string ApiKey
 		{
 			get => BooruAPI.APIKey;
 			set
 			{
 
-				apiKey = value;
+				_apiKey = value;
 				RaisePropertyChanged("IsSignedOutWithMoreThan2Tags");
 				RaisePropertyChanged();
 			}
@@ -575,39 +575,39 @@ namespace Booru_Viewer.ViewModels
 
 		}
 
-		private bool dontHaveImages = false;
+		private bool _dontHaveImages = false;
 
 		public bool DontHaveImages
 		{
 			get => Thumbnails.Count == 0;
 			private set
 			{
-				dontHaveImages = value;
+				_dontHaveImages = value;
 				RaisePropertyChanged();
 			}
 		}
 
-		private string noImagesText = "Press the search key to get started";
+		private string _noImagesText = "Press the search key to get started";
 
 		public string NoImagesText
 		{
-			get => noImagesText;
+			get => _noImagesText;
 			set
 			{
-				noImagesText = value;
+				_noImagesText = value;
 				RaisePropertyChanged();
 			}
 		}
 
 
-		private bool isMultiSelectOn = false;
+		private bool _isMultiSelectOn = false;
 
 		public ListViewSelectionMode ImageSelectionMode
 		{
-			get => isMultiSelectOn ? ListViewSelectionMode.Multiple : ListViewSelectionMode.Single;
+			get => _isMultiSelectOn ? ListViewSelectionMode.Multiple : ListViewSelectionMode.Single;
 			set
 			{
-				isMultiSelectOn = value == ListViewSelectionMode.Multiple;
+				_isMultiSelectOn = value == ListViewSelectionMode.Multiple;
 				RaisePropertyChanged("MultiSelectButtonIcon");
 				RaisePropertyChanged();
 			}
@@ -617,26 +617,26 @@ namespace Booru_Viewer.ViewModels
 
 		public SymbolIcon MultiSelectButtonIcon
 		{
-			get => isMultiSelectOn ? new SymbolIcon(Symbol.Cancel) : new SymbolIcon(Symbol.SelectAll);
+			get => _isMultiSelectOn ? new SymbolIcon(Symbol.Cancel) : new SymbolIcon(Symbol.SelectAll);
 			set
 			{
-				isMultiSelectOn = value == new SymbolIcon(Symbol.Cancel);
+				_isMultiSelectOn = value == new SymbolIcon(Symbol.Cancel);
 				RaisePropertyChanged();
 			}
 		}
 
-		public Visibility IsFavButtonVisible => Username != "" && APIKey != "" ? Visibility.Visible : Visibility.Collapsed;
+		public Visibility IsFavButtonVisible => Username != "" && ApiKey != "" ? Visibility.Visible : Visibility.Collapsed;
 
 		public bool DontHaveSavedSearches => FavouriteTags.All(x => x.Count == 0);
 
-		private int selectedSavedSearch = 0;
+		private int _selectedSavedSearch = 0;
 
 		public int SelectedSavedSearch
 		{
-			get => selectedSavedSearch;
+			get => _selectedSavedSearch;
 			set
 			{
-				selectedSavedSearch = value;
+				_selectedSavedSearch = value;
 				RaisePropertyChanged();
 			}
 
@@ -652,7 +652,7 @@ namespace Booru_Viewer.ViewModels
 			{
 				SavedSearches.Remove(search);
 				RaisePropertyChanged("DontHaveSavedSearches");
-				GlobalInfo.SaveSearches(savedSearches.ToList());
+				GlobalInfo.SaveSearches(_savedSearches.ToList());
 			}
 			catch (Exception e)
 			{
@@ -677,13 +677,13 @@ namespace Booru_Viewer.ViewModels
 			}
 
 			var prefix = "";
-			if (selectedPrefixIndex > 0)
+			if (_selectedPrefixIndex > 0)
 			{
-				prefix = Prefixes[selectedPrefixIndex];
+				prefix = Prefixes[_selectedPrefixIndex];
 			}
 			CurrentTags.Add(new TagViewModel(new Tag(prefix + CurrentTag.Trim().ToLower()), this));
 			CurrentTag = "";
-			suggestedTagIndex = -1;
+			_suggestedTagIndex = -1;
 			SuggestedTags.Clear();
 			RaisePropertyChanged("IsSignedOutWithMoreThan2Tags");
 			RaisePropertyChanged("CurrentTag");
@@ -703,7 +703,7 @@ namespace Booru_Viewer.ViewModels
 		{
 
 
-			BooruAPI.SetLogin(username, apiKey);
+			BooruAPI.SetLogin(_username, _apiKey);
 
 			ApplicationData.Current.RoamingSettings.Values["Username"] = BooruAPI.Username;
 			ApplicationData.Current.RoamingSettings.Values["APIKey"] = BooruAPI.APIKey;
@@ -727,7 +727,7 @@ namespace Booru_Viewer.ViewModels
 		void ImageOnLoadFinish()
 		{
 			Debug.WriteLine("ImagesFinished Loading");
-			if (thumbnails.Count == 0)
+			if (_thumbnails.Count == 0)
 			{
 				NoImagesText = "No Images found with those tags, try a different search";
 				DontHaveImages = true;
@@ -754,14 +754,6 @@ namespace Booru_Viewer.ViewModels
 				GlobalInfo.CurrentSearchTags.Clear();
 
 				GlobalInfo.CurrentSearchTags.AddRange(tags);
-				if (excludedTags != null)
-				{
-					foreach (var tag in excludedTags)
-					{
-						GlobalInfo.CurrentSearchTags.Add(tag.Name.Insert(0, "-"));
-					}
-				}
-
 				BooruAPI.Page = 1;
 				await Thumbnails.RefreshAsync();
 			}
@@ -807,26 +799,26 @@ namespace Booru_Viewer.ViewModels
 
 
 
-		async void LoadNextPageExecute(uint count)
+		async Task LoadNextPageExecute(uint count)
 		{
 			await Thumbnails.LoadMoreItemsAsync(Convert.ToUInt32(PerPage));
 		}
 
 		async void LoadNextPageE()
 		{
-			LoadNextPageExecute(0);
+			await LoadNextPageExecute(0);
 		}
 
 
 		void ChangeSelectionModeExecute()
 		{
 			//ImageSelectionMode = (ImageSelectionMode == SelectionMode.Multiple) ? SelectionMode.Single : SelectionMode.Multiple;
-			isMultiSelectOn = !isMultiSelectOn;
+			_isMultiSelectOn = !_isMultiSelectOn;
 			RaisePropertyChanged("ImageSelectionMode");
 			RaisePropertyChanged("MultiSelectButtonIcon");
 		}
 
-		void SaveSearchExecute()
+		async void SaveSearchExecute()
 		{
 			string[] tags = new string[CurrentTags.Count];
 			if (CurrentTags.Count > 0)
@@ -844,7 +836,7 @@ namespace Booru_Viewer.ViewModels
 				RaisePropertyChanged("SavedSearches");
 				RaisePropertyChanged("DontHaveSavedSearches");
 			}
-			GlobalInfo.SaveSearches(savedSearches.ToList());
+			await GlobalInfo.SaveSearches(_savedSearches.ToList());
 		}
 
 		public void StartSavedSearch(string[] tags)
@@ -903,7 +895,7 @@ namespace Booru_Viewer.ViewModels
 		{
 
 			int trueCount = 0;
-			var checkedBools = new[] { safeChecked, questionableChecked, explicitChecked };
+			var checkedBools = new[] { _safeChecked, _questionableChecked, _explicitChecked };
 			foreach (var b in checkedBools)
 			{
 				if (b)
@@ -967,7 +959,7 @@ namespace Booru_Viewer.ViewModels
 					PerPage = PerPage,
 					Username = BooruAPI.Username,
 					APIKey = BooruAPI.APIKey,
-					contentChecks = new[] { safeChecked, QuestionableChecked, ExplicitChecked }
+					contentChecks = new[] { _safeChecked, QuestionableChecked, ExplicitChecked }
 				};
 				var saveFolder = result;
 
@@ -1029,15 +1021,15 @@ namespace Booru_Viewer.ViewModels
 		//public ICommand PerPageChanged => new RelayCommand<int>(PerPageChangedEx);
 		public async void PerPageChangedEx(object sender, PointerRoutedEventArgs e)
 		{
-			if (perPage != (int)(sender as Slider).Value)
+			if (_perPage != (int)(sender as Slider).Value)
 			{
-				Debug.WriteLine("Per Page Changed, old value is {0}, new value is {1}", perPage, (sender as Slider).Value);
+				Debug.WriteLine("Per Page Changed, old value is {0}, new value is {1}", _perPage, (sender as Slider).Value);
 				Debug.WriteLine("PerPage Changed");
 				BooruAPI.Page = 1;
-				perPage = (int)(sender as Slider).Value;
-				ApplicationData.Current.RoamingSettings.Values["PerPage"] = perPage;
-				thumbnails =
-					new IncrementalLoadingCollection<PostSource, FullImageViewModel>(perPage, null, ImageOnLoadFinish,
+				_perPage = (int)(sender as Slider).Value;
+				ApplicationData.Current.RoamingSettings.Values["PerPage"] = _perPage;
+				_thumbnails =
+					new IncrementalLoadingCollection<PostSource, FullImageViewModel>(_perPage, null, ImageOnLoadFinish,
 						ImageLoadOnError);
 
 				await Thumbnails.RefreshAsync();
@@ -1084,22 +1076,22 @@ namespace Booru_Viewer.ViewModels
 
 		public bool IsSavingImages { get; set; }
 
-		private int imageSaveCount = 60;
+		private int _imageSaveCount = 60;
 
 		public int ImageSaveCount
 		{
-			get => imageSaveCount;
-			set { imageSaveCount = value; RaisePropertyChanged(); }
+			get => _imageSaveCount;
+			set { _imageSaveCount = value; RaisePropertyChanged(); }
 		}
 
-		private int currentImageSaveIndex = 0;
+		private int _currentImageSaveIndex = 0;
 
 		public int CurrentImageSaveIndex
 		{
-			get => currentImageSaveIndex;
+			get => _currentImageSaveIndex;
 			set
 			{
-				currentImageSaveIndex = value;
+				_currentImageSaveIndex = value;
 				RaisePropertyChanged();
 			}
 		}
@@ -1114,13 +1106,9 @@ namespace Booru_Viewer.ViewModels
 			GridViewSelectMode = ListViewSelectionMode.None;
 			RaisePropertyChanged("GridViewSelectionMode");
 
-			if (imageList == null)
-			{
-				return;
-			}
 			ImageSaver.ImageFinishedSavingEvent += ImageFinishedSave;
 
-			ImageSaver.SaveImagesFromList(imageList.Select(x => (x as FullImageViewModel).FullImageURL).ToList());
+			await ImageSaver.SaveImagesFromList(imageList.Select(x => (x as FullImageViewModel).FullImageURL).ToList());
 			IsSavingImages = false;
 			RaisePropertyChanged("IsSavingImages");
 		}

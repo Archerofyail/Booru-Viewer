@@ -1,4 +1,7 @@
 ﻿using Newtonsoft.Json;
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace Booru_Viewer.ViewModels
 {

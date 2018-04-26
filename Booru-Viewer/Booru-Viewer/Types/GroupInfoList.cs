@@ -24,28 +24,19 @@ namespace Booru_Viewer.Types
 		public new void Sort()
 		{
 			Sort((x, y)=>x.CompareTo(y));
-			if (CollectionChanged != null)
-			{
-				CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-			}
+			CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
 		}
 
 		public new void Add(TagViewModel item)
 		{
 			base.Add(item);
-			if (CollectionChanged != null)
-			{
-				CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-			}
+			CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
 		}
 
 		public new void AddRange(IEnumerable<TagViewModel> range)
 		{
 			base.AddRange(range);
-			if (CollectionChanged != null)
-			{
-				CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-			}
+			CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
 		}
 
 		public event NotifyCollectionChangedEventHandler CollectionChanged;

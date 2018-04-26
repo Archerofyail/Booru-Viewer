@@ -4,7 +4,7 @@ namespace Booru_Viewer.Models
 {
 	public class UserModel
 	{
-	
+		// ReSharper disable InconsistentNaming
 			public int id { get; set; }
 			public DateTime created_at { get; set; }
 			public string name { get; set; }

@@ -48,10 +48,6 @@ namespace Booru_Viewer
 			SearchButton.Loaded += (sender, args) => { SearchButton.CommandParameter = SearchAppBarButton; };
 			SearchFavouritesButton.Loaded += (sender, args) => { SearchButton.CommandParameter = SearchAppBarButton; };
 
-			//SavedSearchesList.Loaded += (sender, args) =>
-			//{
-			//	SavedSearchesList.GetBindingExpression(ListView.ItemsSourceProperty).UpdateSource();
-			//};
 			Loaded += (sender, args) =>
 			{
 				ViewModel = DataContext as MainPageViewModel;
@@ -60,7 +56,6 @@ namespace Booru_Viewer
 			{
 				ImageGridView.RightTapped += (o, eventArgs) =>
 				{
-					//ImageContextFlyout.ShowAt(o as UIElement, eventArgs.GetPosition(null));
 					eventArgs.Handled = false;
 					var elements = VisualTreeHelper.FindElementsInHostCoordinates(eventArgs.GetPosition(o as UIElement), ImageGridView);
 					var imageView = elements.First((x) => x.GetType() == typeof(ImageEx)) as ImageEx;
@@ -142,8 +137,7 @@ namespace Booru_Viewer
 
 		private void GridView_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			var grid = sender as GridView;
-			if (grid != null && grid.SelectionMode == ListViewSelectionMode.Single)
+			if (sender is GridView grid && grid.SelectionMode == ListViewSelectionMode.Single)
 			{
 
 				GlobalInfo.SelectedImage = grid.SelectedIndex;
@@ -154,7 +148,7 @@ namespace Booru_Viewer
 		private void GridView_MultiSelectChanged(object sender, SelectionChangedEventArgs e)
 		{
 			SaveButton.IsEnabled = ImageGridView.SelectedItems.Count > 0;
-			//SaveButton.GetBindingExpression(Button.CommandParameterProperty)?.UpdateSource();
+			
 		}
 
 		private void ImageGridView_OnItemClick(object sender, ItemClickEventArgs e)
@@ -170,7 +164,7 @@ namespace Booru_Viewer
 
 		private void AddTagClicked(object sender, RoutedEventArgs e)
 		{
-			//AddTagButton.Focus(FocusState.Programmatic);
+		
 			TagTextBox.GetBindingExpression(AutoSuggestBox.TextProperty).UpdateSource();
 		}
 
@@ -182,7 +176,7 @@ namespace Booru_Viewer
 
 		private void TagTextBox_TextChanged(AutoSuggestBox autoSuggestBox, AutoSuggestBoxTextChangedEventArgs args)
 		{
-			//TagTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+			
 		}
 
 		private void APIKeyTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -279,7 +273,7 @@ namespace Booru_Viewer
 		private void ImageOpened(object sender, ImageExOpenedEventArgs e)
 		{
 
-			//Debug.WriteLine("Image opened at URI:" + (sender as ImageEx).Source + "\n, index is " + ImageGridView.Items.IndexOf((sender as ImageEx).DataContext));
+			
 		}
 
 		private void ImageEx_OnImageExFailed(object sender, ImageExFailedEventArgs e)
@@ -291,11 +285,7 @@ namespace Booru_Viewer
 
 		private void PerPageSlider_OnLoaded(object sender, RoutedEventArgs e)
 		{
-			//var perPage = ApplicationData.Current.RoamingSettings.Values["PerPage"] as int?;
-			//if (perPage != null)
-			//{
-			//	PerPageSlider.Value = perPage.Value;
-			//}
+			
 		}
 
 		async void SavedSearchesList_OnDragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
@@ -385,14 +375,13 @@ namespace Booru_Viewer
 			ImageGridView.SelectionMode = ListViewSelectionMode.None;
 			SearchAppBarButton.Visibility = Visibility.Visible;
 			SettingsButton.Visibility = Visibility.Visible;
-			//ImageGridView.SelectedItems.Clear();
 			SaveButton.IsEnabled = false;
 			ImageGridView.SelectionChanged -= GridView_MultiSelectChanged;
 			ImageGridView.ItemClick += ImageGridView_OnItemClick;
 			ImageGridView.SelectionChanged += GridView_SelectionChanged;
 		}
 
-		private async void Over18Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+		private void Over18Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
 		{
 			ApplicationData.Current.RoamingSettings.Values["IsOver18"] = true;
 			QuestionableCheckbox.IsEnabled = true;
@@ -401,7 +390,7 @@ namespace Booru_Viewer
 			UnlockExplicitContentButton.Visibility = Visibility.Collapsed;
 		}
 
-		private async void Under18Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+		private void Under18Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
 		{
 			ApplicationData.Current.RoamingSettings.Values["IsOver18"] = false;
 			sender.Hide();

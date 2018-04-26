@@ -44,7 +44,6 @@ namespace Booru_Viewer.Types
 			set => favouriteTags = value;
 		}
 
-		public static EventHandler ExcludedTagsLoadedEventHandler;
 		public static EventHandler SavedSearchesLoadedEventHandler;
 		public static EventHandler FavouriteTagsLoadedEventHandler;
 		public static ObservableCollection<string[]> SavedSearches

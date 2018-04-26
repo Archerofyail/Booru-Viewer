@@ -130,27 +130,11 @@
 								              Visibility="{Binding Path=FullImageURL, Converter={StaticResource SourceToVisibilityConverter}, ConverterParameter=True}"
 								                  BorderBrush="Fuchsia"
 								                  BorderThickness="1">
-									<!--<controls:ImageEx.RenderTransform>
-									<CompositeTransform TranslateX="0.5"
-														TranslateY="0.5" />
-								</controls:ImageEx.RenderTransform>-->
+								
 
 
 								</controls:ImageEx>
-								<!--<StackPanel BorderBrush="Blue"
-								            BorderThickness="1">
-								<WebView Source="{Binding FullImageURL}"
-								         Visibility="{Binding Path=FullImageURL, Converter={StaticResource SourceToVisibilityConverter}, ConverterParameter=False}"
-								         MaxHeight="{Binding ViewportHeight, ElementName=ImageScrollViewer}"
-								         MaxWidth="{Binding ViewportWidth, ElementName=ImageScrollViewer}"
-								         VerticalAlignment="Center"
-								         HorizontalAlignment="Center"
-								         Height="{Binding ViewportHeight, ElementName=ImageScrollViewer}"
-								         Width="{Binding ViewportWidth, ElementName=ImageScrollViewer}"
-								         >
-
-								</WebView>
-								</StackPanel>-->
+							
 								<MediaPlayerElement Source="{Binding FullImageURL, Converter={StaticResource SourceToStreamConverter}}"
 													AutoPlay="True"
 													Stretch="Uniform"

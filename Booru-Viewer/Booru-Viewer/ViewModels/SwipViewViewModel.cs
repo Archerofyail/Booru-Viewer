@@ -107,7 +107,7 @@ namespace Booru_Viewer.ViewModels
 			set
 			{
 				GlobalInfo.SelectedImage = value;
-				if (value > 0 && value < GlobalInfo.ImageViewModels.Count)
+				if (value >= 0 && value < GlobalInfo.ImageViewModels.Count)
 				{
 					var genTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].GeneralTags;
 					var charTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].CharacterTags;

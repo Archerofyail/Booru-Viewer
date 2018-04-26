@@ -132,24 +132,7 @@ namespace Booru_Viewer.Types
 			int index = 0;
 			foreach (var img in imageLinks)
 			{
-
-				//if (img.File_Url == null && img.Preview_File_Url == null && img.Large_File_Url == null ||
-				//    (img.GeneralTags.Contains("video") || img.GeneralTags.Contains("flash")))
-				//{
-				//	continue;
-				//}
-
-				//if (img.File_Url.EndsWith(".mp4") || img.File_Url.EndsWith(".swf") || img.File_Url.EndsWith(".zip") ||
-				//    img.File_Url.EndsWith(".webm") || img.Large_File_Url.EndsWith(".mp4") || img.Large_File_Url.EndsWith(".swf") ||
-				//    img.Large_File_Url.EndsWith(".zip") || img.Large_File_Url.EndsWith(".webm"))
-				//{
-				//	if (!img.File_Url.EndsWith(".gif") || !img.Large_File_Url.EndsWith(".gif"))
-				//	{
-				//		continue;
-				//	}
-				//}
-				//img.File_Url = img.File_Url.Replace(".zip", ".gif");
-			GlobalInfo.CurrentSearch.Add(img);
+				GlobalInfo.CurrentSearch.Add(img);
 				index++;
 			}
 			Debug.WriteLine("Page is: " + page + ". URL: " + requestURI);
@@ -257,6 +240,7 @@ namespace Booru_Viewer.Types
 			catch (Exception e)
 			{
 
+				Debug.WriteLine(e.Message);
 
 			}
 			if (response == null)
@@ -270,7 +254,7 @@ namespace Booru_Viewer.Types
 				return true;
 			}
 
-			return true;
+			return false;
 		}
 
 		public static async Task<Tag> GetTagInfo(string tagName)
@@ -317,6 +301,13 @@ namespace Booru_Viewer.Types
 			{
 				return true;
 			}
+			return false;
+		}
+
+		private static async Task<bool> Get(string endpoint, HttpFormUrlEncodedContent parameters)
+		{
+			var uri = BaseURL + endpoint + "?" + parameters.ToString();
+			var response = await booruClient.GetAsync(new Uri(uri));
 			return false;
 		}
 
