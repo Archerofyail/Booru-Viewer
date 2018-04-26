@@ -13,7 +13,6 @@ namespace Booru_Viewer.ViewModels
 		public string PreviewURL { get; set; }
 		public int Width { get; set; }
 		public int Height { get; set; }
-		private RelayCommand<string> saveImageCommand;
 		public string WebsiteURL { get; set; }
 		public FullImageViewModel(string previewURL, string imageURLUrl, string websiteURL, string largeImage = null, int width = 0, int height = 0)
 		{
@@ -24,14 +23,7 @@ namespace Booru_Viewer.ViewModels
 			Width = width;
 			Height = height;
 			WebsiteURL = websiteURL;
-			
-		}
 
-		public ICommand SaveImage => new RelayCommand(SaveImageExec);
-
-		void SaveImageExec()
-		{
-			saveImageCommand.Execute(LargeImageURL);
 		}
 	}
 }

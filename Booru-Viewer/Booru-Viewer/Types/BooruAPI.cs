@@ -304,11 +304,17 @@ namespace Booru_Viewer.Types
 			return false;
 		}
 
-		private static async Task<bool> Get(string endpoint, HttpFormUrlEncodedContent parameters)
+		private static async Task<string> Get(string endpoint, HttpFormUrlEncodedContent parameters)
 		{
-			var uri = BaseURL + endpoint + "?" + parameters.ToString();
+			var loginInfo = new HttpFormUrlEncodedContent(new []{new KeyValuePair<string, string>("login", Username), new KeyValuePair<string, string>("api_key", APIKey) });
+			var uri = BaseURL + endpoint + "?" + parameters.ToString() + loginInfo.ToString();
 			var response = await booruClient.GetAsync(new Uri(uri));
-			return false;
+			if (response == null)
+			{
+				return null;
+			}
+			
+			return await response.Content.ReadAsStringAsync();
 		}
 
 		public static void SetLogin(string username, string APIKey)
