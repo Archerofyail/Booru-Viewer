@@ -18,6 +18,7 @@ namespace Booru_Viewer.ViewModels
 		public TagViewModel(Tag tag, MainPageViewModel pageVM)
 		{
 			Tag = tag;
+			name = tag.Name;
 			parentVM = pageVM;
 			_type = tag.category;
 		}
@@ -25,6 +26,7 @@ namespace Booru_Viewer.ViewModels
 		public TagViewModel(Tag tag)
 		{
 			Tag = new Tag(tag.Name.Substring(0), tag.category);
+			name = tag.Name;
 		}
 
 		public TagViewModel()
@@ -45,7 +47,8 @@ namespace Booru_Viewer.ViewModels
 			}
 		}
 
-		public string Name { get => Tag.Name; set { Tag.Name = value; RaisePropertyChanged(); } }
+		private string name;
+		public string Name { get => name; set { name = value; RaisePropertyChanged(); } }
 
 		public bool IsFavourite
 		{
@@ -66,13 +69,6 @@ namespace Booru_Viewer.ViewModels
 
 		public Visibility Selected { get; set; } = Visibility.Collapsed;
 
-
-		void RemoveExcludedTagEx()
-		{
-			parentVM?.RemoveExcludedTagEx(this);
-			parentVM?.RaisePropertyChanged("IsSignedOutWithMoreThan2Tags");
-			parentVM?.RaisePropertyChanged("TotalTagCount");
-		}
 
 		void RemoveTagExecute()
 		{
@@ -170,7 +166,6 @@ namespace Booru_Viewer.ViewModels
 		public ICommand FavouriteTag => new RelayCommand(FavouriteTagEx);
 		public ICommand CopyTag => new RelayCommand<string>(CopyTagExec);
 		public ICommand RemoveTag => new RelayCommand(RemoveTagExecute, RemoveTagCanExecute);
-		public ICommand RemoveExcludedTag => new RelayCommand(RemoveExcludedTagEx);
 		public ICommand StartSearchFromFavourite => new RelayCommand(StartSearchFromThisEx);
 		public int CompareTo(object obj)
 		{

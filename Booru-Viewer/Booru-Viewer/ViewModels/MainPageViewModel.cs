@@ -33,6 +33,7 @@ namespace Booru_Viewer.ViewModels
 		public MainPageViewModel()
 		{
 			GetSaveFolder();
+
 			appSettings = ApplicationData.Current.RoamingSettings.Values;
 			var savedUN = appSettings["Username"] as string;
 			var savedAPIKey = appSettings["APIKey"] as string;
@@ -132,18 +133,7 @@ namespace Booru_Viewer.ViewModels
 				}
 			};
 
-			GlobalInfo.ExcludedTagsLoadedEventHandler += (sender, args) =>
-			{
-				if (GlobalInfo.ExcludedTags.Count > 0)
-				{
-					foreach (var tag in GlobalInfo.ExcludedTags)
-					{
-						excludedTags.Add(new TagViewModel(tag, this));
-					}
-					RaisePropertyChanged("ExcludedTags");
-				}
-			};
-
+			
 			//thumbnails.CollectionChanged += (sender, args) => RaisePropertyChanged("Thumbnails");
 			RaisePropertyChanged("SelectedPrefixIndex");
 
@@ -161,8 +151,23 @@ namespace Booru_Viewer.ViewModels
 			Thumbnails.OnEndLoading = ImageOnLoadFinish;
 			Thumbnails.OnError = ImageLoadOnError;
 			Thumbnails.RefreshAsync();
-			BooruAPI.GetUser();
 
+			BooruAPI.UserLookupEvent += (sender, args) =>
+			{
+				var tags = BooruAPI.UserModel?.blacklisted_tags.Split('\r');
+				if (tags != null && tags.Length > 0)
+				{
+					foreach (var tag in tags)
+					{
+						if (tag.Trim() != "")
+						{
+							var name = tag.Replace("\n", "");
+							ExcludedTags.Add(new TagViewModel(new Tag(name.Trim())));
+						}
+					}
+				}
+			};
+			BooruAPI.GetUser();
 		}
 
 		private bool useLargerImagesForThumbnails;
@@ -394,18 +399,6 @@ namespace Booru_Viewer.ViewModels
 			}
 		}
 
-		private string currentExcludedTag = "";
-
-		public string CurrentExcludedTag
-		{
-			get => currentExcludedTag;
-			set
-			{
-				currentExcludedTag = value;
-				RaisePropertyChanged();
-			}
-		}
-
 		private ObservableCollection<TagViewModel> excludedTags = null;
 
 		public ObservableCollection<TagViewModel> ExcludedTags
@@ -415,10 +408,7 @@ namespace Booru_Viewer.ViewModels
 				if (excludedTags == null)
 				{
 					excludedTags = new ObservableCollection<TagViewModel>();
-					foreach (var tag in GlobalInfo.ExcludedTags)
-					{
-						excludedTags.Add(new TagViewModel(tag, this));
-					}
+
 				}
 
 				return excludedTags;
@@ -679,16 +669,13 @@ namespace Booru_Viewer.ViewModels
 
 		}
 
-		public void RemoveExcludedTagEx(TagViewModel tag)
-		{
-			ExcludedTags.Remove(tag);
-			GlobalInfo.ExcludedTags.Remove(GlobalInfo.ExcludedTags.First(x => x.Name == tag.Name));
-			GlobalInfo.SaveExcludedTags();
-			RaisePropertyChanged("ExcludedTags");
-		}
-
 		void AddTagExecute()
 		{
+			if (CurrentTags.Any(x => x.Name.TrimStart('-', '~') == CurrentTag))
+			{
+				return;
+			}
+
 			var prefix = "";
 			if (selectedPrefixIndex > 0)
 			{
@@ -873,7 +860,6 @@ namespace Booru_Viewer.ViewModels
 		}
 
 		public ICommand AddTag => new RelayCommand(AddTagExecute);
-		public ICommand AddExcludedTag => new RelayCommand(AddExcludedTagEx);
 		public ICommand SaveLoginData => new RelayCommand(SaveLoginDataExecute, SaveLoginDataCanExecute);
 		public ICommand StartSearch => new RelayCommand(StartSearchExecute);
 		public ICommand LoadNextPage => new RelayCommand(LoadNextPageE);
@@ -883,20 +869,7 @@ namespace Booru_Viewer.ViewModels
 		public ICommand SavedSearchSelected => new RelayCommand<SavedSearchViewModel>(SavedSearchSelectedExec);
 		public ICommand ClearSearch => new RelayCommand(ClearSearchEx);
 
-		async void AddExcludedTagEx()
-		{
-			ExcludedTags.Add(new TagViewModel(new Tag(CurrentExcludedTag), this));
-			GlobalInfo.ExcludedTags.Add(new Tag(CurrentExcludedTag));
-			CurrentExcludedTag = "";
-			SuggestedTagIndex = -1;
-			SuggestedTags.Clear();
-			RaisePropertyChanged("IsSignedOutWithMoreThan2Tags");
-			RaisePropertyChanged("ExcludedTags");
-			RaisePropertyChanged("ExcludedTag");
-			RaisePropertyChanged("TotalTagCount");
-			await GlobalInfo.SaveExcludedTags();
-		}
-
+		
 		void ClearSearchEx()
 		{
 			CurrentTags.Clear();

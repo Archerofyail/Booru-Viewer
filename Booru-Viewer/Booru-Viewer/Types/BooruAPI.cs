@@ -21,6 +21,8 @@ namespace Booru_Viewer.Types
 		public static int Page { get; set; } = 1;
 		private static HttpClient booruClient = new HttpClient();
 		public static EventHandler<Tuple<bool, List<Tag>, string>> TagSearchCompletedHandler;
+		public static EventHandler UserLookupEvent;
+		
 
 		public static UserModel UserModel;
 		//GeneralTags must have a space added to them when they are passed to this function. This returns a null list if failed
@@ -202,11 +204,11 @@ namespace Booru_Viewer.Types
 
 		public static async Task<UserModel> GetUser()
 		{
-			if (UserModel != null)
+			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(new[]
 			{
-				return UserModel;
-			}
-			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(new[] { new KeyValuePair<string, string>("search[name]", Username) });
+				new KeyValuePair<string, string>("search[name]", Username), new KeyValuePair<string, string>("login", Username),
+				new KeyValuePair<string, string>("api_key", APIKey),
+			});
 			var requestURI = BaseURL + "/users.json" + "?" + content.ToString();
 			HttpResponseMessage response = new HttpResponseMessage();
 			try
@@ -225,7 +227,18 @@ namespace Booru_Viewer.Types
 			var json = await response.Content.ReadAsStringAsync();
 			UserModel user = JsonConvert.DeserializeObject<List<UserModel>>(json)[0];
 			UserModel = user;
+			if (UserLookupEvent != null)
+			{
+				UserLookupEvent.Invoke(user, null);
+			}
 			return user;
+		}
+
+		public static async Task<bool> UpdateBlacklistedTags(string blacklistedTags)
+		{
+			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(new []{new KeyValuePair<string, string>("user[blacklisted_tags]", blacklistedTags), });
+			var requestURI = BaseURL + "/users/" + UserModel.id + ".json?" + content.ToString();
+			return false;
 		}
 
 		public static async Task<bool> FavouriteImage(ImageModel im)

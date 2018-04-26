@@ -103,7 +103,7 @@
 					           MaxLines="2"
 					           TextTrimming="WordEllipsis"
 					           TextWrapping="WrapWholeWords" />
-				
+
 					<Button Command="{Binding RemoveExcludedTag, Mode=TwoWay}"
 					        Background="#FF7C7C7C"
 					        Margin="4, 0, 0, 0"
@@ -414,7 +414,7 @@
 									   Visibility="{Binding DontHaveSavedSearches}" />
 						</StackPanel>
 
-						
+
 					</StackPanel>
 				</ScrollViewer>
 				<StackPanel Orientation="Vertical"
@@ -689,9 +689,17 @@
 				<AppBarButton Label="Search"
 							  Icon="Find"
 							  Name="SearchAppBarButton"
-							  Click="SearchButtonClicked">
-					<!--<AppBarButton.Flyout>
-						--><!--<Flyout x:Name="SearchFlyout">
+							  Click="SearchButtonClicked"
+				              ToolTipService.ToolTip="Search (Ctrl+E)">
+					<AppBarButton.KeyboardAccelerators>
+						<KeyboardAccelerator 
+							Modifiers="Control" 
+							Key="E" />
+					</AppBarButton.KeyboardAccelerators>
+				
+				<!--<AppBarButton.Flyout>
+						-->
+				<!--<Flyout x:Name="SearchFlyout">
 
 							<Flyout.FlyoutPresenterStyle>
 								<Style TargetType="FlyoutPresenter"
@@ -861,7 +869,8 @@
 									</Button>
 								</StackPanel>
 							</StackPanel>
-						</Flyout>--><!--
+						</Flyout>-->
+				<!--
 					</AppBarButton.Flyout>-->
 				</AppBarButton>
 				<AppBarButton Visibility="Collapsed"
@@ -924,39 +933,7 @@
 										Margin="4"
 										Click="UnlockExplicitContentButton_OnClick" />
 								<TextBlock Text="Excluded tags"></TextBlock>
-								<StackPanel Orientation="Horizontal" MinWidth="300">
-									<AutoSuggestBox PlaceholderText="Tag"
-									                Name="ExcludedTagTextBox"
-									                MinWidth="260"
-									                Text="{Binding CurrentExcludedTag, Mode=TwoWay, 
-														UpdateSourceTrigger=PropertyChanged}"
-									                TextChanged="TagTextBox_TextChanged"
-									                AllowFocusOnInteraction="True"
-									                KeyUp="ExcludedTagTextBox_KeyUp"
-									                ItemsSource="{Binding SuggestedTags}"
-									                UpdateTextOnSelect="False"
-									                VerticalAlignment="Center"
-									                SuggestionChosen="ExcludedTagTextBox_OnSuggestionChosen">
-										<AutoSuggestBox.TextBoxStyle>
-											<Style TargetType="TextBox">
-												<Setter Property="IsTextPredictionEnabled"
-												        Value="False" />
-											</Style>
-										</AutoSuggestBox.TextBoxStyle>
-									</AutoSuggestBox>
 
-									<Button Name="AddExcludedTagButton"
-									        Margin="4, 0, 0, 0"
-									        Background="{StaticResource ThemeBrush}"
-									        Foreground="White"
-									        Click="AddTagClicked"
-									        Command="{Binding AddExcludedTag}">
-										<Button.Content>
-											<SymbolIcon>Add</SymbolIcon>
-										</Button.Content>
-									</Button>
-
-								</StackPanel>
 								<ListView ItemsSource="{Binding ExcludedTags, Mode=TwoWay}"
 								          ItemTemplate="{StaticResource ExcludedTag}"
 								          MinHeight="30"
