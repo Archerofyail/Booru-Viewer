@@ -245,7 +245,7 @@ namespace Booru_Viewer.ViewModels
 		async void SaveImageExec(bool showNotification = true)
 		{
 			Saving = true;
-			SaveImageFailureReason = await ImageSaver.SaveImage(images[Index].LargeImageURL);
+			SaveImageFailureReason = (await ImageSaver.SaveImage(images[Index].LargeImageURL)).Item2;
 			Saving = false;
 			if (showNotification)
 			{
@@ -273,7 +273,6 @@ namespace Booru_Viewer.ViewModels
 				ToastNotification not = new ToastNotification(doc);
 				ToastNotificationManager.ConfigureNotificationMirroring(NotificationMirroring.Disabled);
 				ToastNotificationManager.CreateToastNotifier().Show(not);
-				ToastNotificationManager.History.Clear();
 			}
 		}
 

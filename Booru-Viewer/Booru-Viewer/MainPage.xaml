@@ -120,7 +120,7 @@
 							CommandParameter="~"
 							Background="#FF7C7C7C"
 							BorderThickness="1"
-							MinWidth="30" />
+							MinWidth="30"/>
 					<Button Content="-"
 							Command="{Binding AddPrefix}"
 							Visibility="{Binding Selected}"
@@ -314,8 +314,16 @@
 				<TextBlock Text="{Binding CurrentImageSaveIndex}" />
 				<TextBlock Margin="4, 0"
 						   Text=" of " />
-				<TextBlock Text="{Binding ImageSaveCount}" />
+				<TextBlock Text="{Binding ImageSaveCount}" 
+				           Margin="4, 0"/>
+				
 
+			</StackPanel>
+			<StackPanel Orientation="Horizontal"
+			            HorizontalAlignment="Center"
+			            Margin="0, 4">
+				<TextBlock Text="Images already saved:" Margin="4, 0"/>
+				<TextBlock Text="{Binding DuplicateSaveCount}" />
 			</StackPanel>
 			<ProgressBar Maximum="{Binding ImageSaveCount}"
 						 Value="{Binding CurrentImageSaveIndex}" 
@@ -352,7 +360,21 @@
 					   HorizontalAlignment="Stretch"
 					   VerticalAlignment="Top">
 			<StackPanel>
-				<ScrollViewer MaxHeight="600">
+				<Button HorizontalAlignment="Right"
+				        VerticalAlignment="Top"
+				        Click="CloseSearchDialogClick"
+				        Margin="0"
+				        FocusVisualPrimaryBrush="Transparent"
+				        FocusVisualSecondaryBrush="Transparent"
+				        Padding="4"
+				        Background="Transparent"
+				        >
+					
+					<Button.Content>
+						<SymbolIcon Symbol="Cancel"/>
+					</Button.Content>
+				</Button>
+				<!--<ScrollViewer MaxHeight="600">-->
 					<StackPanel>
 						<StackPanel Margin="0, 0, 12, 0"
 									MinWidth="350"
@@ -399,7 +421,7 @@
 
 
 					</StackPanel>
-				</ScrollViewer>
+				<!--</ScrollViewer>-->
 				<StackPanel Orientation="Vertical"
 							MaxWidth="350"
 							MinWidth="350"

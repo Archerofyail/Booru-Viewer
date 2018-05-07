@@ -150,6 +150,8 @@ namespace Booru_Viewer.ViewModels
 
 		void AddPrefixEx(string prefix)
 		{
+			Selected = Visibility.Collapsed;
+			RaisePropertyChanged("Selected");
 			if (prefix[0] == Name[0])
 			{
 				Name = Name.TrimStart('~', '-');

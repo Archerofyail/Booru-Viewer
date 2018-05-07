@@ -415,5 +415,10 @@ namespace Booru_Viewer
 		{
 			SearchDialog.Hide();
 		}
+
+		private void CloseSearchDialogClick(object sender, RoutedEventArgs e)
+		{
+			SearchDialog.Hide();
+		}
 	}
 }

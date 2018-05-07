@@ -450,7 +450,6 @@ namespace Booru_Viewer.ViewModels
 			{
 				if (_thumbnails.Count == 0)
 				{
-					NoImagesText = "No Images found with those tags, try a different search";
 					DontHaveImages = true;
 				}
 				return _thumbnails;
@@ -727,7 +726,7 @@ namespace Booru_Viewer.ViewModels
 		void ImageOnLoadFinish()
 		{
 			Debug.WriteLine("ImagesFinished Loading");
-			if (_thumbnails.Count == 0)
+			if (_thumbnails.Count == 0 && !NoImagesText.Contains("Failed"))
 			{
 				NoImagesText = "No Images found with those tags, try a different search";
 				DontHaveImages = true;
@@ -1062,7 +1061,7 @@ namespace Booru_Viewer.ViewModels
 							},
 							new AdaptiveText()
 							{
-								Text = saveImageFailureReason
+								Text = saveImageFailureReason.Item2
 							}
 						}
 					}
@@ -1082,6 +1081,14 @@ namespace Booru_Viewer.ViewModels
 		{
 			get => _imageSaveCount;
 			set { _imageSaveCount = value; RaisePropertyChanged(); }
+		}
+
+		private int _duplicateSaveCount = 0;
+
+		public int DuplicateSaveCount
+		{
+			get => _duplicateSaveCount;
+			set { _duplicateSaveCount = value;RaisePropertyChanged(); }
 		}
 
 		private int _currentImageSaveIndex = 0;
@@ -1114,11 +1121,12 @@ namespace Booru_Viewer.ViewModels
 		}
 
 
-		void ImageFinishedSave(int index, int count, bool lastImage)
+		void ImageFinishedSave(int index, int count, bool lastImage, int dupeCount)
 		{
 			CurrentImageSaveIndex = index;
 			ImageSaveCount = count;
 			IsSavingImages = !lastImage;
+			DuplicateSaveCount = dupeCount;
 			if (lastImage)
 			{
 				ImageSaver.ImageFinishedSavingEvent -= ImageFinishedSave;

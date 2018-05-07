@@ -110,7 +110,6 @@
 									  VerticalScrollMode="Auto"
 									  HorizontalScrollBarVisibility="Auto"
 									  VerticalScrollBarVisibility="Auto"
-									  BorderBrush="Orange"
 									  BorderThickness="1">
 							<StackPanel VerticalAlignment="Center"
 							            HorizontalAlignment="Center">
@@ -120,7 +119,7 @@
 											  PlaceholderSource="../Assets/Placeholder.png"
 											  PlaceholderStretch="Uniform"
 											  Stretch="Uniform"
-											  IsCacheEnabled="True"
+											  IsCacheEnabled="False"
 											  Source="{Binding FullImageURL}"
 											  MaxHeight="{Binding ViewportHeight, ElementName=ImageScrollViewer}"
 							                  MaxWidth="{Binding ViewportWidth, ElementName=ImageScrollViewer}"
@@ -128,14 +127,13 @@
 											  HorizontalAlignment="Center"
 							                  ImageExFailed="ImageEx_OnImageExFailed"
 								              Visibility="{Binding Path=FullImageURL, Converter={StaticResource SourceToVisibilityConverter}, ConverterParameter=True}"
-								                  BorderBrush="Fuchsia"
 								                  BorderThickness="1">
 								
 
 
 								</controls:ImageEx>
 							
-								<MediaPlayerElement Source="{Binding FullImageURL, Converter={StaticResource SourceToStreamConverter}}"
+								<!--<MediaPlayerElement Source="{Binding FullImageURL, Converter={StaticResource SourceToStreamConverter}}"
 													AutoPlay="True"
 													Stretch="Uniform"
 													Visibility="{Binding Path=FullImageURL, Converter={StaticResource SourceToVisibilityConverter}, ConverterParameter=False}"
@@ -147,7 +145,7 @@
 								                    Height="{Binding ViewportHeight, ElementName=ImageScrollViewer}"
 								                    Width="{Binding ViewportWidth, ElementName=ImageScrollViewer}"
 								                    BorderBrush="Blue"
-								                    BorderThickness="5"/>
+								                    BorderThickness="5"/>-->
 							</StackPanel>
 
 						</ScrollViewer>

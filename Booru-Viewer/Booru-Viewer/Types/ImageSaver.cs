@@ -16,7 +16,7 @@ namespace Booru_Viewer.Types
 		public static int TotalImageSaveCount { get; private set; }
 		public static int CurrentImageSaveIndex { get; private set; }
 
-		public delegate void ImageFinishedSavingEventHandler(int currentIndex, int totalCount, bool isLastImage);
+		public delegate void ImageFinishedSavingEventHandler(int currentIndex, int totalCount, bool isLastImage, int duplicateCount);
 
 		public static event ImageFinishedSavingEventHandler ImageFinishedSavingEvent;
 
@@ -81,7 +81,7 @@ namespace Booru_Viewer.Types
 			}
 
 		}
-		public static async Task<string> SaveImage(string ImageURL)
+		public static async Task<Tuple<bool, string>> SaveImage(string ImageURL)
 		{
 			
 			
@@ -95,7 +95,7 @@ namespace Booru_Viewer.Types
 				catch (Exception e)
 				{
 					Debug.WriteLine(e);
-					return "Could not open Save Folder";
+					return new Tuple<bool, string>(false, "Could not open folder");
 				}
 
 			}
@@ -106,7 +106,7 @@ namespace Booru_Viewer.Types
 			var imageItem = await ImageFolder.TryGetItemAsync(imageName);
 			if (imageItem != null && (await imageItem.GetBasicPropertiesAsync()).Size > 0)
 			{
-				return "Already saved image";
+				return new Tuple<bool, string>(true, "Already saved image");
 			}
 			try
 			{
@@ -117,13 +117,13 @@ namespace Booru_Viewer.Types
 					var bytes = await response.Content.ReadAsByteArrayAsync();
 					await FileIO.WriteBytesAsync(file, bytes);
 				}
-				return "Image Saved";
+				return new Tuple<bool, string>(true, "Image Saved");
 
 			}
 			catch (Exception e)
 			{
 				Debug.WriteLine(e);
-				return "An error ocurred when saving, please try again";
+				return new Tuple<bool, string>(false, "Failed to save image, " + e.Message);
 			}
 
 
@@ -134,11 +134,17 @@ namespace Booru_Viewer.Types
 			IsSavingImageList = true;
 			CurrentImageSaveIndex = 0;
 			TotalImageSaveCount = urls.Count;
+			int dupeCount = 0;
 			foreach (var url in urls)
 			{
-				await SaveImage(url);
+				var result = await SaveImage(url);
+				if (result.Item1 && result.Item2.Contains("Already"))
+				{
+					dupeCount++;
+				}
+
 				ImageFinishedSavingEvent?.Invoke(CurrentImageSaveIndex++, TotalImageSaveCount,
-					CurrentImageSaveIndex == TotalImageSaveCount - 1);
+					CurrentImageSaveIndex == TotalImageSaveCount - 1, dupeCount);
 			}
 			IsSavingImageList = false;
 		}
