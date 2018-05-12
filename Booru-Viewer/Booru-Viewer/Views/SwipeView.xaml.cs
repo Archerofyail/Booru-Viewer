@@ -41,7 +41,7 @@ namespace Booru_Viewer.Views
 
 		private void FlipView_OnTapped(object sender, TappedRoutedEventArgs e)
 		{
-			AppBar.Visibility = AppBar.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+			
 		}
 
 		private void FlipView_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -86,6 +86,16 @@ namespace Booru_Viewer.Views
 					scrollViewer.ChangeView(doubleTapPoint.X, doubleTapPoint.Y, null);
 				});
 			}
+		}
+
+		private void ImageSelectClick(object sender, RoutedEventArgs e)
+		{
+			
+		}
+
+		private void ImageTapped(object sender, TappedRoutedEventArgs e)
+		{
+			AppBar.Visibility = AppBar.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
 		}
 	}
 

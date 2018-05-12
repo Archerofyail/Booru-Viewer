@@ -15,12 +15,12 @@ using Microsoft.Toolkit.Uwp.Notifications;
 
 namespace Booru_Viewer.ViewModels
 {
-	class SwipViewViewModel : ViewModelBase
+	class SwipeViewViewModel : ViewModelBase
 	{
 
 		private int perPage = 20;
 
-		public SwipViewViewModel()
+		public SwipeViewViewModel()
 		{
 			var settings = ApplicationData.Current.RoamingSettings.Values;
 			if (settings["PerPage"] != null)
@@ -249,25 +249,25 @@ namespace Booru_Viewer.ViewModels
 			Saving = false;
 			if (showNotification)
 			{
-				ToastContent content = new ToastContent()
+				ToastContent content = new ToastContent
 				{
-					Visual = new ToastVisual()
+					Visual = new ToastVisual
 					{
-						BindingGeneric = new ToastBindingGeneric()
+						BindingGeneric = new ToastBindingGeneric
 						{
 							Children =
 							{
-								new AdaptiveImage()
+								new AdaptiveImage
 								{
 									Source = images[Index].FullImageURL
 								},
-								new AdaptiveText()
+								new AdaptiveText
 								{
 									Text = SaveImageFailureReason
 								}
 							}
 						}
-					}
+					},
 				};
 				Windows.Data.Xml.Dom.XmlDocument doc = content.GetXml();
 				ToastNotification not = new ToastNotification(doc);

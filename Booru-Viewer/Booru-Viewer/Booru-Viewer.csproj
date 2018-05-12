@@ -121,7 +121,7 @@
     <Compile Include="ViewModels\FullImageViewModel.cs" />
     <Compile Include="ViewModels\MainPageViewModel.cs" />
     <Compile Include="ViewModels\SavedSearchViewModel.cs" />
-    <Compile Include="ViewModels\SwipViewViewModel.cs" />
+    <Compile Include="ViewModels\SwipeViewViewModel.cs" />
     <Compile Include="ViewModels\TagViewModel.cs" />
     <Compile Include="Views\SwipeView.xaml.cs">
       <DependentUpon>SwipeView.xaml</DependentUpon>

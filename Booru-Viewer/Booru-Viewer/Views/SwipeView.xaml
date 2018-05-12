@@ -12,7 +12,7 @@
 	  xmlns:t="using:Booru_Viewer.Types"
 	  Height="Auto">
 	<Page.DataContext>
-		<vm:SwipViewViewModel />
+		<vm:SwipeViewViewModel />
 	</Page.DataContext>
 
 	<Page.Resources>
@@ -78,7 +78,8 @@
 				  Tapped="FlipView_OnTapped"
 				  SelectionChanged="FlipView_OnSelectionChanged"
 				  UseTouchAnimationsForAllNavigation="True"
-				  Grid.Row="1">
+				  Grid.Row="1"
+		          >
 			<FlipView.ItemsPanel>
 				<ItemsPanelTemplate>
 					<VirtualizingStackPanel VirtualizationMode="Standard"
@@ -120,19 +121,20 @@
 											  PlaceholderStretch="Uniform"
 											  Stretch="Uniform"
 											  IsCacheEnabled="False"
-											  Source="{Binding FullImageURL}"
+											  Source="{Binding CurrentImage}"
 											  MaxHeight="{Binding ViewportHeight, ElementName=ImageScrollViewer}"
 							                  MaxWidth="{Binding ViewportWidth, ElementName=ImageScrollViewer}"
 							                  VerticalAlignment="Center"
 											  HorizontalAlignment="Center"
 							                  ImageExFailed="ImageEx_OnImageExFailed"
 								              Visibility="{Binding Path=FullImageURL, Converter={StaticResource SourceToVisibilityConverter}, ConverterParameter=True}"
-								                  BorderThickness="1">
-								
+								                  BorderThickness="1"
+								                  Tapped="ImageTapped">
+
 
 
 								</controls:ImageEx>
-							
+
 								<!--<MediaPlayerElement Source="{Binding FullImageURL, Converter={StaticResource SourceToStreamConverter}}"
 													AutoPlay="True"
 													Stretch="Uniform"
@@ -149,7 +151,44 @@
 							</StackPanel>
 
 						</ScrollViewer>
-
+						<ScrollViewer 
+						            Grid.Row="2"
+							VerticalScrollMode="Disabled"
+							HorizontalScrollMode="Auto"
+							HorizontalScrollBarVisibility="Auto"
+							VerticalScrollBarVisibility="Hidden">
+							
+							<StackPanel Orientation="Horizontal">
+								<Button Background="Transparent"
+							        Command="{Binding SwitchImage}"
+							        CommandParameter="{Binding FullImageURL}">
+									<Button.Content>
+										<Image Source="{Binding PreviewURL}"></Image>
+									</Button.Content>
+								</Button>
+								<ListView
+						          Margin="4"
+								  ItemsSource="{Binding ChildrenImages}">
+									<ListView.ItemTemplate>
+										<DataTemplate>
+											<Button Background="Transparent"
+									        Command="{Binding SwitchImage}"
+									        CommandParameter="{Binding FullImageURL}"
+											        Click="ImageSelectClick">
+												<Button.Content>
+													<Image Source="{Binding PreviewURL}"/>
+												</Button.Content>
+											</Button>
+										</DataTemplate>
+									</ListView.ItemTemplate>
+									<ListView.ItemsPanel>
+										<ItemsPanelTemplate>
+											<VirtualizingStackPanel Orientation="Horizontal"></VirtualizingStackPanel>
+										</ItemsPanelTemplate>
+									</ListView.ItemsPanel>
+								</ListView>
+							</StackPanel>
+						</ScrollViewer>
 					</Grid>
 
 

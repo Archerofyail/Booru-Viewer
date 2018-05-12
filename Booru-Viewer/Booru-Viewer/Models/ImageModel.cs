@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using Microsoft.Toolkit.Uwp.UI.Controls.TextToolbarSymbols;
+using Newtonsoft.Json;
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
@@ -24,7 +26,10 @@ namespace Booru_Viewer.ViewModels
 		public bool Is_Banned { get; set; }
 		public int image_width { get; set; }
 		public int image_height { get; set; }
-		
+		public bool Has_Children { get; set; }
+		public string Parent_Id { get; set; }
+
+		[JsonIgnore] public List<ImageModel> ChildrenImages = new List<ImageModel>();
 		
 		public string rating { get; set; }
 		[JsonIgnore]

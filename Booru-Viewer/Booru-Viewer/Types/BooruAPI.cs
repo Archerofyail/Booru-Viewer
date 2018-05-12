@@ -22,7 +22,7 @@ namespace Booru_Viewer.Types
 		private static HttpClient booruClient = new HttpClient();
 		public static EventHandler<Tuple<bool, List<Tag>, string>> TagSearchCompletedHandler;
 		public static EventHandler UserLookupEvent;
-		
+
 
 		public static UserModel UserModel;
 		//GeneralTags must have a space added to them when they are passed to this function. This returns a null list if failed
@@ -59,28 +59,28 @@ namespace Booru_Viewer.Types
 				switch (trueCount)
 				{
 					case 1:
-					{
-						for (int i = 0; i < ratingChecks.Length; i++)
 						{
-							if (ratingChecks[i])
+							for (int i = 0; i < ratingChecks.Length; i++)
 							{
-								tagsAsOne += contentTags[i];
+								if (ratingChecks[i])
+								{
+									tagsAsOne += contentTags[i];
+								}
 							}
 						}
-					}
-					break;
+						break;
 
 					case 2:
-					{
-						for (int i = 0; i < ratingChecks.Length; i++)
 						{
-							if (!ratingChecks[i])
+							for (int i = 0; i < ratingChecks.Length; i++)
 							{
-								tagsAsOne += "-" + contentTags[i];
+								if (!ratingChecks[i])
+								{
+									tagsAsOne += "-" + contentTags[i];
+								}
 							}
 						}
-					}
-					break;
+						break;
 				}
 			}
 			var variables = new List<KeyValuePair<string, string>>
@@ -129,14 +129,67 @@ namespace Booru_Viewer.Types
 			};
 
 			HttpFormUrlEncodedContent signinDetails = new HttpFormUrlEncodedContent(signinStuff);
-			int index = 0;
-			foreach (var img in imageLinks)
+			try
 			{
-				GlobalInfo.CurrentSearch.Add(img);
-				index++;
+				for (var i = 0; i < imageLinks.Count; i++)
+				{
+					var img = imageLinks[i];
+					if (!img.File_Url.EndsWith("mp4") && !img.File_Url.EndsWith("webm") && !img.Large_File_Url.EndsWith("mp4") &&
+						!img.Large_File_Url.EndsWith("webm"))
+					{
+						if (i < imageLinks.Count - 2)
+						{
+
+							var j = i + 1;
+							if (j < imageLinks.Count - 1)
+							{
+								try
+								{
+									//if img has same parent id as j's parent id, and both aren't null check
+									//if img has same parent id as j's id check
+									//if img has same id as j's parent id check
+									var parentsSameAndNotNull = (imageLinks[j].Parent_Id == img.Parent_Id && img.Parent_Id != null &&
+									                             imageLinks[j].Parent_Id != null);
+									while (img.id.ToString() == imageLinks[j].Parent_Id || img.Parent_Id == imageLinks[j].id.ToString() || parentsSameAndNotNull)
+									{
+										img.ChildrenImages.Add(imageLinks[j]);
+										imageLinks.Remove(imageLinks[j]);
+										if (j >= imageLinks.Count)
+										{
+											break;
+										}
+										parentsSameAndNotNull = (imageLinks[j].Parent_Id == img.Parent_Id && img.Parent_Id != null &&
+										                             imageLinks[j].Parent_Id != null);
+
+									}
+								}
+								catch (Exception e)
+								{
+									Console.WriteLine(e);
+									throw;
+								}
+
+							}
+
+						}
+
+					}
+					GlobalInfo.CurrentSearch.Add(img);
+				}
 			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
+				throw;
+			}
+
+
+
+
+
+			var noDupes = imageLinks.GroupBy(x => x.id).Where(x => x.Count() == 1).Select(x => x.First(y => y.id > 0)).ToList();
 			Debug.WriteLine("Page is: " + page + ". URL: " + requestURI);
-			return new Tuple<bool, List<ImageModel>, string>(true, imageLinks, response.StatusCode.ToString());
+			return new Tuple<bool, List<ImageModel>, string>(true, noDupes, response.StatusCode.ToString());
 
 		}
 
@@ -219,7 +272,7 @@ namespace Booru_Viewer.Types
 
 		public static async Task<bool> UpdateBlacklistedTags(string blacklistedTags)
 		{
-			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(new []{new KeyValuePair<string, string>("user[blacklisted_tags]", blacklistedTags), });
+			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(new[] { new KeyValuePair<string, string>("user[blacklisted_tags]", blacklistedTags), });
 			var requestURI = BaseURL + "/users/" + UserModel.id + ".json?" + content.ToString();
 			return false;
 		}
@@ -261,7 +314,7 @@ namespace Booru_Viewer.Types
 		{
 			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(new[]
 			{
-				new KeyValuePair<string, string>("search[name]",tagName.Replace(" ", "_")), 
+				new KeyValuePair<string, string>("search[name]",tagName.Replace(" ", "_")),
 			});
 			var requestURI = BaseURL + "/tags.json?" + content.ToString();
 			var response = await (booruClient.GetAsync(new Uri(requestURI)));
@@ -270,11 +323,14 @@ namespace Booru_Viewer.Types
 				return null;
 			}
 			var json = await response.Content.ReadAsStringAsync();
-			var tag = JsonConvert.DeserializeObject<List<Tag>>(json, new JsonSerializerSettings{Error = (sender, args) =>
+			var tag = JsonConvert.DeserializeObject<List<Tag>>(json, new JsonSerializerSettings
 			{
-				Debug.WriteLine(args.ErrorContext.Error.Message);
-				args.ErrorContext.Handled = true;
-			}});
+				Error = (sender, args) =>
+{
+	Debug.WriteLine(args.ErrorContext.Error.Message);
+	args.ErrorContext.Handled = true;
+}
+			});
 			if (tag.Count >= 1)
 			{
 				return tag[0];
@@ -306,14 +362,14 @@ namespace Booru_Viewer.Types
 
 		private static async Task<string> Get(string endpoint, HttpFormUrlEncodedContent parameters)
 		{
-			var loginInfo = new HttpFormUrlEncodedContent(new []{new KeyValuePair<string, string>("login", Username), new KeyValuePair<string, string>("api_key", APIKey) });
+			var loginInfo = new HttpFormUrlEncodedContent(new[] { new KeyValuePair<string, string>("login", Username), new KeyValuePair<string, string>("api_key", APIKey) });
 			var uri = BaseURL + endpoint + "?" + parameters.ToString() + loginInfo.ToString();
 			var response = await booruClient.GetAsync(new Uri(uri));
 			if (response == null)
 			{
 				return null;
 			}
-			
+
 			return await response.Content.ReadAsStringAsync();
 		}
 

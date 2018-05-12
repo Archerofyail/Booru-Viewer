@@ -72,8 +72,11 @@ namespace Booru_Viewer
 						if (layoutcount == 0)
 						{
 							layoutcount++;
-							var image = ImageGridView.Items[GlobalInfo.SelectedImage];
-							ImageGridView.ScrollIntoView(image, ScrollIntoViewAlignment.Leading);
+							if (ImageGridView.Items.Count > 0)
+							{
+								var image = ImageGridView.Items[GlobalInfo.SelectedImage];
+								ImageGridView.ScrollIntoView(image, ScrollIntoViewAlignment.Leading);
+							}
 						}
 
 					};
@@ -148,7 +151,7 @@ namespace Booru_Viewer
 		private void GridView_MultiSelectChanged(object sender, SelectionChangedEventArgs e)
 		{
 			SaveButton.IsEnabled = ImageGridView.SelectedItems.Count > 0;
-			
+
 		}
 
 		private void ImageGridView_OnItemClick(object sender, ItemClickEventArgs e)
@@ -164,7 +167,7 @@ namespace Booru_Viewer
 
 		private void AddTagClicked(object sender, RoutedEventArgs e)
 		{
-		
+
 			TagTextBox.GetBindingExpression(AutoSuggestBox.TextProperty).UpdateSource();
 		}
 
@@ -176,7 +179,7 @@ namespace Booru_Viewer
 
 		private void TagTextBox_TextChanged(AutoSuggestBox autoSuggestBox, AutoSuggestBoxTextChangedEventArgs args)
 		{
-			
+
 		}
 
 		private void APIKeyTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -273,7 +276,7 @@ namespace Booru_Viewer
 		private void ImageOpened(object sender, ImageExOpenedEventArgs e)
 		{
 
-			
+
 		}
 
 		private void ImageEx_OnImageExFailed(object sender, ImageExFailedEventArgs e)
@@ -285,7 +288,7 @@ namespace Booru_Viewer
 
 		private void PerPageSlider_OnLoaded(object sender, RoutedEventArgs e)
 		{
-			
+
 		}
 
 		async void SavedSearchesList_OnDragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
