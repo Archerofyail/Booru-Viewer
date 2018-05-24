@@ -156,7 +156,8 @@
 							VerticalScrollMode="Disabled"
 							HorizontalScrollMode="Auto"
 							HorizontalScrollBarVisibility="Auto"
-							VerticalScrollBarVisibility="Hidden">
+							VerticalScrollBarVisibility="Hidden"
+							Visibility="{Binding ChildrenImages.Count, Converter={StaticResource CountToVis}}">
 							
 							<StackPanel Orientation="Horizontal">
 								<Button Background="Transparent"
