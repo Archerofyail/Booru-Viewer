@@ -199,7 +199,8 @@
 		</FlipView>
 
 		<StackPanel Orientation="Horizontal"
-					VerticalAlignment="Bottom">
+					VerticalAlignment="Bottom"
+		            Visibility="Collapsed">
 			<TextBlock Text="{Binding ElementName=FlipView, Path=SelectedIndex}"
 					   VerticalAlignment="Bottom"
 					   MaxHeight="20" />

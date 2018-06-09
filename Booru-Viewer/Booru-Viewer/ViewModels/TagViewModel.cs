@@ -135,6 +135,13 @@ namespace Booru_Viewer.ViewModels
 
 		void AddTagToSearchEx()
 		{
+			if (parentVM == null)
+				return;
+
+			if (parentVM.CurrentTags.Any(x => x.Name.TrimStart('-', '~') == Tag.Name))
+			{
+				return;
+			}
 			parentVM?.CurrentTags.Add(new TagViewModel(Tag, parentVM));
 			parentVM?.RaisePropertyChanged("TotalTagCount");
 		}

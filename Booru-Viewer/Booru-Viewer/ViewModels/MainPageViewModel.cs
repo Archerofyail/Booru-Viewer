@@ -670,7 +670,7 @@ namespace Booru_Viewer.ViewModels
 
 		void AddTagExecute()
 		{
-			if (CurrentTags.Any(x => x.Name.TrimStart('-', '~') == CurrentTag))
+			if (CurrentTags.Any(x => x.Name.TrimStart('-', '~') == CurrentTag.ToLower()))
 			{
 				return;
 			}
@@ -693,11 +693,6 @@ namespace Booru_Viewer.ViewModels
 			RaisePropertyChanged("TotalTagCount");
 		}
 
-		bool AddTagCanExecute()
-		{
-			return true;
-		}
-
 		void SaveLoginDataExecute()
 		{
 
@@ -710,11 +705,6 @@ namespace Booru_Viewer.ViewModels
 			ApplicationData.Current.RoamingSettings.Values["ImageSize"] = ImageSize;
 			RaisePropertyChanged("APIKey");
 			RaisePropertyChanged("IsFavButtonVisible");
-		}
-
-		bool SaveLoginDataCanExecute()
-		{
-			return true;
 		}
 
 		void ImageLoadOnError(Exception e)
@@ -851,7 +841,7 @@ namespace Booru_Viewer.ViewModels
 		}
 
 		public ICommand AddTag => new RelayCommand(AddTagExecute);
-		public ICommand SaveLoginData => new RelayCommand(SaveLoginDataExecute, SaveLoginDataCanExecute);
+		public ICommand SaveLoginData => new RelayCommand(SaveLoginDataExecute);
 		public ICommand StartSearch => new RelayCommand(StartSearchExecute);
 		public ICommand LoadNextPage => new RelayCommand(LoadNextPageE);
 		public ICommand ChangeSelectionMode => new RelayCommand(ChangeSelectionModeExecute);
