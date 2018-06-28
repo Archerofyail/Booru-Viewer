@@ -131,11 +131,18 @@ namespace Booru_Viewer.Types
 			HttpFormUrlEncodedContent signinDetails = new HttpFormUrlEncodedContent(signinStuff);
 			try
 			{
+				var toRemove = new List<ImageModel>();
 				for (var i = 0; i < imageLinks.Count; i++)
 				{
 					var img = imageLinks[i];
-					if (!img.File_Url.EndsWith("mp4") && !img.File_Url.EndsWith("webm") && !img.Large_File_Url.EndsWith("mp4") &&
-						!img.Large_File_Url.EndsWith("webm"))
+					if (!img.File_Url.EndsWith("mp4") && 
+					    !img.File_Url.EndsWith("webm") && 
+					    !img.File_Url.EndsWith("zip") &&
+						!img.File_Url.EndsWith("swf") &&
+					    !img.Large_File_Url.EndsWith("mp4") &&
+						!img.Large_File_Url.EndsWith("webm")&& 
+					    !img.Large_File_Url.EndsWith("zip") &&
+						!img.Large_File_Url.EndsWith("swf"))
 					{
 						if (i < imageLinks.Count - 2)
 						{
@@ -172,9 +179,17 @@ namespace Booru_Viewer.Types
 							}
 
 						}
-
+						GlobalInfo.CurrentSearch.Add(img);
 					}
-					GlobalInfo.CurrentSearch.Add(img);
+					else
+					{
+						toRemove.Add(img);
+					}
+					
+				}
+				foreach (var img in toRemove)
+				{
+					imageLinks.Remove(img);
 				}
 			}
 			catch (Exception e)
@@ -185,7 +200,7 @@ namespace Booru_Viewer.Types
 
 
 
-
+			
 
 			var noDupes = imageLinks.GroupBy(x => x.id).Where(x => x.Count() == 1).Select(x => x.First(y => y.id > 0)).ToList();
 			Debug.WriteLine("Page is: " + page + ". URL: " + requestURI);

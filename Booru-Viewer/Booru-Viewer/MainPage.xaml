@@ -52,14 +52,14 @@
 									<x:Boolean>True</x:Boolean>
 								</MenuFlyoutItem.CommandParameter>
 							</MenuFlyoutItem>
-							
+
 						</MenuFlyout>
 					</controls:ImageEx.ContextFlyout>
 					<controls:ImageEx.Resources>
 
 					</controls:ImageEx.Resources>
 
-					
+
 				</controls:ImageEx>
 			</DataTemplate>
 			<DataTemplate x:Name="ExcludedTag">
@@ -316,7 +316,7 @@
 						   Text=" of " />
 				<TextBlock Text="{Binding ImageSaveCount}" 
 				           Margin="4, 0"/>
-				
+
 
 			</StackPanel>
 			<StackPanel Orientation="Horizontal"
@@ -369,20 +369,20 @@
 				        Padding="4"
 				        Background="Transparent"
 				        >
-					
+
 					<Button.Content>
 						<SymbolIcon Symbol="Cancel"/>
 					</Button.Content>
 				</Button>
 				<!--<ScrollViewer MaxHeight="600">-->
-					<StackPanel>
-						<StackPanel Margin="0, 0, 12, 0"
+				<StackPanel>
+					<StackPanel Margin="0, 0, 12, 0"
 									MinWidth="350"
 									MaxWidth="350"
 									
 									VerticalAlignment="Top">
-							<TextBlock Text="Favourite Tags" />
-							<ListView ItemsSource="{Binding Source={StaticResource FavouriteTagsGroupedList}}"
+						<TextBlock Text="Favourite Tags" />
+						<ListView ItemsSource="{Binding Source={StaticResource FavouriteTagsGroupedList}}"
 									  ItemTemplate="{StaticResource FavouriteTag}"
 									  SelectionChanged="SavedSearchSelection"
 									  SelectedIndex="{Binding SelectedSavedSearch, Mode=TwoWay}"
@@ -394,33 +394,33 @@
 									  VerticalAlignment="Top"
 									 
 									  Height="300">
-								<ListView.GroupStyle>
-									<GroupStyle>
-										<GroupStyle.HeaderTemplate>
-											<DataTemplate>
-												<StackPanel>
-													<TextBlock Text="{Binding Key}"
+							<ListView.GroupStyle>
+								<GroupStyle>
+									<GroupStyle.HeaderTemplate>
+										<DataTemplate>
+											<StackPanel>
+												<TextBlock Text="{Binding Key}"
 															   FontSize="14"
 															   Margin="-4" />
-													<Line HorizontalAlignment="Stretch"/>
-												</StackPanel>
-											</DataTemplate>
-										</GroupStyle.HeaderTemplate>
-										<GroupStyle.HeaderContainerStyle>
-											<Style TargetType="ListViewHeaderItem">
-												<Setter Property="Margin" Value="-4"></Setter>
-											</Style>
-										</GroupStyle.HeaderContainerStyle>
-									</GroupStyle>
-								</ListView.GroupStyle>
-							</ListView>
-							<TextBlock Text="You have no favourite tags yet"
+												<Line HorizontalAlignment="Stretch"/>
+											</StackPanel>
+										</DataTemplate>
+									</GroupStyle.HeaderTemplate>
+									<GroupStyle.HeaderContainerStyle>
+										<Style TargetType="ListViewHeaderItem">
+											<Setter Property="Margin" Value="-4"></Setter>
+										</Style>
+									</GroupStyle.HeaderContainerStyle>
+								</GroupStyle>
+							</ListView.GroupStyle>
+						</ListView>
+						<TextBlock Text="You have no favourite tags yet"
 									   FontSize="12"
 									   Visibility="{Binding DontHaveSavedSearches}" />
-						</StackPanel>
-
-
 					</StackPanel>
+
+
+				</StackPanel>
 				<!--</ScrollViewer>-->
 				<StackPanel Orientation="Vertical"
 							MaxWidth="350"
@@ -465,38 +465,11 @@
 
 					<StackPanel Orientation="Horizontal"
 								Margin="0, 4">
-						<Button Command="{Binding DecrementPage}"
-								Margin="4, 0, 2, 0">
-							<Button.Content>
-								<StackPanel>
-									<SymbolIcon Symbol="Remove" />
-								</StackPanel>
-							</Button.Content>
-						</Button>
-						<TextBox Text="{Binding PageNum, Mode=TwoWay}"
-								 HorizontalAlignment="Left"
-								 Margin="4, 0"
-								 PlaceholderText="Page"
-								 AllowFocusOnInteraction="True"
-								 Name="StartPageTextBox"
-								 InputScope="Number" />
 
-						<Button Command="{Binding IncrementPage}"
-								Margin="2, 0, 4, 0">
-							<Button.Content>
-								<StackPanel>
-									<SymbolIcon Symbol="Add" />
-								</StackPanel>
-							</Button.Content>
-						</Button>
-						<ComboBox ItemsSource="{Binding OrderOptions}"
-								  SelectedIndex="{Binding SelectedOrderIndex, Mode=TwoWay}"
-								  AllowFocusOnInteraction="True"
-								  PlaceholderText="Order by" />
 					</StackPanel>
 					<ListView ItemsSource="{Binding CurrentTags, Mode=TwoWay}"
 							  ItemTemplate="{StaticResource Tag}"
-							  MinHeight="100"
+							  MinHeight="152"
 							  MaxHeight="100"
 							  SelectionMode="None"
 							  ItemContainerStyle="{StaticResource TagStyleNoMargin}"
@@ -542,7 +515,7 @@
 						Tapped="SearchButton_OnTapped"
 						Click="SearchClicked"
 						>
-					
+
 					<Button.Content>
 						<SymbolIcon>Find</SymbolIcon>
 					</Button.Content>
@@ -550,6 +523,26 @@
 			</StackPanel>
 
 		</ContentDialog>
+
+		<StackPanel Orientation="Horizontal"  Grid.Row="0"
+		            Grid.Column="0"
+		            Margin="4, 0">
+			<TextBlock Text="Order:"
+			           VerticalAlignment="Center"/>
+			<ComboBox ItemsSource="{Binding OrderOptions}"
+		          SelectedIndex="{Binding SelectedOrderIndex, Mode=TwoWay}"
+		          AllowFocusOnInteraction="True"
+		          PlaceholderText="Order by"
+		          BorderThickness="0"
+			          VerticalAlignment="Center">
+				
+			<ComboBox.ItemContainerStyle>
+					<Style TargetType="ComboBoxItem">
+						<Setter Property="FocusVisualPrimaryBrush" Value="Blue"></Setter>
+					</Style>
+				</ComboBox.ItemContainerStyle>
+			</ComboBox>
+		</StackPanel>
 		<controls:AdaptiveGridView   Background="{StaticResource BackgroundThemeBrush}"
 									 ItemTemplate="{StaticResource ImageTemplate}"
 									 ItemsSource="{Binding Path=Thumbnails}"
@@ -626,7 +619,7 @@
 			</Button.Content>
 		</Button>
 
-		
+
 		<VisualStateManager.VisualStateGroups>
 			<VisualStateGroup>
 				<VisualState x:Name="Below640">
@@ -675,7 +668,7 @@
 							  Name="SearchAppBarButton"
 							  Click="SearchButtonClicked"
 							  ToolTipService.ToolTip="Search (Ctrl+E)">
-				
+
 				</AppBarButton>
 				<AppBarButton Visibility="Collapsed"
 							  Icon="Save"

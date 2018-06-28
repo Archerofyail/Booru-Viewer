@@ -247,7 +247,6 @@ namespace Booru_Viewer
 
 		private void SearchButton_OnTapped(object sender, TappedRoutedEventArgs e)
 		{
-			StartPageTextBox.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
 			e.Handled = true;
 			SearchAppBarButton.Flyout?.Hide();
 		}

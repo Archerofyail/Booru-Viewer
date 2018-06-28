@@ -490,6 +490,7 @@ namespace Booru_Viewer.ViewModels
 				GlobalInfo.CurrentOrdering = SelectedOrderIndex > 0 ? OrderOptions[SelectedOrderIndex] : "";
 				RaisePropertyChanged("IsSignedOutWithMoreThan2Tags");
 				RaisePropertyChanged("TotalTagCount");
+				StartSearchExecute();
 			}
 		}
 
