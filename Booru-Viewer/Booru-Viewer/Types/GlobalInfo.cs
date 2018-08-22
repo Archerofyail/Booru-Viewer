@@ -1,4 +1,7 @@
-﻿using Booru_Viewer.ViewModels;
+﻿using Booru_Viewer.Models;
+using Booru_Viewer.ViewModels;
+using Microsoft.Toolkit.Uwp;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -6,9 +9,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Storage;
-using Booru_Viewer.Models;
-using Microsoft.Toolkit.Uwp;
-using Newtonsoft.Json;
+using log4net.Core;
+using log4net.Repository.Hierarchy;
+using Microsoft.HockeyApp.DataContracts;
 
 namespace Booru_Viewer.Types
 {
@@ -20,6 +23,24 @@ namespace Booru_Viewer.Types
 		public static ObservableCollection<TagViewModel> CurrentTags { get; set; } = new ObservableCollection<TagViewModel>();
 		public static List<string> CurrentSearchTags { get; set; } = new List<string>();
 		private static string currentOrdering = "";
+
+		public static EventHandler FavouriteImagesLoadedEventHandler;
+		private static List<string> favouriteImages;
+
+		public static List<string> FavouriteImages
+		{
+			get
+			{
+				if (favouriteImages == null)
+				{
+					favouriteImages = new List<string>();
+					LoadFavouritePosts();
+				}
+
+				return favouriteImages;
+			}
+			set => favouriteImages = value;
+		}
 
 		public static string CurrentOrdering
 		{
@@ -299,6 +320,108 @@ namespace Booru_Viewer.Types
 
 
 			FavouriteTagsLoadedEventHandler?.Invoke(typeof(GlobalInfo), EventArgs.Empty);
+		}
+
+		public static async Task SaveFavouritePosts(StorageFolder baseFolder = null)
+		{
+			if (FavouriteImages == null)
+			{
+				throw new NullReferenceException("searches list can't be null");
+			}
+			try
+			{
+				StorageFolder folder;
+				if (baseFolder != null)
+				{
+					if (baseFolder.DisplayName != "Booru-Viewer")
+					{
+						var potFold = await baseFolder.TryGetItemAsync("Booru-Viewer");
+						if (potFold != null)
+						{
+							folder = await baseFolder.GetFolderAsync("Booru-Viewer");
+						}
+						else
+						{
+							folder = await baseFolder.CreateFolderAsync("Booru-Viewer");
+						}
+					}
+					else
+					{
+						folder = baseFolder;
+					}
+				}
+				else
+				{
+					folder = ApplicationData.Current.RoamingFolder;
+				}
+
+				var item = await folder.TryGetItemAsync("FavouritePosts.json");
+				if (item != null)
+				{
+					SearchesFile = await folder.GetFileAsync("FavouritePosts.json");
+				}
+				else
+				{
+					SearchesFile = await folder.CreateFileAsync("FavouritePosts.json");
+				}
+
+				var json = JsonConvert.SerializeObject(FavouriteImages);
+				await FileIO.WriteTextAsync(SearchesFile, json);
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
+
+			}
+
+		}
+		public static async Task LoadFavouritePosts(StorageFolder searchesFolder = null)
+		{
+			List<string> searchList = null;
+			Debug.WriteLine("Loading Favourite Posts");
+			StorageFolder folder = ApplicationData.Current.RoamingFolder;
+			if (searchesFolder != null)
+			{
+				folder = searchesFolder;
+			}
+			var item = await folder.TryGetItemAsync("FavouritePosts.json");
+			if (item == null)
+			{
+				Debug.WriteLine("File was null");
+				return;
+			}
+
+			var logFile = await folder.GetFileAsync("log.txt");
+			
+			SearchesFile = await folder.GetFileAsync("FavouritePosts.json");
+			var json = await FileIO.ReadTextAsync(SearchesFile);
+			
+			try
+			{
+				searchList = JsonConvert.DeserializeObject<List<string>>(json);
+				if (searchList != null && FavouriteImages.Count == 0)
+				{
+
+					favouriteImages.Clear();
+					foreach (var search in searchList)
+					{
+
+						favouriteImages.Add(search);
+					}
+				}
+				else
+				{
+					Debug.WriteLine("SearchList was null");
+				}
+			}
+			catch (Exception e)
+			{
+				Debug.WriteLine(e);
+			}
+			await FileIO.WriteTextAsync(logFile, "File path is " + SearchesFile.Path + "\r\n, and json is \r\n" + json + "\r\n" + "Favorites list has " + FavouriteImages.Count + " items, they are: " + FavouriteImages.ToString()
+			                                      + "\r\nlocal list has " + searchList.Count + "items.\r\n conditional statemen is " + (searchList != null && FavouriteImages.Count == 0));
+			Debug.WriteLine("Favourite Posts Loaded, count is " + FavouriteImages.Count);
+			FavouriteImagesLoadedEventHandler?.Invoke(typeof(GlobalInfo), EventArgs.Empty);
 		}
 	}
 }

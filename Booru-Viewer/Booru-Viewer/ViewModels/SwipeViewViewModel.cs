@@ -150,22 +150,24 @@ namespace Booru_Viewer.ViewModels
 						MetaTags.Add(new TagViewModel(new Tag(metaTag)));
 					}
 
-					if (GlobalInfo.CurrentSearchTags.Contains("fav:archerofyail") || GlobalInfo.CurrentSearchTags.Contains("ordfav:archerofyail"))
-					{
-						FavIcon = Symbol.Favorite;
-						FavString = "Unfavourite";
-					}
-					else
-					{
-						FavIcon = Symbol.OutlineStar;
-						FavString = "Favourite";
-					}
+					var favTag = BooruAPI.Username.ToLower() + " ";
+					//if (GlobalInfo.CurrentSearchTags.Contains("fav:" + favTag) || GlobalInfo.CurrentSearchTags.Contains("ordfav:" + favTag))
+					//{
+					//	FavIcon = Symbol.Favorite;
+					//	FavString = "Unfavourite";
+					//}
+					//else
+					//{
+					//	FavIcon = Symbol.OutlineStar;
+					//	FavString = "Favourite";
+					//}
 					if (Images.Count - value < 5)
 					{
 						Images.LoadMoreItemsAsync(Convert.ToUInt32(perPage));
 					}
 					CurrentURL = GlobalInfo.CurrentSearch[value].Large_File_Url;
 					RaisePropertyChanged("CurrentURL");
+					RaisePropertyChanged("FavIcon");
 				}
 
 				RaisePropertyChanged();
@@ -210,9 +212,17 @@ namespace Booru_Viewer.ViewModels
 		{
 			get
 			{
-				if (GlobalInfo.CurrentSearchTags.Contains("fav:archerofyail") || GlobalInfo.CurrentSearchTags.Contains("ordfav:archerofyail"))
+				//if (GlobalInfo.CurrentSearchTags.Contains("fav:" + BooruAPI.Username) || GlobalInfo.CurrentSearchTags.Contains("ordfav:" + BooruAPI.Username))
+				//{
+				//	favIcon = Symbol.Favorite;
+				//}
+				if (GlobalInfo.FavouriteImages.Contains(Images[Index].SelectedImagePostID))
 				{
 					favIcon = Symbol.Favorite;
+				}
+				else
+				{
+					favIcon = Symbol.OutlineStar;
 				}
 				return favIcon;
 			}
@@ -290,6 +300,8 @@ namespace Booru_Viewer.ViewModels
 				{
 					FavIcon = Symbol.Favorite;
 					FavString = "Unfavourite";
+					GlobalInfo.FavouriteImages.Add(GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].id);
+					await GlobalInfo.SaveFavouritePosts();
 				}
 
 			}
@@ -301,6 +313,9 @@ namespace Booru_Viewer.ViewModels
 					
 					FavIcon = Symbol.OutlineStar;
 					FavString = "Favourite";
+					GlobalInfo.FavouriteImages.Remove(im.id);
+					await GlobalInfo.SaveFavouritePosts();
+
 				}
 			}
 		}

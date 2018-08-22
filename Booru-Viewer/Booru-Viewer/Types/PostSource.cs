@@ -30,7 +30,7 @@ namespace Booru_Viewer.Types
 			foreach (var image in result.Item2)
 			{
 				bool shouldUseLargeImage = image.Has_Large; // && !image.Large_File_Url.EndsWith(".webm");
-				tns.Add(new FullImageViewModel(useLargerImagePreviews ? image.File_Url : image.Preview_File_Url,
+				tns.Add(new FullImageViewModel(image.id, useLargerImagePreviews ? image.File_Url : image.Preview_File_Url,
 					shouldUseLargeImage ? image.Large_File_Url : image.File_Url, "https://danbooru.donmai.us/posts/" + image.id, image.ChildrenImages, null,
 					image.Large_File_Url, image.image_width, image.image_height));
 

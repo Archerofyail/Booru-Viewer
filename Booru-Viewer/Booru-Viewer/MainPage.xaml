@@ -502,8 +502,7 @@
 					</StackPanel>
 
 				</StackPanel>
-				<TextBlock Text="This search will return empty because you
-											   have more than 2 tags and are not signed in"
+				<TextBlock Text="You need a gold account or higher to use more than 2 tags"
 						   TextWrapping="WrapWholeWords"
 						   Visibility="{Binding IsSignedOutWithMoreThan2Tags}" />
 				<Button MinWidth="290"
@@ -535,8 +534,8 @@
 		          PlaceholderText="Order by"
 		          BorderThickness="0"
 			          VerticalAlignment="Center">
-				
-			<ComboBox.ItemContainerStyle>
+
+				<ComboBox.ItemContainerStyle>
 					<Style TargetType="ComboBoxItem">
 						<Setter Property="FocusVisualPrimaryBrush" Value="Blue"></Setter>
 					</Style>
@@ -809,6 +808,19 @@
 										<Button Content="Restore"
 												Command="{Binding Restore}"
 												Margin="4"></Button>
+									</StackPanel>
+								</StackPanel>
+								<StackPanel>
+									<TextBlock Text="Download or delete your favourites info"></TextBlock>
+									<StackPanel Orientation="Horizontal">
+									<Button Content="Download Favourites"
+									        Command="{Binding DownloadFavourites}"/>
+										<Button Content="Delete Favourites"
+										        Command="{Binding DeleteFavourites}"></Button>
+									</StackPanel>
+									<StackPanel Orientation="Horizontal">
+										<TextBlock Text="Favourite Count"></TextBlock>
+										<TextBlock Text="{Binding FavouritePostCount}"/>
 									</StackPanel>
 								</StackPanel>
 								<StackPanel Orientation="Horizontal"

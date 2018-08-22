@@ -83,6 +83,7 @@ namespace Booru_Viewer.ViewModels
 
 			}
 
+			
 			//StartSearchExecute();
 			Debug.WriteLine("Count for saved Searches is " + SavedSearches.Count);
 			BooruAPI.TagSearchCompletedHandler += (sender, tuple) =>
@@ -132,7 +133,11 @@ namespace Booru_Viewer.ViewModels
 					RaisePropertyChanged("DontHaveSavedSearches");
 				}
 			};
-
+			//GlobalInfo.LoadFavouritePosts();
+			GlobalInfo.FavouriteImagesLoadedEventHandler += (sender, args) =>
+			{
+				RaisePropertyChanged("FavouritePostCount");
+			};
 			
 			//thumbnails.CollectionChanged += (sender, args) => RaisePropertyChanged("Thumbnails");
 			RaisePropertyChanged("SelectedPrefixIndex");
@@ -168,6 +173,22 @@ namespace Booru_Viewer.ViewModels
 				}
 			};
 			BooruAPI.GetUser();
+		}
+
+		private int favouritePostCount = 0;
+
+		public int FavouritePostCount
+		{
+			get
+			{
+				favouritePostCount = GlobalInfo.FavouriteImages.Count;
+				return favouritePostCount;
+			}
+			set
+			{
+				favouritePostCount = value;
+				RaisePropertyChanged();
+			}
 		}
 
 		private bool _useLargerImagesForThumbnails;
@@ -780,7 +801,7 @@ namespace Booru_Viewer.ViewModels
 		{
 
 			CurrentTags.Clear();
-			CurrentTag = "ordfav:" + Username;
+			CurrentTag = "fav:" + Username;
 			RaisePropertyChanged("CurrentTags");
 			RaisePropertyChanged("TotalTagCount");
 			AddTagExecute();
@@ -1124,6 +1145,28 @@ namespace Booru_Viewer.ViewModels
 			}
 			RaisePropertyChanged("IsSavingImages");
 		}
+
+		public ICommand DownloadFavourites => new RelayCommand(DownloadFavouritesEx);
+		async void DownloadFavouritesEx()
+		{
+			var favs = await BooruAPI.GetUserFavourites();
+			foreach (var image in favs)
+			{
+				GlobalInfo.FavouriteImages.Add(image.id);
+			}
+			Debug.WriteLine("Downloaded favourites");
+			await GlobalInfo.SaveFavouritePosts();
+			RaisePropertyChanged("FavouritePostCount");
+		}
+
+		public ICommand DeleteFavourites => new RelayCommand(DeleteFavouritesEx);
+
+		async void DeleteFavouritesEx()
+		{
+			GlobalInfo.FavouriteImages.Clear();
+			GlobalInfo.SaveFavouritePosts();
+		}
+		
 	}
 
 

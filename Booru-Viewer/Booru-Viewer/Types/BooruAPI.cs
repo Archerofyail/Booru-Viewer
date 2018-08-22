@@ -135,13 +135,13 @@ namespace Booru_Viewer.Types
 				for (var i = 0; i < imageLinks.Count; i++)
 				{
 					var img = imageLinks[i];
-					if (!img.File_Url.EndsWith("mp4") && 
-					    !img.File_Url.EndsWith("webm") && 
-					    !img.File_Url.EndsWith("zip") &&
+					if (!img.File_Url.EndsWith("mp4") &&
+						!img.File_Url.EndsWith("webm") &&
+						!img.File_Url.EndsWith("zip") &&
 						!img.File_Url.EndsWith("swf") &&
-					    !img.Large_File_Url.EndsWith("mp4") &&
-						!img.Large_File_Url.EndsWith("webm")&& 
-					    !img.Large_File_Url.EndsWith("zip") &&
+						!img.Large_File_Url.EndsWith("mp4") &&
+						!img.Large_File_Url.EndsWith("webm") &&
+						!img.Large_File_Url.EndsWith("zip") &&
 						!img.Large_File_Url.EndsWith("swf"))
 					{
 						if (i < imageLinks.Count - 2)
@@ -156,8 +156,8 @@ namespace Booru_Viewer.Types
 									//if img has same parent id as j's id check
 									//if img has same id as j's parent id check
 									var parentsSameAndNotNull = (imageLinks[j].Parent_Id == img.Parent_Id && img.Parent_Id != null &&
-									                             imageLinks[j].Parent_Id != null);
-									while (img.id.ToString() == imageLinks[j].Parent_Id || img.Parent_Id == imageLinks[j].id.ToString() || parentsSameAndNotNull)
+																 imageLinks[j].Parent_Id != null);
+									while (img.id == imageLinks[j].Parent_Id || img.Parent_Id == imageLinks[j].id || parentsSameAndNotNull)
 									{
 										img.ChildrenImages.Add(imageLinks[j]);
 										imageLinks.Remove(imageLinks[j]);
@@ -166,7 +166,7 @@ namespace Booru_Viewer.Types
 											break;
 										}
 										parentsSameAndNotNull = (imageLinks[j].Parent_Id == img.Parent_Id && img.Parent_Id != null &&
-										                             imageLinks[j].Parent_Id != null);
+																	 imageLinks[j].Parent_Id != null);
 
 									}
 								}
@@ -185,7 +185,7 @@ namespace Booru_Viewer.Types
 					{
 						toRemove.Add(img);
 					}
-					
+
 				}
 				foreach (var img in toRemove)
 				{
@@ -200,9 +200,9 @@ namespace Booru_Viewer.Types
 
 
 
-			
 
-			var noDupes = imageLinks.GroupBy(x => x.id).Where(x => x.Count() == 1).Select(x => x.First(y => y.id > 0)).ToList();
+
+			var noDupes = imageLinks.GroupBy(x => x.id).Where(x => x.Count() == 1).Select(x => x.First(y => !string.IsNullOrEmpty(y.id))).ToList();
 			Debug.WriteLine("Page is: " + page + ". URL: " + requestURI);
 			return new Tuple<bool, List<ImageModel>, string>(true, noDupes, response.StatusCode.ToString());
 
@@ -295,7 +295,7 @@ namespace Booru_Viewer.Types
 		public static async Task<bool> FavouriteImage(ImageModel im)
 		{
 			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(new[]{
-																			new KeyValuePair<string, string>("post_id", im.id.ToString()),
+																			new KeyValuePair<string, string>("post_id", im.id),
 																			new KeyValuePair<string, string>("login", Username),
 																			new KeyValuePair<string, string>("api_key", APIKey),});
 			HttpResponseMessage response = new HttpResponseMessage();
@@ -315,11 +315,17 @@ namespace Booru_Viewer.Types
 			{
 				return false;
 			}
-			var jobj = JObject.Parse(await response.Content.ReadAsStringAsync());
-			var isSuccess = jobj["success"].Value<bool>();
-			if (isSuccess)
+
+			var responseData = await response.Content.ReadAsStringAsync();
+			if (responseData != null)
 			{
-				return true;
+				var jobj = JsonConvert.DeserializeObject<ImageModel>(responseData);
+				var isSuccess = jobj.id == im.id;
+
+				if (isSuccess)
+				{
+					return true;
+				}
 			}
 
 			return false;
@@ -366,11 +372,16 @@ namespace Booru_Viewer.Types
 			{
 				return false;
 			}
-			var jobj = JObject.Parse(await response.Content.ReadAsStringAsync());
-			var isSuccess = jobj["success"].Value<bool>();
-			if (isSuccess)
+
+			var json = await response.Content.ReadAsStringAsync();
+			if (!string.IsNullOrEmpty(json))
 			{
-				return true;
+				var jobj = JObject.Parse(json);
+				var isSuccess = jobj["success"].Value<bool>();
+				if (isSuccess)
+				{
+					return true;
+				}
 			}
 			return false;
 		}
@@ -398,5 +409,35 @@ namespace Booru_Viewer.Types
 		{
 			BaseURL = newBaseURL;
 		}
+
+		public static async Task<List<ImageModel>> GetUserFavourites()
+		{
+			List<ImageModel> favourites = new List<ImageModel>();
+			int index = 1;
+			int imageReturnCount = 20;
+			bool caughtUp = false;
+			Debug.WriteLine("favourite images count before adding is " + GlobalInfo.FavouriteImages.Count);
+			do
+			{
+				var images = (await SearchPosts(new[] { "ordfav:archerofyail" }, index++, 100)).Item2;
+				imageReturnCount = images.Count;
+				foreach (var img in images)
+				{
+					if (GlobalInfo.FavouriteImages.Contains(img.id))
+					{
+						caughtUp = true;
+						break;
+					}
+					favourites.Add(img);
+				}
+
+				Debug.WriteLine("Downloaded page " + index + "of favourites");
+
+			} while ((index - 2) * 100 < UserModel.favorite_count && !caughtUp);
+
+
+			return favourites;
+		}
+
 	}
 }

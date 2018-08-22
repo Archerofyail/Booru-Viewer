@@ -230,7 +230,7 @@
 					</ToolTip>
 				</AppBarButton>
 
-				<AppBarButton Label="View GeneralTags"
+				<AppBarButton Label="View Tags"
 							  Icon="List">
 					<AppBarButton.Flyout>
 						<Flyout x:Name="TagFlyout">

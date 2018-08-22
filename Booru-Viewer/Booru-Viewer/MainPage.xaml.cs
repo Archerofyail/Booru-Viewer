@@ -43,7 +43,11 @@ namespace Booru_Viewer
 
 			}
 
-
+			//var favs = BooruAPI.GetUserFavourites().Result;
+			//foreach (var image in favs)
+			//{
+			//	GlobalInfo.FavouriteImages.Add(image.id.ToString(), image);
+			//}
 			this.NavigationCacheMode = NavigationCacheMode.Required;
 			SearchButton.Loaded += (sender, args) => { SearchButton.CommandParameter = SearchAppBarButton; };
 			SearchFavouritesButton.Loaded += (sender, args) => { SearchButton.CommandParameter = SearchAppBarButton; };
