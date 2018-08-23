@@ -10,8 +10,7 @@
 	  RequestedTheme="Default"
 	  x:Name="Page"
 	  xmlns:i="using:Microsoft.Xaml.Interactivity"
-	  xmlns:core="using:Microsoft.Xaml.Interactions.Core"
-	  >
+	  xmlns:core="using:Microsoft.Xaml.Interactions.Core">
 
 	<Page.DataContext>
 		<vm1:MainPageViewModel></vm1:MainPageViewModel>
@@ -55,11 +54,6 @@
 
 						</MenuFlyout>
 					</controls:ImageEx.ContextFlyout>
-					<controls:ImageEx.Resources>
-
-					</controls:ImageEx.Resources>
-
-
 				</controls:ImageEx>
 			</DataTemplate>
 			<DataTemplate x:Name="ExcludedTag">
@@ -187,30 +181,6 @@
 					</Button>
 				</StackPanel>
 			</DataTemplate>
-			<DataTemplate x:Key="SavedSearch">
-				<StackPanel Orientation="Horizontal"
-							BorderThickness="1"
-							Background="{StaticResource ThemeBrush}">
-					<StackPanel.BorderBrush>
-						<SolidColorBrush Color="{ThemeResource SystemBaseLowColor}" />
-					</StackPanel.BorderBrush>
-
-
-					<TextBlock Text="{Binding Path=Search}"
-							   MaxLines="2"
-							   TextWrapping="WrapWholeWords"
-							   Margin="8, 0"
-							   VerticalAlignment="Center"
-							   Foreground="White" />
-
-					<Button Command="{Binding Path=DeleteSearch}"
-							Background="#FF7C7C7C">
-						<Button.Content>
-							<SymbolIcon Symbol="Delete" />
-						</Button.Content>
-					</Button>
-				</StackPanel>
-			</DataTemplate>
 			<DataTemplate x:Key="SuggestedTag">
 				<StackPanel Orientation="Horizontal"
 							BorderThickness="1"
@@ -285,58 +255,136 @@
 							Value="1200"></Setter>
 				</Style>
 			</DataTemplate>
+			<DataTemplate x:Key="HorizontalListViewItemPanel">
+
+			</DataTemplate>
+			<DataTemplate x:Key="SavedSearchTemplate">
+				<Grid Margin="10">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="500"/>
+						<ColumnDefinition Width="Auto"/>
+					</Grid.ColumnDefinitions>
+					
+					<ListView ItemsSource="{Binding SearchPreview}"
+								  SelectionMode="None"
+								  Margin="0, 0, 0, 0"
+								 Grid.Column="0"
+							     VerticalAlignment="Stretch"
+					          IsItemClickEnabled="True"
+					          ItemClick="PreviewPictureClicked">
+						<ListView.ItemsPanel>
+							<ItemsPanelTemplate>
+								<VirtualizingStackPanel Orientation="Horizontal"/>
+							</ItemsPanelTemplate>
+						</ListView.ItemsPanel>
+						<ListView.ItemContainerStyle>
+							<Style TargetType="ListViewItem">
+								<Setter Property="Margin" Value="0"></Setter>
+								<Setter Property="Padding" Value="0"></Setter>
+								<Setter Property="BorderThickness" Value="0" />
+								<Setter Property="Template">
+									<Setter.Value>
+										<ControlTemplate TargetType="ListViewItem">
+											<ListViewItemPresenter ContentMargin="0" Padding="0" />
+										</ControlTemplate>
+									</Setter.Value>
+								</Setter>
+							</Style>
+						</ListView.ItemContainerStyle>
+						<ListView.ItemTemplate>
+
+							<DataTemplate>
+								<controls:ImageEx Source="{Binding}"
+													  MaxHeight="150"
+													  MaxWidth="150"
+													  MinWidth="0"
+													  PlaceholderSource="Assets/Placeholder.png"
+													  PlaceholderStretch="UniformToFill"
+													  Stretch="UniformToFill"
+													  ImageExOpened="ImageExBase_OnImageExOpened"
+												  HorizontalAlignment="Stretch"
+												  VerticalAlignment="Stretch"
+													Margin="0"/>
+							</DataTemplate>
+						</ListView.ItemTemplate>
+					</ListView>
+					<Border Background="#BB000000"
+							Grid.Column="0"
+					        Margin="0"
+							Padding="0, 0, 0, 20"
+					        HorizontalAlignment="Stretch"
+					        VerticalAlignment="Top"
+					        >
+						<TextBlock Text="{Binding AllTags}"
+								  HorizontalAlignment="Stretch"
+								  Foreground="White"
+							  Margin="4"
+							   TextWrapping="WrapWholeWords"
+						           />
+					</Border>
+
+					<Button Content="Delete" Command="{Binding DeleteSearch}"
+							Margin="4"
+							HorizontalAlignment="Right"
+							Grid.Column="1"/>
+				</Grid>
+			</DataTemplate>
 		</ResourceDictionary>
 	</Page.Resources>
-	<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+	<Hub Name="MainHub">
+		<HubSection Header="Search Results"
+					Name="SearchResultsSection">
+			<DataTemplate>
+				<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
 		  Name="RootGrid"
 		  MinHeight="250"
 		  VerticalAlignment="Stretch">
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition />
-			<ColumnDefinition />
-		</Grid.ColumnDefinitions>
-		<Grid.RowDefinitions>
-			<RowDefinition Height="Auto"></RowDefinition>
-			<RowDefinition Height="*"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition />
+						<ColumnDefinition />
+					</Grid.ColumnDefinitions>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto"></RowDefinition>
+						<RowDefinition Height="*"></RowDefinition>
+						<RowDefinition Height="Auto"></RowDefinition>
 
-		</Grid.RowDefinitions>
-		<StackPanel VerticalAlignment="Top"
+					</Grid.RowDefinitions>
+					<StackPanel VerticalAlignment="Top"
 					HorizontalAlignment="Stretch"
 					Visibility="{Binding IsSavingImages}"
 					Grid.Row="0"
 					Grid.ColumnSpan="2">
-			<StackPanel Orientation="Horizontal"
+						<StackPanel Orientation="Horizontal"
 						Margin="0, 4"
 						HorizontalAlignment="Center">
-				<TextBlock Text="Saving"
+							<TextBlock Text="Saving"
 						   Margin="4, 0"></TextBlock>
-				<TextBlock Text="{Binding CurrentImageSaveIndex}" />
-				<TextBlock Margin="4, 0"
+							<TextBlock Text="{Binding CurrentImageSaveIndex}" />
+							<TextBlock Margin="4, 0"
 						   Text=" of " />
-				<TextBlock Text="{Binding ImageSaveCount}" 
-				           Margin="4, 0"/>
+							<TextBlock Text="{Binding ImageSaveCount}" 
+						   Margin="4, 0"/>
 
 
-			</StackPanel>
-			<StackPanel Orientation="Horizontal"
-			            HorizontalAlignment="Center"
-			            Margin="0, 4">
-				<TextBlock Text="Images already saved:" Margin="4, 0"/>
-				<TextBlock Text="{Binding DuplicateSaveCount}" />
-			</StackPanel>
-			<ProgressBar Maximum="{Binding ImageSaveCount}"
+						</StackPanel>
+						<StackPanel Orientation="Horizontal"
+						HorizontalAlignment="Center"
+						Margin="0, 4">
+							<TextBlock Text="Images already saved:" Margin="4, 0"/>
+							<TextBlock Text="{Binding DuplicateSaveCount}" />
+						</StackPanel>
+						<ProgressBar Maximum="{Binding ImageSaveCount}"
 						 Value="{Binding CurrentImageSaveIndex}" 
 						 HorizontalAlignment="Stretch"/>
-			<TextBlock Text="Please don't exit the app while saving"
+						<TextBlock Text="Please don't exit the app while saving"
 					   FontSize="12"
 					   FontStyle="Italic"
 					   FontWeight="SemiLight"
 					   Margin="4, 0" 
 					   HorizontalAlignment="Center"/>
 
-		</StackPanel>
-		<ContentDialog VerticalAlignment="Center"
+					</StackPanel>
+					<ContentDialog VerticalAlignment="Center"
 					   HorizontalAlignment="Center"
 					   IsPrimaryButtonEnabled="True"
 					   IsSecondaryButtonEnabled="True"
@@ -350,39 +398,40 @@
 					   Grid.Column="0"
 					   Grid.ColumnSpan="1"
 					   Grid.RowSpan="2">
-			<TextBlock Text="Are you 18 or older?" />
-		</ContentDialog>
-		<ContentDialog Grid.RowSpan="3"
+						<TextBlock Text="Are you 18 or older?" />
+					</ContentDialog>
+					<ContentDialog Grid.RowSpan="3"
 					   Grid.Row="0"
 					   Grid.ColumnSpan="2"
 					   Grid.Column="0"
-					   Name="SearchDialog"
+					   x:Name="SearchDialog"
 					   HorizontalAlignment="Stretch"
-					   VerticalAlignment="Top">
-			<StackPanel>
-				<Button HorizontalAlignment="Right"
-				        VerticalAlignment="Top"
-				        Click="CloseSearchDialogClick"
-				        Margin="0"
-				        FocusVisualPrimaryBrush="Transparent"
-				        FocusVisualSecondaryBrush="Transparent"
-				        Padding="4"
-				        Background="Transparent"
-				        >
+					   VerticalAlignment="Top"
+					               Height="2000">
+						<StackPanel>
+							<Button HorizontalAlignment="Right"
+						VerticalAlignment="Top"
+						Click="CloseSearchDialogClick"
+						Margin="0, 0, 0, -40"
+						FocusVisualPrimaryBrush="Transparent"
+						FocusVisualSecondaryBrush="Transparent"
+						Padding="4"
+						Background="Transparent"
+						>
 
-					<Button.Content>
-						<SymbolIcon Symbol="Cancel"/>
-					</Button.Content>
-				</Button>
-				<!--<ScrollViewer MaxHeight="600">-->
-				<StackPanel>
-					<StackPanel Margin="0, 0, 12, 0"
+								<Button.Content>
+									<SymbolIcon Symbol="Cancel"/>
+								</Button.Content>
+							</Button>
+							<!--<ScrollViewer MaxHeight="600">-->
+							<StackPanel>
+								<StackPanel Margin="0, 0, 12, 0"
 									MinWidth="350"
 									MaxWidth="350"
 									
 									VerticalAlignment="Top">
-						<TextBlock Text="Favourite Tags" />
-						<ListView ItemsSource="{Binding Source={StaticResource FavouriteTagsGroupedList}}"
+									<TextBlock Text="Favourite Tags" />
+									<ListView ItemsSource="{Binding Source={StaticResource FavouriteTagsGroupedList}}"
 									  ItemTemplate="{StaticResource FavouriteTag}"
 									  SelectionChanged="SavedSearchSelection"
 									  SelectedIndex="{Binding SelectedSavedSearch, Mode=TwoWay}"
@@ -392,45 +441,44 @@
 									  SelectionMode="None"
 									  ItemClick="SavedSearchesList_OnItemClick"
 									  VerticalAlignment="Top"
-									 
+									
 									  Height="300">
-							<ListView.GroupStyle>
-								<GroupStyle>
-									<GroupStyle.HeaderTemplate>
-										<DataTemplate>
-											<StackPanel>
-												<TextBlock Text="{Binding Key}"
+										<ListView.GroupStyle>
+											<GroupStyle>
+												<GroupStyle.HeaderTemplate>
+													<DataTemplate>
+														<StackPanel>
+															<TextBlock Text="{Binding Key}"
 															   FontSize="14"
 															   Margin="-4" />
-												<Line HorizontalAlignment="Stretch"/>
-											</StackPanel>
-										</DataTemplate>
-									</GroupStyle.HeaderTemplate>
-									<GroupStyle.HeaderContainerStyle>
-										<Style TargetType="ListViewHeaderItem">
-											<Setter Property="Margin" Value="-4"></Setter>
-										</Style>
-									</GroupStyle.HeaderContainerStyle>
-								</GroupStyle>
-							</ListView.GroupStyle>
-						</ListView>
-						<TextBlock Text="You have no favourite tags yet"
+															<Line HorizontalAlignment="Stretch"/>
+														</StackPanel>
+													</DataTemplate>
+												</GroupStyle.HeaderTemplate>
+												<GroupStyle.HeaderContainerStyle>
+													<Style TargetType="ListViewHeaderItem">
+														<Setter Property="Margin" Value="-4"></Setter>
+													</Style>
+												</GroupStyle.HeaderContainerStyle>
+											</GroupStyle>
+										</ListView.GroupStyle>
+									</ListView>
+									<TextBlock Text="You have no favourite tags yet"
 									   FontSize="12"
 									   Visibility="{Binding DontHaveSavedSearches}" />
-					</StackPanel>
+								</StackPanel>
 
 
-				</StackPanel>
-				<!--</ScrollViewer>-->
-				<StackPanel Orientation="Vertical"
-							MaxWidth="350"
+							</StackPanel>
+							<!--</ScrollViewer>-->
+							<StackPanel Orientation="Vertical"
 							MinWidth="350"
 							HorizontalAlignment="Stretch"
 							VerticalAlignment="Top"
 							>
-					<TextBlock Text="Add tags"></TextBlock>
-					<StackPanel Orientation="Horizontal">
-						<AutoSuggestBox PlaceholderText="Tag"
+								<TextBlock Text="Add tags"></TextBlock>
+								<StackPanel Orientation="Horizontal">
+									<AutoSuggestBox PlaceholderText="Tag"
 										Name="TagTextBox"
 										MinWidth="260"
 										Text="{Binding CurrentTag, Mode=TwoWay, 
@@ -442,70 +490,75 @@
 										UpdateTextOnSelect="False"
 										VerticalAlignment="Center"
 										SuggestionChosen="TagTextBox_OnSuggestionChosen">
-							<AutoSuggestBox.TextBoxStyle>
-								<Style TargetType="TextBox">
-									<Setter Property="IsTextPredictionEnabled"
+										<AutoSuggestBox.TextBoxStyle>
+											<Style TargetType="TextBox">
+												<Setter Property="IsTextPredictionEnabled"
 											Value="False" />
-								</Style>
-							</AutoSuggestBox.TextBoxStyle>
-						</AutoSuggestBox>
+											</Style>
+										</AutoSuggestBox.TextBoxStyle>
+									</AutoSuggestBox>
 
-						<Button Name="AddTagButton"
+									<Button Name="AddTagButton"
 								Margin="4, 0, 0, 0"
 								Background="{StaticResource ThemeBrush}"
 								Foreground="White"
 								Click="AddTagClicked"
 								Command="{Binding AddTag}">
-							<Button.Content>
-								<SymbolIcon>Add</SymbolIcon>
-							</Button.Content>
-						</Button>
+										<Button.Content>
+											<SymbolIcon Symbol="Add"/>
+										</Button.Content>
+									</Button>
 
-					</StackPanel>
+								</StackPanel>
 
-					<StackPanel Orientation="Horizontal"
+								<StackPanel Orientation="Horizontal"
 								Margin="0, 4">
 
-					</StackPanel>
-					<ListView ItemsSource="{Binding CurrentTags, Mode=TwoWay}"
-							  ItemTemplate="{StaticResource Tag}"
-							  MinHeight="152"
-							  MaxHeight="100"
-							  SelectionMode="None"
-							  ItemContainerStyle="{StaticResource TagStyleNoMargin}"
-							  HorizontalContentAlignment="Left"
-							  MaxWidth="{Binding ElementName=RootGrid, Path=ActualWidth}"
-							  Name="CurrentTagsList">
-						<ListView.ItemsPanel>
-							<ItemsPanelTemplate>
-								<controls:WrapPanel Orientation="Horizontal" />
-							</ItemsPanelTemplate>
-						</ListView.ItemsPanel>
-					</ListView>
-					<StackPanel Orientation="Horizontal">
-						<TextBlock Text="Total tags:"></TextBlock>
-						<TextBlock Text="{Binding TotalTagCount}"></TextBlock>
-					</StackPanel>
-					<StackPanel Orientation="Horizontal"
+								</StackPanel>
+								<ListView ItemsSource="{Binding CurrentTags, Mode=OneWay}"
+										  ItemTemplate="{StaticResource Tag}"
+										  MinHeight="152"
+										  MaxHeight="100"
+										  SelectionMode="None"
+										  ItemContainerStyle="{StaticResource TagStyleNoMargin}"
+										  HorizontalContentAlignment="Left"
+										  MaxWidth="350"
+										  Name="CurrentTagsList">
+									<ListView.ItemsPanel>
+										<ItemsPanelTemplate>
+											<controls:WrapPanel Orientation="Horizontal" />
+										</ItemsPanelTemplate>
+									</ListView.ItemsPanel>
+								</ListView>
+								<StackPanel Orientation="Horizontal">
+									<TextBlock Text="Total tags:"></TextBlock>
+									<TextBlock Text="{Binding TotalTagCount}"></TextBlock>
+								</StackPanel>
+								<StackPanel Orientation="Horizontal"
 								FlowDirection="RightToLeft"
-								Margin="8">
-						<Button Content="Search Your Favourites"
-								Command="{Binding SearchFavourites}"
-								Visibility="{Binding IsFavButtonVisible}"
-								Name="SearchFavouritesButton"
-								Margin="8, 0"></Button>
-						<Button Content="Clear Search"
-								Command="{Binding ClearSearch}"
-								Name="ClearSearchButton"
-								Margin="8, 0"></Button>
+								Margin="8"
+								            MinWidth="250">
+									<Button Content="Search Your Favourites"
+											Command="{Binding SearchFavourites}"
+											Visibility="{Binding IsFavButtonVisible}"
+											Name="SearchFavouritesButton"
+											Margin="8, 0"></Button>
+									<Button Content="Clear Search"
+											Command="{Binding ClearSearch}"
+											Name="ClearSearchButton"
+											Margin="8, 0"></Button>
 
-					</StackPanel>
-
-				</StackPanel>
-				<TextBlock Text="You need a gold account or higher to use more than 2 tags"
+								</StackPanel>
+								<Button Margin="16, 4, 16, 8"
+								        Name="SaveCurrentSearch"
+								        Command="{Binding SaveSearch}"
+								        Content="Save Search"
+								        HorizontalAlignment="Right"/>
+							</StackPanel>
+							<TextBlock Text="You need a gold account or higher to use more than 2 tags"
 						   TextWrapping="WrapWholeWords"
 						   Visibility="{Binding IsSignedOutWithMoreThan2Tags}" />
-				<Button MinWidth="290"
+							<Button MinWidth="290"
 						HorizontalAlignment="Center"
 						Background="{StaticResource ThemeBrush}"
 						Foreground="White"
@@ -515,34 +568,34 @@
 						Click="SearchClicked"
 						>
 
-					<Button.Content>
-						<SymbolIcon>Find</SymbolIcon>
-					</Button.Content>
-				</Button>
-			</StackPanel>
+								<Button.Content>
+									<SymbolIcon Symbol="Find"/>
+								</Button.Content>
+							</Button>
+						</StackPanel>
 
-		</ContentDialog>
+					</ContentDialog>
 
-		<StackPanel Orientation="Horizontal"  Grid.Row="0"
-		            Grid.Column="0"
-		            Margin="4, 0">
-			<TextBlock Text="Order:"
-			           VerticalAlignment="Center"/>
-			<ComboBox ItemsSource="{Binding OrderOptions}"
-		          SelectedIndex="{Binding SelectedOrderIndex, Mode=TwoWay}"
-		          AllowFocusOnInteraction="True"
-		          PlaceholderText="Order by"
-		          BorderThickness="0"
-			          VerticalAlignment="Center">
+					<StackPanel Orientation="Horizontal"  Grid.Row="0"
+					Grid.Column="0"
+					Margin="4, 0">
+						<TextBlock Text="Order:"
+					   VerticalAlignment="Center"/>
+						<ComboBox ItemsSource="{Binding OrderOptions}"
+				  SelectedIndex="{Binding SelectedOrderIndex, Mode=TwoWay}"
+				  AllowFocusOnInteraction="True"
+				  PlaceholderText="Order by"
+				  BorderThickness="0"
+					  VerticalAlignment="Center">
 
-				<ComboBox.ItemContainerStyle>
-					<Style TargetType="ComboBoxItem">
-						<Setter Property="FocusVisualPrimaryBrush" Value="Blue"></Setter>
-					</Style>
-				</ComboBox.ItemContainerStyle>
-			</ComboBox>
-		</StackPanel>
-		<controls:AdaptiveGridView   Background="{StaticResource BackgroundThemeBrush}"
+							<ComboBox.ItemContainerStyle>
+								<Style TargetType="ComboBoxItem">
+									<Setter Property="FocusVisualPrimaryBrush" Value="Blue"></Setter>
+								</Style>
+							</ComboBox.ItemContainerStyle>
+						</ComboBox>
+					</StackPanel>
+					<controls:AdaptiveGridView   Background="{StaticResource BackgroundThemeBrush}"
 									 ItemTemplate="{StaticResource ImageTemplate}"
 									 ItemsSource="{Binding Path=Thumbnails}"
 									 SelectionMode="None"
@@ -558,18 +611,19 @@
 									 ShowsScrollingPlaceholders="True"
 									 Grid.Row="1"
 									 Grid.ColumnSpan="2"
-									 Grid.Column="0">
-			<i:Interaction.Behaviors>
-				<core:EventTriggerBehavior SourceObject="{Binding ElementName=ImageGridView}">
-					<core:InvokeCommandAction Command="{Binding ImageContextOpened}"></core:InvokeCommandAction>
-				</core:EventTriggerBehavior>
-			</i:Interaction.Behaviors>
-			<controls:AdaptiveGridView.Resources>
+									 Grid.Column="0"
+									 Width="500">
+						<i:Interaction.Behaviors>
+							<core:EventTriggerBehavior SourceObject="{Binding ElementName=ImageGridView}">
+								<core:InvokeCommandAction Command="{Binding ImageContextOpened}"></core:InvokeCommandAction>
+							</core:EventTriggerBehavior>
+						</i:Interaction.Behaviors>
+						<controls:AdaptiveGridView.Resources>
 
 
-			</controls:AdaptiveGridView.Resources>
-		</controls:AdaptiveGridView>
-		<TextBlock Text="{Binding NoImagesText}"
+						</controls:AdaptiveGridView.Resources>
+					</controls:AdaptiveGridView>
+					<TextBlock Text="{Binding NoImagesText}"
 				   Visibility="{Binding DontHaveImages}"
 				   TextWrapping="WrapWholeWords"
 				   VerticalAlignment="Center"
@@ -580,7 +634,7 @@
 				   Grid.ColumnSpan="2" />
 
 
-		<Button VerticalAlignment="Bottom"
+					<Button VerticalAlignment="Bottom"
 				HorizontalAlignment="Right"
 				Height="44"
 				Margin="0,0,28,16"
@@ -598,66 +652,122 @@
 				Grid.ColumnSpan="2">
 
 
-			<Button.Background>
-				<SolidColorBrush Opacity="1"
+						<Button.Background>
+							<SolidColorBrush Opacity="1"
 								 Color="#FFCFCFCF" />
-			</Button.Background>
+						</Button.Background>
 
-			<Button.Foreground>
-				<SolidColorBrush Color="{ThemeResource SystemAccentColor}">
+						<Button.Foreground>
+							<SolidColorBrush Color="{ThemeResource SystemAccentColor}">
 
-				</SolidColorBrush>
-			</Button.Foreground>
-			<Button.BorderBrush>
-				<SolidColorBrush Color="{ThemeResource SystemAccentColor}" />
-			</Button.BorderBrush>
-			<Button.Content>
-				<StackPanel>
-					<SymbolIcon Symbol="Up"></SymbolIcon>
-				</StackPanel>
-			</Button.Content>
-		</Button>
+							</SolidColorBrush>
+						</Button.Foreground>
+						<Button.BorderBrush>
+							<SolidColorBrush Color="{ThemeResource SystemAccentColor}" />
+						</Button.BorderBrush>
+						<Button.Content>
+							<StackPanel>
+								<SymbolIcon Symbol="Up"></SymbolIcon>
+							</StackPanel>
+						</Button.Content>
+					</Button>
 
 
-		<VisualStateManager.VisualStateGroups>
-			<VisualStateGroup>
-				<VisualState x:Name="Below640">
-					<VisualState.StateTriggers>
-						<AdaptiveTrigger MinWindowHeight="0"></AdaptiveTrigger>
-					</VisualState.StateTriggers>
-					<VisualState.Setters>
-						<Setter Target="SavedSearchesList.MaxHeight"
+					<VisualStateManager.VisualStateGroups>
+						<VisualStateGroup>
+							<VisualState x:Name="Below640">
+								<VisualState.StateTriggers>
+									<AdaptiveTrigger MinWindowHeight="0"></AdaptiveTrigger>
+								</VisualState.StateTriggers>
+								<VisualState.Setters>
+									<Setter Target="SavedSearchesList.MaxHeight"
 								Value="250"></Setter>
-						<Setter Target="SearchAppBarButton.Flyout.FlyoutPresenterStyle"
+									<Setter Target="SearchAppBarButton.Flyout.FlyoutPresenterStyle"
 								Value="{StaticResource Below750SearchFlyout}"></Setter>
-					</VisualState.Setters>
+								</VisualState.Setters>
 
-				</VisualState>
-				<VisualState>
-					<VisualState.StateTriggers>
-						<AdaptiveTrigger MinWindowHeight="750"></AdaptiveTrigger>
-					</VisualState.StateTriggers>
-					<VisualState.Setters>
-						<Setter Target="SavedSearchesList.MaxHeight"
+							</VisualState>
+							<VisualState>
+								<VisualState.StateTriggers>
+									<AdaptiveTrigger MinWindowHeight="750"></AdaptiveTrigger>
+								</VisualState.StateTriggers>
+								<VisualState.Setters>
+									<Setter Target="SavedSearchesList.MaxHeight"
 								Value="450"></Setter>
-						<Setter Target="SearchAppBarButton.Flyout.FlyoutPresenterStyle"
+									<Setter Target="SearchAppBarButton.Flyout.FlyoutPresenterStyle"
 								Value="{StaticResource Below1200SearchFlyout}"></Setter>
-					</VisualState.Setters>
-				</VisualState>
-				<VisualState>
-					<VisualState.StateTriggers>
-						<AdaptiveTrigger MinWindowHeight="1100"></AdaptiveTrigger>
-					</VisualState.StateTriggers>
-					<VisualState.Setters>
-						<Setter Target="SavedSearchesList.MaxHeight"
+								</VisualState.Setters>
+							</VisualState>
+							<VisualState>
+								<VisualState.StateTriggers>
+									<AdaptiveTrigger MinWindowHeight="1100"></AdaptiveTrigger>
+								</VisualState.StateTriggers>
+								<VisualState.Setters>
+									<Setter Target="SavedSearchesList.MaxHeight"
 								Value="450"></Setter>
-						<Setter Target="SearchAppBarButton.Flyout.FlyoutPresenterStyle"
+									<Setter Target="SearchAppBarButton.Flyout.FlyoutPresenterStyle"
 								Value="{StaticResource Above1200SearchFlyout}"></Setter>
-					</VisualState.Setters>
-				</VisualState>
-			</VisualStateGroup>
-		</VisualStateManager.VisualStateGroups>
-	</Grid>
+								</VisualState.Setters>
+							</VisualState>
+						</VisualStateGroup>
+					</VisualStateManager.VisualStateGroups>
+				</Grid>
+			</DataTemplate>
+		</HubSection>
+		<HubSection Header="Saved Searches"
+					Name="SavedSearchesHub"
+					>
+			<DataTemplate>
+				<Grid
+					Name="SavedSearchGrid">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="*"/>
+						<ColumnDefinition Width="Auto"/>
+					</Grid.ColumnDefinitions>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="*"/>
+						<RowDefinition Height="Auto"/>
+					</Grid.RowDefinitions>
+					<ListView ItemsSource="{Binding SavedSearches, Mode=TwoWay}"
+						  ItemTemplate="{StaticResource SavedSearchTemplate}"
+						  SelectionMode="None"
+						  Name="SavedSearchesListForReal"
+						  IsItemClickEnabled="True"
+						  ItemClick="SavedSearchesListForReal_OnItemClick"
+						  CanReorderItems="True"
+							  CanDragItems="True"
+							  Margin="4"
+							  VerticalAlignment="Stretch"
+							  Grid.Row="1"
+							  Grid.Column="1"
+							  HorizontalAlignment="Stretch"
+							  HorizontalContentAlignment="Stretch">
+						<ListView.ItemContainerStyle>
+							<Style TargetType="ListViewItem">
+								<Setter Property="Padding" Value="0"></Setter>
+								<Setter Property="BorderThickness" Value="0" />
+								<Setter Property="Template">
+									<Setter.Value>
+										<ControlTemplate TargetType="ListViewItem">
+											<ListViewItemPresenter ContentMargin="0" Padding="0" />
+										</ControlTemplate>
+									</Setter.Value>
+								</Setter>
+							</Style>
+						</ListView.ItemContainerStyle>
+
+					</ListView>
+					<Button Command="{Binding SavedSearchSelected}"
+							Name="SavedSearchInvoke"
+							Visibility="Collapsed"
+							/>
+				</Grid>
+			</DataTemplate>
+		</HubSection>
+	</Hub>
+
 	<Page.BottomAppBar>
 		<CommandBar VerticalAlignment="Bottom">
 			<CommandBar.PrimaryCommands>
@@ -666,7 +776,8 @@
 							  Icon="Find"
 							  Name="SearchAppBarButton"
 							  Click="SearchButtonClicked"
-							  ToolTipService.ToolTip="Search (Ctrl+E)">
+							  ToolTipService.ToolTip="Search (Ctrl+E)"
+							  Command="{Binding RefreshTags}">
 
 				</AppBarButton>
 				<AppBarButton Visibility="Collapsed"
@@ -774,7 +885,7 @@
 										Command="{Binding SaveLoginData}"
 										Tapped="SaveLoginDataButtonTapped">
 									<Button.Content>
-										<SymbolIcon>Save</SymbolIcon>
+										<SymbolIcon Symbol="Save"/>
 									</Button.Content>
 								</Button>
 								<TextBlock Text="Save Folder"
@@ -813,10 +924,12 @@
 								<StackPanel>
 									<TextBlock Text="Download or delete your favourites info"></TextBlock>
 									<StackPanel Orientation="Horizontal">
-									<Button Content="Download Favourites"
-									        Command="{Binding DownloadFavourites}"/>
+										<Button Content="Download Favourites"
+											Command="{Binding DownloadFavourites}"
+												Margin="4"/>
 										<Button Content="Delete Favourites"
-										        Command="{Binding DeleteFavourites}"></Button>
+												Command="{Binding DeleteFavourites}"
+												Margin="4"/>
 									</StackPanel>
 									<StackPanel Orientation="Horizontal">
 										<TextBlock Text="Favourite Count"></TextBlock>

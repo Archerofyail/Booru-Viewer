@@ -9,10 +9,13 @@ using System.Diagnostics;
 using System.Linq;
 using Windows.Storage;
 using Windows.UI.Core;
+using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media;
 using Booru_Viewer.ViewModels;
 using Booru_Viewer.Views;
 using Microsoft.Toolkit.Uwp.UI.Controls;
+using Microsoft.Toolkit.Uwp.UI.Extensions;
+using Microsoft.Xaml.Interactions.Core;
 using ListViewBase = Windows.UI.Xaml.Controls.ListViewBase;
 
 
@@ -23,25 +26,25 @@ namespace Booru_Viewer
 	public sealed partial class MainPage : Page
 	{
 		private MainPageViewModel ViewModel { get; set; }
+		private GridView ImageGridView;
+		private Button SearchButton;
+		private Button SearchFavouritesButton;
+		private Button AddTagButton;
+		private ContentDialog ConfirmAgeDialog;
+		private ContentDialog SearchDialog;
+		private ListView SavedSearchesList;
+		private AutoSuggestBox TagTextBox;
+		private ListView SavedSearchesListForReal;
 
+		private Button SavedSearchInvoke;
+		//private ListView SavedSearchesList;
 		private bool isMultiSelectEnabled = false;
+
 		public MainPage()
 		{
 			InitializeComponent();
-			SearchClicked(null, null);
-			if (SearchButton != null)
-			{
-				var command = SearchButton.Command;
-				if (command != null)
-				{
-					command.Execute(SearchButton);
-				}
-				else
-				{
-					Debug.WriteLine("search command returned null");
-				}
-
-			}
+			
+			
 
 			//var favs = BooruAPI.GetUserFavourites().Result;
 			//foreach (var image in favs)
@@ -49,46 +52,86 @@ namespace Booru_Viewer
 			//	GlobalInfo.FavouriteImages.Add(image.id.ToString(), image);
 			//}
 			this.NavigationCacheMode = NavigationCacheMode.Required;
-			SearchButton.Loaded += (sender, args) => { SearchButton.CommandParameter = SearchAppBarButton; };
-			SearchFavouritesButton.Loaded += (sender, args) => { SearchButton.CommandParameter = SearchAppBarButton; };
+
 
 			Loaded += (sender, args) =>
 			{
 				ViewModel = DataContext as MainPageViewModel;
-			};
-			ImageGridView.Loaded += (sender, args) =>
-			{
-				ImageGridView.RightTapped += (o, eventArgs) =>
+				var childrenOfHub = AllChildren(MainHub);
+				ImageGridView = childrenOfHub.OfType<GridView>().First(x => x.Name == "ImageGridView");
+
+				ConfirmAgeDialog = childrenOfHub.OfType<ContentDialog>().First(x => x.Name == "ConfirmAgeDialog");
+				SearchDialog = childrenOfHub.OfType<ContentDialog>().First(x => x.Name == "SearchDialog");
+				//SavedSearchCommandInvoker = childrenOfHub.OfType<InvokeCommandAction>().First();
+
+				SavedSearchesHub.Loaded += (o, eventArgs1) =>
 				{
-					eventArgs.Handled = false;
-					var elements = VisualTreeHelper.FindElementsInHostCoordinates(eventArgs.GetPosition(o as UIElement), ImageGridView);
-					var imageView = elements.First((x) => x.GetType() == typeof(ImageEx)) as ImageEx;
-					Debug.WriteLine("imageView is " + imageView);
-					ViewModel.ImageContextOpened = imageView.DataContext as FullImageViewModel;
+					var childs = AllChildren(SavedSearchesHub);
+					SavedSearchesListForReal = childs.OfType<ListView>().FirstOrDefault(x => x.Name == "SavedSearchesListForReal");
+					SavedSearchInvoke = childs.OfType<Button>().FirstOrDefault(x => x.Name == "SavedSearchInvoke");
 				};
-
-				if (GlobalInfo.CurrentSearch.Count > 0)
+				ImageGridView.Loaded += (sender3, args3) =>
 				{
-					Debug.WriteLine("ImageCount coming back is: " + GlobalInfo.CurrentSearch.Count);
-					int layoutcount = 0;
-					ImageGridView.LayoutUpdated += (sender1, o) =>
+					ImageGridView.RightTapped += (o, eventArgs) =>
 					{
-						if (layoutcount == 0)
-						{
-							layoutcount++;
-							if (ImageGridView.Items.Count > 0)
-							{
-								var image = ImageGridView.Items[GlobalInfo.SelectedImage];
-								ImageGridView.ScrollIntoView(image, ScrollIntoViewAlignment.Leading);
-							}
-						}
-
+						eventArgs.Handled = false;
+						var elements = VisualTreeHelper.FindElementsInHostCoordinates(eventArgs.GetPosition(o as UIElement), ImageGridView);
+						var imageView = elements.First((x) => x.GetType() == typeof(ImageEx)) as ImageEx;
+						Debug.WriteLine("imageView is " + imageView);
+						ViewModel.ImageContextOpened = imageView.DataContext as FullImageViewModel;
 					};
-					ImageGridView.UpdateLayout();
+
+					if (GlobalInfo.CurrentSearch.Count > 0)
+					{
+						Debug.WriteLine("ImageCount coming back is: " + GlobalInfo.CurrentSearch.Count);
+						int layoutcount = 0;
+						ImageGridView.LayoutUpdated += (sender1, o) =>
+						{
+							if (layoutcount == 0)
+							{
+								layoutcount++;
+								if (ImageGridView.Items.Count > 0)
+								{
+									var image = ImageGridView.Items[GlobalInfo.SelectedImage];
+									ImageGridView.ScrollIntoView(image, ScrollIntoViewAlignment.Leading);
+								}
+							}
+
+						};
+						ImageGridView.UpdateLayout();
+
+					}
+
+				};
+				SearchDialog.Opened += (sender4, args4) =>
+				{
+					var childrenOfDialog = AllChildren(SearchDialog.ContentTemplateRoot);
+					AddTagButton = childrenOfDialog.OfType<Button>().First(x => x.Name == "AddTagButton");
+					SearchButton = childrenOfDialog.OfType<Button>().First(x => x.Name == "SearchButton");
+					SearchFavouritesButton = childrenOfDialog.OfType<Button>().First(x => x.Name == "SearchFavouritesButton");
+					SavedSearchesList = childrenOfDialog.OfType<ListView>().First(x => x.Name == "SavedSearchesList");
+					SearchButton.Loaded += (sender1, args1) => { SearchButton.CommandParameter = SearchAppBarButton; };
+					SearchFavouritesButton.Loaded += (sender2, args2) => { SearchButton.CommandParameter = SearchAppBarButton; };
+					TagTextBox = childrenOfDialog.OfType<AutoSuggestBox>().First(x => x.Name == "TagTextBox");
+					SearchButton?.Command?.Execute(null);
+				};
+				SearchClicked(null, null);
+				if (SearchButton != null)
+				{
+					var command = SearchButton.Command;
+					if (command != null)
+					{
+						command.Execute(SearchButton);
+					}
+					else
+					{
+						Debug.WriteLine("search command returned null");
+					}
 
 				}
-
 			};
+
+
 
 			QuestionableCheckbox.Loaded += (sender, args) =>
 			{
@@ -415,16 +458,59 @@ namespace Booru_Viewer
 		private async void SearchButtonClicked(object sender, RoutedEventArgs e)
 		{
 			await SearchDialog.ShowAsync();
+
 		}
 
 		private void SearchClicked(object sender, RoutedEventArgs e)
 		{
-			SearchDialog.Hide();
+			SearchDialog?.Hide();
 		}
 
 		private void CloseSearchDialogClick(object sender, RoutedEventArgs e)
 		{
 			SearchDialog.Hide();
+		}
+
+		public List<Control> AllChildren(DependencyObject parent)
+		{
+			var _List = new List<Control>();
+			for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+			{
+				var _Child = VisualTreeHelper.GetChild(parent, i);
+				if (_Child is Control)
+					_List.Add(_Child as Control);
+				_List.AddRange(AllChildren(_Child));
+			}
+			return _List;
+		}
+
+		private void SavedSearchesListForReal_OnItemClick(object sender, ItemClickEventArgs e)
+		{
+			if (SavedSearchInvoke != null || SavedSearchesListForReal != null)
+			{
+				SavedSearchInvoke.Command.Execute(e.ClickedItem);
+				MainHub.ScrollToSection(SearchResultsSection);
+			}
+			else
+			{
+				Debug.WriteLine("SavedSearchInvoke is null");
+			}
+		}
+
+		private void ImageExBase_OnImageExOpened(object sender, ImageExOpenedEventArgs e)
+		{
+			Debug.WriteLine("ImageEx opened with source: ");
+		}
+
+		private void PreviewPictureClicked(object sender, ItemClickEventArgs e)
+		{
+			var list = sender as ListView;
+			var parent = list.FindAscendant<ListView>();
+			if (parent != null)
+			{
+				var i = SavedSearchesListForReal.Items.IndexOf(list.DataContext);
+				SavedSearchInvoke.Command.Execute(SavedSearchesListForReal.Items[i]);
+			}
 		}
 	}
 }

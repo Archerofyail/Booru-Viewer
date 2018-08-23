@@ -30,7 +30,6 @@ namespace Booru_Viewer.Types
 			bool[] ratingChecks = null, bool restartSearch = true)
 		{
 
-
 			if (restartSearch)
 			{
 				GlobalInfo.CurrentSearch.Clear();
@@ -198,14 +197,10 @@ namespace Booru_Viewer.Types
 				throw;
 			}
 
-
-
-
-
 			var noDupes = imageLinks.GroupBy(x => x.id).Where(x => x.Count() == 1).Select(x => x.First(y => !string.IsNullOrEmpty(y.id))).ToList();
 			Debug.WriteLine("Page is: " + page + ". URL: " + requestURI);
 			return new Tuple<bool, List<ImageModel>, string>(true, noDupes, response.StatusCode.ToString());
-
+			
 		}
 
 		public static async Task<Tuple<bool, List<Tag>, string>> SearchTags(string search, int limit = -1, bool isExact = false)

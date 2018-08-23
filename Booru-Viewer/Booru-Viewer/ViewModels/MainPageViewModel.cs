@@ -858,8 +858,9 @@ namespace Booru_Viewer.ViewModels
 			{
 				CurrentTags.Add(new TagViewModel(new Tag(tag), this));
 			}
-			RaisePropertyChanged("CurrentTags");
+			
 			StartSearchExecute();
+			RaisePropertyChanged("CurrentTags");
 		}
 
 		public ICommand AddTag => new RelayCommand(AddTagExecute);
@@ -871,7 +872,13 @@ namespace Booru_Viewer.ViewModels
 		public ICommand SaveSearch => new RelayCommand(SaveSearchExecute);
 		public ICommand SavedSearchSelected => new RelayCommand<SavedSearchViewModel>(SavedSearchSelectedExec);
 		public ICommand ClearSearch => new RelayCommand(ClearSearchEx);
+		public ICommand RefreshTags => new RelayCommand(RefreshTagsEx);
 
+		void RefreshTagsEx()
+		{
+			Debug.WriteLine("Raise tags changed");
+			RaisePropertyChanged("CurrentTags");
+		}
 		
 		void ClearSearchEx()
 		{
