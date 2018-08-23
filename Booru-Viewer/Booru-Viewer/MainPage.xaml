@@ -412,7 +412,7 @@
 							<Button HorizontalAlignment="Right"
 						VerticalAlignment="Top"
 						Click="CloseSearchDialogClick"
-						Margin="0, 0, 0, -40"
+						Margin="0, 0, 0, -30"
 						FocusVisualPrimaryBrush="Transparent"
 						FocusVisualSecondaryBrush="Transparent"
 						Padding="4"
@@ -777,7 +777,7 @@
 							  Name="SearchAppBarButton"
 							  Click="SearchButtonClicked"
 							  ToolTipService.ToolTip="Search (Ctrl+E)"
-							  Command="{Binding RefreshTags}">
+							  >
 
 				</AppBarButton>
 				<AppBarButton Visibility="Collapsed"

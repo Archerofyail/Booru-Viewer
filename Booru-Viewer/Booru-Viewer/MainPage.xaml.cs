@@ -113,7 +113,7 @@ namespace Booru_Viewer
 					SearchButton.Loaded += (sender1, args1) => { SearchButton.CommandParameter = SearchAppBarButton; };
 					SearchFavouritesButton.Loaded += (sender2, args2) => { SearchButton.CommandParameter = SearchAppBarButton; };
 					TagTextBox = childrenOfDialog.OfType<AutoSuggestBox>().First(x => x.Name == "TagTextBox");
-					SearchButton?.Command?.Execute(null);
+					
 				};
 				SearchClicked(null, null);
 				if (SearchButton != null)
@@ -458,7 +458,6 @@ namespace Booru_Viewer
 		private async void SearchButtonClicked(object sender, RoutedEventArgs e)
 		{
 			await SearchDialog.ShowAsync();
-
 		}
 
 		private void SearchClicked(object sender, RoutedEventArgs e)
