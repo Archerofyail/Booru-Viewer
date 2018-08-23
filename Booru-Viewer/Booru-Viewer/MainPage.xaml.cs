@@ -510,6 +510,7 @@ namespace Booru_Viewer
 			{
 				var i = SavedSearchesListForReal.Items.IndexOf(list.DataContext);
 				SavedSearchInvoke.Command.Execute(SavedSearchesListForReal.Items[i]);
+				MainHub.ScrollToSection(SearchResultsSection);
 			}
 		}
 	}
