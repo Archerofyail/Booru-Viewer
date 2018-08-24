@@ -99,7 +99,7 @@ namespace Booru_Viewer.ViewModels
 					RaisePropertyChanged("SuggestedTags");
 				}
 			};
-			GlobalInfo.SavedSearchesLoadedEventHandler += (sender, e) =>
+			GlobalInfo.SavedSearchesLoaded += (sender, e) =>
 			{
 				if (GlobalInfo.SavedSearches.Count > 0)
 				{
@@ -112,7 +112,7 @@ namespace Booru_Viewer.ViewModels
 				}
 			};
 
-			GlobalInfo.FavouriteTagsLoadedEventHandler += (sender, args) =>
+			GlobalInfo.FavouriteTagsLoaded += (sender, args) =>
 			{
 				if (GlobalInfo.FavouriteTags.Count > 0)
 				{
@@ -138,7 +138,22 @@ namespace Booru_Viewer.ViewModels
 			{
 				RaisePropertyChanged("FavouritePostCount");
 			};
-			
+
+			GlobalInfo.ImagesSavedForLaterLoaded += (sender, args) =>
+			{
+				savedForLater = new ObservableCollection<FullImageViewModel>();
+				foreach (var image in GlobalInfo.ImagesSavedForLater)
+				{
+					savedForLater.Add(new FullImageViewModel(image, image.id, image.Preview_File_Url, image.Large_File_Url, "https://danbooru.donmai.us/posts/" + image.id, null, null));
+				}
+				RaisePropertyChanged("SavedForLater");
+
+			};
+			savedForLater = new ObservableCollection<FullImageViewModel>();
+			foreach (var image in GlobalInfo.ImagesSavedForLater)
+			{
+				savedForLater.Add(new FullImageViewModel(image, image.id, image.Preview_File_Url, image.Large_File_Url, "https://danbooru.donmai.us/posts/" + image.id, null, null));
+			}
 			//thumbnails.CollectionChanged += (sender, args) => RaisePropertyChanged("Thumbnails");
 			RaisePropertyChanged("SelectedPrefixIndex");
 
@@ -463,6 +478,16 @@ namespace Booru_Viewer.ViewModels
 			set => _favouriteTags = value;
 		}
 
+		private ObservableCollection<FullImageViewModel> savedForLater;
+
+		public ObservableCollection<FullImageViewModel> SavedForLater
+		{
+			get
+			{
+				return savedForLater;
+			}
+		}
+
 		private IncrementalLoadingCollection<PostSource, FullImageViewModel> _thumbnails;
 
 		public IncrementalLoadingCollection<PostSource, FullImageViewModel> Thumbnails
@@ -673,7 +698,7 @@ namespace Booru_Viewer.ViewModels
 			{
 				SavedSearches.Remove(search);
 				RaisePropertyChanged("DontHaveSavedSearches");
-				GlobalInfo.SaveSearches(_savedSearches.ToList());
+				GlobalInfo.SaveSearches();
 			}
 			catch (Exception e)
 			{
@@ -847,7 +872,7 @@ namespace Booru_Viewer.ViewModels
 				RaisePropertyChanged("SavedSearches");
 				RaisePropertyChanged("DontHaveSavedSearches");
 			}
-			await GlobalInfo.SaveSearches(_savedSearches.ToList());
+			await GlobalInfo.SaveSearches();
 		}
 
 		public void StartSavedSearch(string[] tags)
@@ -970,7 +995,7 @@ namespace Booru_Viewer.ViewModels
 
 			if (result != null)
 			{
-				await GlobalInfo.SaveSearches(SavedSearches.ToList(), result);
+				await GlobalInfo.SaveSearches(result);
 				await GlobalInfo.SaveFavouriteTags(result);
 				SettingsData settings = new SettingsData()
 				{
@@ -1011,7 +1036,7 @@ namespace Booru_Viewer.ViewModels
 			if (result != null)
 			{
 				await GlobalInfo.LoadSavedSearches(result);
-				await GlobalInfo.SaveSearches(SavedSearches.ToList());
+				await GlobalInfo.SaveSearches();
 				await GlobalInfo.LoadFavouriteTags(result);
 				await GlobalInfo.SaveFavouriteTags();
 				var saveFolder = result;
@@ -1178,6 +1203,4 @@ namespace Booru_Viewer.ViewModels
 
 
 }
-
-
 

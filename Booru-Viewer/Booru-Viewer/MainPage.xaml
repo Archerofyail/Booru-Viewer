@@ -19,9 +19,9 @@
 	<Page.Resources>
 		<ResourceDictionary>
 
-			<ResourceDictionary.MergedDictionaries>
-				<ResourceDictionary Source="Assets/ColorDict.xaml" />
-			</ResourceDictionary.MergedDictionaries>
+			<SolidColorBrush x:Key="ThemeBrush" Color="{ThemeResource SystemAccentColor}"/>
+			<SolidColorBrush x:Key="SystemBaseLowBrush" Color="{ThemeResource SystemBaseLowColor}"></SolidColorBrush>
+			<SolidColorBrush x:Key="BackgroundThemeBrush" Color="{ThemeResource SystemAltHighColor}"/>
 			<CollectionViewSource Source="{Binding FavouriteTags}"
 								  IsSourceGrouped="True"
 								  x:Name="FavouriteTagsGroupedList" />
@@ -54,6 +54,22 @@
 
 						</MenuFlyout>
 					</controls:ImageEx.ContextFlyout>
+				</controls:ImageEx>
+			</DataTemplate>
+
+			<DataTemplate x:Name="ImageTemplateNoSave">
+
+				<controls:ImageEx Name="Image"
+				                  Source="{Binding Path=PreviewURL}"
+				                  Stretch="Uniform"
+				                  ImageExOpened="ImageOpened"
+				                  ImageExFailed="ImageEx_OnImageExFailed"
+				                  MaxHeight="250"
+				                  MinHeight="160"
+				                  MinWidth="160"
+				                  PlaceholderSource="Assets/Placeholder.png"
+				                  PlaceholderStretch="Uniform">
+
 				</controls:ImageEx>
 			</DataTemplate>
 			<DataTemplate x:Name="ExcludedTag">
@@ -264,7 +280,7 @@
 						<ColumnDefinition Width="500"/>
 						<ColumnDefinition Width="Auto"/>
 					</Grid.ColumnDefinitions>
-					
+
 					<ListView ItemsSource="{Binding SearchPreview}"
 								  SelectionMode="None"
 								  Margin="0, 0, 0, 0"
@@ -763,6 +779,46 @@
 							Name="SavedSearchInvoke"
 							Visibility="Collapsed"
 							/>
+				</Grid>
+			</DataTemplate>
+		</HubSection>
+		<HubSection Header="Saved for Later">
+			<DataTemplate>
+				<Grid BorderBrush="Orange"
+				      BorderThickness="2"
+				      VerticalAlignment="Stretch"
+				      HorizontalAlignment="Stretch">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="*"/>
+						<ColumnDefinition Width="Auto"/>
+					</Grid.ColumnDefinitions>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="*"/>
+						<RowDefinition Height="Auto"/>
+					</Grid.RowDefinitions>
+					<ListView
+							Name="SavedForLaterGridView"
+							ItemsSource="{Binding SavedForLater}"
+							ItemTemplate="{StaticResource ImageTemplateNoSave}"
+							Grid.Column="1"
+							Grid.Row="1"
+							BorderBrush="Red"
+							BorderThickness="2"
+							VerticalAlignment="Stretch"
+							HorizontalAlignment="Stretch"
+							ContainerContentChanging="ListViewBase_OnContainerContentChanging"
+							SelectionMode="None"
+							Margin="0, 24, 0, 0"
+							IsItemClickEnabled="True"
+							ItemClick="ImageGridView_OnItemClick">
+						<ListView.ItemsPanel>
+							<ItemsPanelTemplate>
+								<controls:WrapPanel MaxWidth="600"></controls:WrapPanel>
+							</ItemsPanelTemplate>
+						</ListView.ItemsPanel>
+					</ListView>
 				</Grid>
 			</DataTemplate>
 		</HubSection>

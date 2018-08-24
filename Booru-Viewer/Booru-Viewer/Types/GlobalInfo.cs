@@ -65,8 +65,8 @@ namespace Booru_Viewer.Types
 			set => favouriteTags = value;
 		}
 
-		public static EventHandler SavedSearchesLoadedEventHandler;
-		public static EventHandler FavouriteTagsLoadedEventHandler;
+		public static EventHandler SavedSearchesLoaded;
+		public static EventHandler FavouriteTagsLoaded;
 		public static ObservableCollection<string[]> SavedSearches
 		{
 			get
@@ -88,101 +88,38 @@ namespace Booru_Viewer.Types
 			CurrentTags.Remove(tag);
 		}
 
-		public static async Task SaveSearches(List<SavedSearchViewModel> searches, StorageFolder baseFolder = null)
+		public static EventHandler ImagesSavedForLaterLoaded;
+		private static List<ImageModel> imagesSavedForLater = null;
+
+		public static List<ImageModel> ImagesSavedForLater
 		{
-			if (searches == null)
+			get
 			{
-				throw new NullReferenceException("searches list can't be null");
+				if (imagesSavedForLater == null)
+				{
+					imagesSavedForLater = new List<ImageModel>();
+					LoadSavedForLaterImages();
+				}
+
+				return imagesSavedForLater;
 			}
-			try
-			{
-				StorageFolder folder;
-				if (baseFolder != null)
-				{
-					if (baseFolder.DisplayName != "Booru-Viewer")
-					{
-						var potFold = await baseFolder.TryGetItemAsync("Booru-Viewer");
-						if (potFold != null)
-						{
-							folder = await baseFolder.GetFolderAsync("Booru-Viewer");
-						}
-						else
-						{
-							folder = await baseFolder.CreateFolderAsync("Booru-Viewer");
-						}
-					}
-					else
-					{
-						folder = baseFolder;
-					}
-				}
-				else
-				{
-					folder = ApplicationData.Current.RoamingFolder;
-				}
+		}
 
-				var item = await folder.TryGetItemAsync("SavedSearches.json");
-				if (item != null)
-				{
-					SearchesFile = await folder.GetFileAsync("SavedSearches.json");
-				}
-				else
-				{
-					SearchesFile = await folder.CreateFileAsync("SavedSearches.json");
-				}
-
-				var json = JsonConvert.SerializeObject(searches.Select(x => x.Tags));
-				await FileIO.WriteTextAsync(SearchesFile, json);
-			}
-			catch (Exception e)
-			{
-				Console.WriteLine(e);
-
-			}
-
+		public static async Task SaveSearches(StorageFolder baseFolder = null)
+		{
+			SaveDataToFile(savedSearches.ToList(), "SavedSearches.json");
 		}
 
 		public static async Task LoadSavedSearches(StorageFolder searchesFolder = null)
 		{
 
-
-			StorageFolder folder = ApplicationData.Current.RoamingFolder;
-			if (searchesFolder != null)
+			var searches = await LoadDataToObject<List<string[]>>("SavedSearches.json");
+			savedSearches.Clear();
+			foreach (var search in searches)
 			{
-				folder = searchesFolder;
+				savedSearches.Add(search);
 			}
-			var item = await folder.TryGetItemAsync("SavedSearches.json");
-			if (item == null)
-			{
-				Debug.WriteLine("File was null");
-				return;
-			}
-			SearchesFile = await folder.GetFileAsync("SavedSearches.json");
-			var json = await FileIO.ReadTextAsync(SearchesFile);
-			try
-			{
-				var searchList = JsonConvert.DeserializeObject<List<string[]>>(json);
-				if (searchList != null)
-				{
-					savedSearches.Clear();
-					foreach (var search in searchList)
-					{
-
-						savedSearches.Add(search);
-					}
-				}
-				else
-				{
-					Debug.WriteLine("SearchList was null");
-				}
-			}
-			catch (Exception e)
-			{
-				Console.WriteLine(e);
-			}
-
-
-			SavedSearchesLoadedEventHandler?.Invoke(typeof(GlobalInfo), EventArgs.Empty);
+			SavedSearchesLoaded?.Invoke(typeof(GlobalInfo), EventArgs.Empty);
 		}
 
 		public static async Task<ObservableCollection<Tag>> GetFavouriteTags()
@@ -192,12 +129,8 @@ namespace Booru_Viewer.Types
 
 		}
 
-		public static async Task SaveFavouriteTags(StorageFolder baseFolder = null)
+		private static async Task SaveDataToFile(object data, string fileName, StorageFolder baseFolder = null)
 		{
-			if (favouriteTags == null)
-			{
-				await LoadFavouriteTags();
-			}
 			try
 			{
 				StorageFolder folder;
@@ -225,29 +158,29 @@ namespace Booru_Viewer.Types
 					folder = ApplicationData.Current.RoamingFolder;
 				}
 
-				var item = await folder.TryGetItemAsync("FavouriteTags.json");
+				var item = await folder.TryGetItemAsync(fileName);
 				if (item != null)
 				{
-					SearchesFile = await folder.GetFileAsync("FavouriteTags.json");
+					SearchesFile = await folder.GetFileAsync(fileName);
 				}
 				else
 				{
-					SearchesFile = await folder.CreateFileAsync("FavouriteTags.json");
+					SearchesFile = await folder.CreateFileAsync(fileName);
 				}
 
-				var json = JsonConvert.SerializeObject(favouriteTags.ToList());
+				var json = JsonConvert.SerializeObject(data);
 				await FileIO.WriteTextAsync(SearchesFile, json);
 			}
 			catch (Exception e)
 			{
 				Console.WriteLine(e);
-
 			}
 
 		}
 
-		public static async Task LoadFavouriteTags(StorageFolder tagsFolder = null)
+		private static async Task<T> LoadDataToObject<T>(string fileName, StorageFolder tagsFolder = null) where T : class, new()
 		{
+			T data = null;
 			StorageFolder folder;
 			if (tagsFolder != null)
 			{
@@ -276,151 +209,82 @@ namespace Booru_Viewer.Types
 			{
 				folder = tagsFolder;
 			}
-			var item = await folder.TryGetItemAsync("FavouriteTags.json");
+			var item = await folder.TryGetItemAsync(fileName);
 			if (item == null)
 			{
 				Debug.WriteLine("File was null");
-				return;
+				return new T();
 			}
-			SearchesFile = await folder.GetFileAsync("FavouriteTags.json");
+			SearchesFile = await folder.GetFileAsync(fileName);
 			var json = await FileIO.ReadTextAsync(SearchesFile);
 			try
 			{
-				var searchList = JsonConvert.DeserializeObject<List<Tag>>(json, new JsonSerializerSettings
+				data = JsonConvert.DeserializeObject<T>(json, new JsonSerializerSettings
 				{
 					Error = (sender, args) =>
 					{
 						args.ErrorContext.Handled = true;
 					}
 				});
-				if (searchList != null)
-				{
-					favouriteTags.Clear();
-					foreach (var search in searchList)
-					{
-						var tag = search;
-
-						tag.Name = tag.Name.TrimStart('-', '~');
-						if (!favouriteTags.Any(x => x.Name == tag.Name))
-						{
-							favouriteTags.Add(tag);
-						}
-
-					}
-				}
-				else
-				{
-					Debug.WriteLine("FavouriteTagslist was null");
-				}
 			}
 			catch (Exception e)
 			{
 				Console.WriteLine(e);
 			}
 
+			return data;
 
-			FavouriteTagsLoadedEventHandler?.Invoke(typeof(GlobalInfo), EventArgs.Empty);
+		}
+
+		public static async Task SaveSavedForLaterImages(StorageFolder baseFolder = null)
+		{
+			await SaveDataToFile(imagesSavedForLater, "ImagesSavedForLater.json");
+		}
+
+		public static async Task LoadSavedForLaterImages(StorageFolder baseFolder = null)
+		{
+			imagesSavedForLater = await LoadDataToObject<List<ImageModel>>("ImagesSavedForLater.json");
+			ImagesSavedForLaterLoaded?.Invoke(typeof(GlobalInfo), EventArgs.Empty);
+		}
+
+		public static async Task SaveFavouriteTags(StorageFolder baseFolder = null)
+		{
+			await SaveDataToFile(favouriteTags.ToList(), "FavouriteTags.json");
+
+		}
+
+		public static async Task LoadFavouriteTags(StorageFolder tagsFolder = null)
+		{
+
+			var tags = await LoadDataToObject<List<Tag>>("FavouriteTags.json");
+			favouriteTags.Clear();
+			foreach (var search in tags)
+			{
+				var tag = search;
+
+				tag.Name = tag.Name.TrimStart('-', '~');
+				if (!favouriteTags.Any(x => x.Name == tag.Name))
+				{
+					favouriteTags.Add(tag);
+				}
+
+			}
+			FavouriteTagsLoaded?.Invoke(typeof(GlobalInfo), EventArgs.Empty);
 		}
 
 		public static async Task SaveFavouritePosts(StorageFolder baseFolder = null)
 		{
-			if (FavouriteImages == null)
-			{
-				throw new NullReferenceException("searches list can't be null");
-			}
-			try
-			{
-				StorageFolder folder;
-				if (baseFolder != null)
-				{
-					if (baseFolder.DisplayName != "Booru-Viewer")
-					{
-						var potFold = await baseFolder.TryGetItemAsync("Booru-Viewer");
-						if (potFold != null)
-						{
-							folder = await baseFolder.GetFolderAsync("Booru-Viewer");
-						}
-						else
-						{
-							folder = await baseFolder.CreateFolderAsync("Booru-Viewer");
-						}
-					}
-					else
-					{
-						folder = baseFolder;
-					}
-				}
-				else
-				{
-					folder = ApplicationData.Current.RoamingFolder;
-				}
-
-				var item = await folder.TryGetItemAsync("FavouritePosts.json");
-				if (item != null)
-				{
-					SearchesFile = await folder.GetFileAsync("FavouritePosts.json");
-				}
-				else
-				{
-					SearchesFile = await folder.CreateFileAsync("FavouritePosts.json");
-				}
-
-				var json = JsonConvert.SerializeObject(FavouriteImages);
-				await FileIO.WriteTextAsync(SearchesFile, json);
-			}
-			catch (Exception e)
-			{
-				Console.WriteLine(e);
-
-			}
-
+			await SaveDataToFile(favouriteImages, "FavouritePosts.json");
 		}
 		public static async Task LoadFavouritePosts(StorageFolder searchesFolder = null)
 		{
-			List<string> searchList = null;
-			Debug.WriteLine("Loading Favourite Posts");
-			StorageFolder folder = ApplicationData.Current.RoamingFolder;
-			if (searchesFolder != null)
+			var favouritePosts = await LoadDataToObject<List<string>>("FavouritePosts.json");
+			favouriteImages.Clear();
+			foreach (var image in favouritePosts)
 			{
-				folder = searchesFolder;
-			}
-			var item = await folder.TryGetItemAsync("FavouritePosts.json");
-			if (item == null)
-			{
-				Debug.WriteLine("File was null");
-				return;
-			}
 
-			var logFile = await folder.GetFileAsync("log.txt");
-			
-			SearchesFile = await folder.GetFileAsync("FavouritePosts.json");
-			var json = await FileIO.ReadTextAsync(SearchesFile);
-			
-			try
-			{
-				searchList = JsonConvert.DeserializeObject<List<string>>(json);
-				if (searchList != null && FavouriteImages.Count == 0)
-				{
-
-					favouriteImages.Clear();
-					foreach (var search in searchList)
-					{
-
-						favouriteImages.Add(search);
-					}
-				}
-				else
-				{
-					Debug.WriteLine("SearchList was null");
-				}
+				favouriteImages.Add(image);
 			}
-			catch (Exception e)
-			{
-				Debug.WriteLine(e);
-			}
-			await FileIO.WriteTextAsync(logFile, "File path is " + SearchesFile.Path + "\r\n, and json is \r\n" + json + "\r\n" + "Favorites list has " + FavouriteImages.Count + " items, they are: " + FavouriteImages.ToString()
-			                                      + "\r\nlocal list has " + searchList.Count + "items.\r\n conditional statemen is " + (searchList != null && FavouriteImages.Count == 0));
-			Debug.WriteLine("Favourite Posts Loaded, count is " + FavouriteImages.Count);
 			FavouriteImagesLoadedEventHandler?.Invoke(typeof(GlobalInfo), EventArgs.Empty);
 		}
 	}

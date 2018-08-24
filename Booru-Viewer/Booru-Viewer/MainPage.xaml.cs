@@ -43,8 +43,8 @@ namespace Booru_Viewer
 		public MainPage()
 		{
 			InitializeComponent();
-			
-			
+
+
 
 			//var favs = BooruAPI.GetUserFavourites().Result;
 			//foreach (var image in favs)
@@ -113,7 +113,7 @@ namespace Booru_Viewer
 					SearchButton.Loaded += (sender1, args1) => { SearchButton.CommandParameter = SearchAppBarButton; };
 					SearchFavouritesButton.Loaded += (sender2, args2) => { SearchButton.CommandParameter = SearchAppBarButton; };
 					TagTextBox = childrenOfDialog.OfType<AutoSuggestBox>().First(x => x.Name == "TagTextBox");
-					
+
 				};
 				SearchClicked(null, null);
 				if (SearchButton != null)
@@ -205,11 +205,22 @@ namespace Booru_Viewer
 		{
 			if (sender is GridView grid)
 			{
-				var index = grid.Items.IndexOf(e.ClickedItem);
-				Debug.WriteLine("Index is " + index);
-				GlobalInfo.SelectedImage = index;
-				Frame.Navigate(typeof(SwipeView));
+				if (grid.Name == "ImageGridView")
+				{
+					var index = grid.Items.IndexOf(e.ClickedItem);
+					Debug.WriteLine("Index is " + index);
+					GlobalInfo.SelectedImage = index;
+					Frame.Navigate(typeof(SwipeView));
+				}
+				else if (grid.Name == "SavedForLaterGridView")
+				{
+					var index = grid.Items.IndexOf(e.ClickedItem);
+					Debug.WriteLine("Index is " + index);
+					GlobalInfo.SelectedImage = index;
+					Frame.Navigate(typeof(SwipeView));
+				}
 			}
+
 		}
 
 		private void AddTagClicked(object sender, RoutedEventArgs e)
@@ -254,10 +265,11 @@ namespace Booru_Viewer
 
 		protected override void OnNavigatedTo(NavigationEventArgs e)
 		{
-			ViewModel?.RaisePropertyChanged("Thumbnails");
+			//ViewModel?.RaisePropertyChanged("Thumbnails");
 
 
-			ViewModel?.RaisePropertyChanged("FavouriteTags");
+			//ViewModel?.RaisePropertyChanged("FavouriteTags");
+			
 			Frame rootFrame = Window.Current.Content as Frame;
 			if (rootFrame.CanGoBack)
 			{
@@ -272,6 +284,7 @@ namespace Booru_Viewer
 					AppViewBackButtonVisibility.Collapsed;
 			}
 			base.OnNavigatedTo(e);
+			//ViewModel?.RaisePropertyChanged("SavedForLater");
 		}
 
 		protected override void OnNavigatedFrom(NavigationEventArgs e)
@@ -340,7 +353,7 @@ namespace Booru_Viewer
 		async void SavedSearchesList_OnDragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
 		{
 			Debug.WriteLine("Drag Finished");
-			await GlobalInfo.SaveSearches(SavedSearchesList.ItemsSource as List<SavedSearchViewModel>);
+			await GlobalInfo.SaveSearches();
 		}
 
 		private void SaveAllDialog(ContentDialog sender, ContentDialogButtonClickEventArgs args)
@@ -498,7 +511,7 @@ namespace Booru_Viewer
 
 		private void ImageExBase_OnImageExOpened(object sender, ImageExOpenedEventArgs e)
 		{
-			Debug.WriteLine("ImageEx opened with source: ");
+			Debug.WriteLine("ImageEx opened with source: " + (sender as ImageEx).Source);
 		}
 
 		private void PreviewPictureClicked(object sender, ItemClickEventArgs e)
@@ -511,6 +524,11 @@ namespace Booru_Viewer
 				SavedSearchInvoke.Command.Execute(SavedSearchesListForReal.Items[i]);
 				MainHub.ScrollToSection(SearchResultsSection);
 			}
+		}
+
+		private void ListViewBase_OnContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
+		{
+			Debug.WriteLine("Items in saved list changed");
 		}
 	}
 }

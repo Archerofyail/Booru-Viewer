@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows.Input;
 using Booru_Viewer.Types;
 using GalaSoft.MvvmLight;
@@ -252,6 +253,48 @@ namespace Booru_Viewer.ViewModels
 			}
 		}
 
+		private string saveForLaterIcon = "\uE728";
+
+		public string SaveForLaterIcon
+		{
+			get
+			{
+				if (GlobalInfo.ImagesSavedForLater.Any(x => x.id == Images[Index].Image.id))
+				{
+					return "\uE8D9";
+				}
+				else
+				{
+					return "\uE728";
+				}
+
+			}
+		}
+
+		private string saveForLaterString = "Save For Later";
+
+		public string SaveForLaterString
+		{
+			get
+			{
+				if (GlobalInfo.ImagesSavedForLater.Any(x => x.id == Images[Index].Image.id))
+				{
+					favString = "Remove from list";
+					return favString;
+				}
+				else
+				{
+					favString = "Save For Later";
+					return favString;
+				}
+			}
+			set
+			{
+				favString = value;
+				RaisePropertyChanged();
+			}
+		}
+
 		async void SaveImageExec(bool showNotification = true)
 		{
 			Saving = true;
@@ -310,7 +353,7 @@ namespace Booru_Viewer.ViewModels
 				if (await BooruAPI.UnfavouriteImage(GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage]))
 				{
 					var im = GlobalInfo.CurrentSearch[postIndex];
-					
+
 					FavIcon = Symbol.OutlineStar;
 					FavString = "Favourite";
 					GlobalInfo.FavouriteImages.Remove(im.id);
@@ -327,5 +370,21 @@ namespace Booru_Viewer.ViewModels
 			await Launcher.LaunchUriAsync(new Uri(images[Index].WebsiteURL));
 		}
 
+
+		public ICommand SaveImageForLater => new RelayCommand(SaveImageForLaterEx);
+
+		async void SaveImageForLaterEx()
+		{
+			if (SaveForLaterIcon == "\uE728")
+			{
+				GlobalInfo.ImagesSavedForLater.Add(Images[Index].Image);
+			
+			}
+			else
+			{
+				GlobalInfo.ImagesSavedForLater.Remove(GlobalInfo.ImagesSavedForLater.First(x=>x.id == Images[Index].Image.id));
+			}
+			await GlobalInfo.SaveSavedForLaterImages();
+		}
 	}
 }

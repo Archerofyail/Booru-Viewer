@@ -22,7 +22,7 @@ namespace Booru_Viewer.ViewModels
 		public string WebsiteURL { get; set; }
 		public ObservableCollection<FullImageViewModel> ChildrenImages { get; set; }
 		public FullImageViewModel ParentImage;
-
+		public ImageModel Image { get; private set; }
 
 		public string SelectedImagePostID
 		{
@@ -40,8 +40,9 @@ namespace Booru_Viewer.ViewModels
 			}
 		}
 
-		public FullImageViewModel(string id, string previewURL, string imageURLUrl, string websiteURL, List<ImageModel> childImages, FullImageViewModel parentImage, string largeImage = null, int width = 0, int height = 0)
+		public FullImageViewModel(ImageModel image, string id, string previewURL, string imageURLUrl, string websiteURL, List<ImageModel> childImages, FullImageViewModel parentImage, string largeImage = null, int width = 0, int height = 0)
 		{
+			Image = image;
 			FullImageURL = imageURLUrl;
 			FullImageWithLoginURL = imageURLUrl + "?login=" + BooruAPI.Username + "&api_key=" + BooruAPI.APIKey;
 			LargeImageURL = largeImage ?? imageURLUrl;
@@ -55,13 +56,10 @@ namespace Booru_Viewer.ViewModels
 			{
 				foreach (var childImage in childImages)
 				{
-					ChildrenImages.Add(new FullImageViewModel(childImage.id, childImage.Preview_File_Url, childImage.File_Url,
+					ChildrenImages.Add(new FullImageViewModel(childImage, childImage.id, childImage.Preview_File_Url, childImage.File_Url,
 						BooruAPI.BaseURL + "/posts/" + childImage.id, null, this, childImage.Large_File_Url));
 				}
 			}
-
-
-
 
 			if (parentImage != null)
 			{
