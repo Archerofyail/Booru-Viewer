@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
@@ -16,12 +17,12 @@ using Microsoft.Toolkit.Uwp.Notifications;
 
 namespace Booru_Viewer.ViewModels
 {
-	class SwipeViewViewModel : ViewModelBase
+	class SavedForLaterSwipeViewViewModel : ViewModelBase
 	{
 
 		private int _perPage = 20;
 
-		public SwipeViewViewModel()
+		public SavedForLaterSwipeViewViewModel()
 		{
 			var settings = ApplicationData.Current.RoamingSettings.Values;
 			if (settings["PerPage"] != null)
@@ -29,8 +30,12 @@ namespace Booru_Viewer.ViewModels
 				_perPage = (int)settings["PerPage"];
 
 			}
-			_images = GlobalInfo.ImageViewModels;
-			Index = GlobalInfo.SelectedImage;
+			_images = new ObservableCollection<FullImageViewModel>();
+			foreach (var img in GlobalInfo.ImagesSavedForLater)
+			{
+				_images.Add(new FullImageViewModel(img, img.id, img.Preview_File_Url, img.Large_File_Url, "https://danbooru.donmai.us/posts/" + img.id, null, null));
+			}
+			GlobalInfo.SelectedImage = GlobalInfo.SelectedImage;
 			Debug.WriteLine("iamges count is " + _images.Count + ", globalinfo version is " + GlobalInfo.ImageViewModels.Count);
 		}
 
@@ -57,21 +62,24 @@ namespace Booru_Viewer.ViewModels
 			}
 		}
 
-		private IncrementalLoadingCollection<PostSource, FullImageViewModel> _images;
+		private ObservableCollection<FullImageViewModel> _images;
 
-		public IncrementalLoadingCollection<PostSource, FullImageViewModel> Images
+		public ObservableCollection<FullImageViewModel> Images
 		{
 			get
 			{
 
-				_images = GlobalInfo.ImageViewModels;
-				
-				if (GlobalInfo.SelectedImage < GlobalInfo.CurrentSearch.Count && GlobalInfo.SelectedImage >= 0)
+				_images = new ObservableCollection<FullImageViewModel>();
+				foreach (var img in GlobalInfo.ImagesSavedForLater)
 				{
-					var genTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].GeneralTags;
-					var charTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].CharacterTags;
-					var artistTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].ArtistTags;
-					var copyTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].CopyrightTags;
+					_images.Add(new FullImageViewModel(img, img.id, img.Preview_File_Url, img.Large_File_Url, "https://danbooru.donmai.us/posts/" + img.id, null, null));
+				}
+				if (GlobalInfo.SelectedImage < GlobalInfo.ImagesSavedForLater.Count && GlobalInfo.SelectedImage >= 0)
+				{
+					var genTags = GlobalInfo.ImagesSavedForLater[GlobalInfo.SelectedImage].GeneralTags;
+					var charTags = GlobalInfo.ImagesSavedForLater[GlobalInfo.SelectedImage].CharacterTags;
+					var artistTags = GlobalInfo.ImagesSavedForLater[GlobalInfo.SelectedImage].ArtistTags;
+					var copyTags = GlobalInfo.ImagesSavedForLater[GlobalInfo.SelectedImage].CopyrightTags;
 
 					GeneralTags.Clear();
 					foreach (var tag in genTags)
@@ -100,6 +108,7 @@ namespace Booru_Viewer.ViewModels
 
 		}
 
+		
 		public int Index
 		{
 			get => GlobalInfo.SelectedImage;
@@ -108,12 +117,12 @@ namespace Booru_Viewer.ViewModels
 				GlobalInfo.SelectedImage = value;
 				if (value >= 0 && value < GlobalInfo.ImageViewModels.Count)
 				{
-					var genTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].GeneralTags;
-					var charTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].CharacterTags;
-					var artistTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].ArtistTags;
-					var copyTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].CopyrightTags;
-					var metaTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].MetaTags;
-					Rating = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].Rating;
+					var genTags = GlobalInfo.ImagesSavedForLater[GlobalInfo.SelectedImage].GeneralTags;
+					var charTags = GlobalInfo.ImagesSavedForLater[GlobalInfo.SelectedImage].CharacterTags;
+					var artistTags = GlobalInfo.ImagesSavedForLater[GlobalInfo.SelectedImage].ArtistTags;
+					var copyTags = GlobalInfo.ImagesSavedForLater[GlobalInfo.SelectedImage].CopyrightTags;
+					var metaTags = GlobalInfo.ImagesSavedForLater[GlobalInfo.SelectedImage].MetaTags;
+					Rating = GlobalInfo.ImagesSavedForLater[GlobalInfo.SelectedImage].Rating;
 					GeneralTags.Clear();
 					CharacterTags.Clear();
 					ArtistTags.Clear();
@@ -150,11 +159,7 @@ namespace Booru_Viewer.ViewModels
 					}
 
 					var favTag = BooruApi.Username.ToLower() + " ";
-					if (Images.Count - value < 5)
-					{
-						Images.LoadMoreItemsAsync(Convert.ToUInt32(_perPage));
-					}
-					CurrentUrl = GlobalInfo.CurrentSearch[value].Large_File_Url;
+					CurrentUrl = GlobalInfo.ImagesSavedForLater[value].Large_File_Url;
 					RaisePropertyChanged("CurrentURL");
 					RaisePropertyChanged("FavIcon");
 				}
@@ -171,7 +176,7 @@ namespace Booru_Viewer.ViewModels
 			get
 
 			{
-				_rating = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].Rating;
+				_rating = GlobalInfo.ImagesSavedForLater[GlobalInfo.SelectedImage].Rating;
 				return " " + _rating;
 			}
 
@@ -201,7 +206,7 @@ namespace Booru_Viewer.ViewModels
 		{
 			get
 			{
-				if (GlobalInfo.FavouriteImages.Contains(Images[Index].SelectedImagePostId))
+				if (GlobalInfo.FavouriteImages.Contains(Images[GlobalInfo.SelectedImage].SelectedImagePostId))
 				{
 					_favIcon = Symbol.Favorite;
 				}
@@ -243,7 +248,7 @@ namespace Booru_Viewer.ViewModels
 		{
 			get
 			{
-				if (GlobalInfo.ImagesSavedForLater.Any(x => x.id == Images[Index].Image.id))
+				if (GlobalInfo.ImagesSavedForLater.Any(x => x.id == Images[GlobalInfo.SelectedImage].Image.id))
 				{
 					return "\uE8D9";
 				}
@@ -261,7 +266,7 @@ namespace Booru_Viewer.ViewModels
 		{
 			get
 			{
-				if (GlobalInfo.ImagesSavedForLater.Any(x => x.id == Images[Index].Image.id))
+				if (GlobalInfo.ImagesSavedForLater.Any(x => x.id == Images[GlobalInfo.SelectedImage].Image.id))
 				{
 					_saveForLaterString = "Remove from list";
 					return _saveForLaterString;
@@ -282,7 +287,7 @@ namespace Booru_Viewer.ViewModels
 		async void SaveImageExec(bool showNotification = true)
 		{
 			Saving = true;
-			SaveImageFailureReason = (await ImageSaver.SaveImage(_images[Index].LargeImageURL)).Item2;
+			SaveImageFailureReason = (await ImageSaver.SaveImage(_images[GlobalInfo.SelectedImage].LargeImageURL)).Item2;
 			Saving = false;
 			if (showNotification)
 			{
@@ -296,7 +301,7 @@ namespace Booru_Viewer.ViewModels
 							{
 								new AdaptiveImage
 								{
-									Source = _images[Index].FullImageURL
+									Source = _images[GlobalInfo.SelectedImage].FullImageURL
 								},
 								new AdaptiveText
 								{
@@ -323,10 +328,10 @@ namespace Booru_Viewer.ViewModels
 			var postIndex = GlobalInfo.SelectedImage;
 			if (FavIcon == Symbol.OutlineStar)
 			{
-				if (await BooruApi.FavouriteImage(GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage]))
+				if (await BooruApi.FavouriteImage(GlobalInfo.ImagesSavedForLater[GlobalInfo.SelectedImage]))
 				{
 					
-					GlobalInfo.FavouriteImages.Add(GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].id);
+					GlobalInfo.FavouriteImages.Add(GlobalInfo.ImagesSavedForLater[GlobalInfo.SelectedImage].id);
 					await GlobalInfo.SaveFavouritePosts();
 					FavIcon = Symbol.Favorite;
 					FavString = "Unfavourite";
@@ -335,11 +340,9 @@ namespace Booru_Viewer.ViewModels
 			}
 			else
 			{
-				if (await BooruApi.UnfavouriteImage(GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage]))
+				if (await BooruApi.UnfavouriteImage(GlobalInfo.ImagesSavedForLater[GlobalInfo.SelectedImage]))
 				{
-					var im = GlobalInfo.CurrentSearch[postIndex];
-
-					
+					var im = GlobalInfo.ImagesSavedForLater[postIndex];
 					GlobalInfo.FavouriteImages.Remove(im.id);
 					await GlobalInfo.SaveFavouritePosts();
 					FavIcon = Symbol.OutlineStar;
@@ -353,7 +356,7 @@ namespace Booru_Viewer.ViewModels
 
 		async void OpenPostInWebsiteEx()
 		{
-			await Launcher.LaunchUriAsync(new Uri(_images[Index].WebsiteUrl));
+			await Launcher.LaunchUriAsync(new Uri(_images[GlobalInfo.SelectedImage].WebsiteUrl));
 		}
 
 
@@ -363,16 +366,21 @@ namespace Booru_Viewer.ViewModels
 		{
 			if (SaveForLaterIcon == "\uE728")
 			{
-				GlobalInfo.ImagesSavedForLater.Add(Images[Index].Image);
+				GlobalInfo.ImagesSavedForLater.Add(Images[GlobalInfo.SelectedImage].Image);
 			}
 			else
 			{
-				GlobalInfo.ImagesSavedForLater.Remove(GlobalInfo.ImagesSavedForLater.First(x=>x.id == Images[Index].Image.id));
+				if (GlobalInfo.ImagesSavedForLater.Count == 1)
+				{
+					return;
+				}
+				GlobalInfo.ImagesSavedForLater.Remove(GlobalInfo.ImagesSavedForLater.First(x=>x.id == Images[GlobalInfo.SelectedImage].Image.id));
+				Images.Remove(Images[GlobalInfo.SelectedImage]);
 			}
 			await GlobalInfo.SaveSavedForLaterImages();
 			RaisePropertyChanged("SaveForLaterIcon");
 			RaisePropertyChanged("SaveForLaterString");
-
+			RaisePropertyChanged("Images");
 		}
 	}
 }

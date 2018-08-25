@@ -11,11 +11,11 @@ namespace Booru_Viewer.ViewModels
 	public class SavedSearchViewModel : ViewModelBase
 	{
 
-		private MainPageViewModel parentVM;
-		public SavedSearchViewModel(string[] tags, MainPageViewModel pVM)
+		private MainPageViewModel _parentVm;
+		public SavedSearchViewModel(string[] tags, MainPageViewModel pVm)
 		{
 			Tags = tags;
-			parentVM = pVM;
+			_parentVm = pVm;
 		}
 
 		public string AllTags
@@ -35,22 +35,22 @@ namespace Booru_Viewer.ViewModels
 			}
 		}
 
-		private string[] searchPreview = null;
+		private string[] _searchPreview = null;
 		public string[] SearchPreview
 		{
 			get
 
 			{
-				if (searchPreview == null)
+				if (_searchPreview == null)
 				{
 					GetPreviews();
 				}
 				//return new []{ "https://danbooru.donmai.us/data/sample/__d_va_overwatch_drawn_by_piao_qi_jiangjun__sample-773ae26de9f2c223dc9cf4e866ce89e6.jpg"};
-				return searchPreview;
+				return _searchPreview;
 			}
 			set
 			{
-				searchPreview = value;
+				_searchPreview = value;
 				RaisePropertyChanged();
 			}
 		}
@@ -59,12 +59,12 @@ namespace Booru_Viewer.ViewModels
 		void DeleteSearchExecute()
 		{
 
-			parentVM.DeleteSavedSearch(this);
+			_parentVm.DeleteSavedSearch(this);
 		}
 
 		void StartSearchExecute()
 		{
-			parentVM.StartSavedSearch(Tags);
+			_parentVm.StartSavedSearch(Tags);
 		}
 
 		async void GetPreviews()
@@ -86,7 +86,7 @@ namespace Booru_Viewer.ViewModels
 			}
 			preppedTags.Add("order:score");
 
-			var imageResults = (await BooruAPI.SearchPosts(preppedTags.ToArray(), 1, 5)).Item2.Select(x => x.Preview_File_Url).ToArray();
+			var imageResults = (await BooruApi.SearchPosts(preppedTags.ToArray(), 1, 5)).Item2.Select(x => x.Preview_File_Url).ToArray();
 			SearchPreview = imageResults;
 			Debug.WriteLine("Got all images");
 			

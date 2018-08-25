@@ -21,7 +21,7 @@ namespace Booru_Viewer.Models
 			}
 			set => category = value;
 		}
-		public int Post_Count { get; set; }
+		public int PostCount { get; set; }
 		public Tag(string name, TagType type = TagType.Unknown)
 		{
 			Name = name;
@@ -29,7 +29,7 @@ namespace Booru_Viewer.Models
 		}
 		async void GetTagCategory()
 		{
-			var taginf = (await BooruAPI.GetTagInfo(Name));
+			var taginf = (await BooruApi.GetTagInfo(Name));
 			if (taginf != null)
 			{
 				category = taginf.category;

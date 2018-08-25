@@ -124,8 +124,12 @@
     <Compile Include="ViewModels\FullImageViewModel.cs" />
     <Compile Include="ViewModels\MainPageViewModel.cs" />
     <Compile Include="ViewModels\SavedSearchViewModel.cs" />
+    <Compile Include="ViewModels\SavedForLaterSwipeViewViewModel.cs" />
     <Compile Include="ViewModels\SwipeViewViewModel.cs" />
     <Compile Include="ViewModels\TagViewModel.cs" />
+    <Compile Include="Views\SavedForLaterSwipeView.xaml.cs">
+      <DependentUpon>SavedForLaterSwipeView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SwipeView.xaml.cs">
       <DependentUpon>SwipeView.xaml</DependentUpon>
     </Compile>
@@ -188,6 +192,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Page>
     <Page Include="MainPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SavedForLaterSwipeView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

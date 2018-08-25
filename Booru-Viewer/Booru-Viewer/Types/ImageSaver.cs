@@ -10,8 +10,8 @@ namespace Booru_Viewer.Types
 {
 	public static class ImageSaver
 	{
-		public static HttpClient client = new HttpClient();
-		private static StorageFolder imageFolder;
+		public static HttpClient Client = new HttpClient();
+		private static StorageFolder _imageFolder;
 		public static bool IsSavingImageList { get; private set; }
 		public static int TotalImageSaveCount { get; private set; }
 		public static int CurrentImageSaveIndex { get; private set; }
@@ -24,14 +24,14 @@ namespace Booru_Viewer.Types
 		{
 			get
 			{
-				if (imageFolder == null)
+				if (_imageFolder == null)
 				{
 					GetFolder();
 
 				}
-				return imageFolder;
+				return _imageFolder;
 			}
-			set => imageFolder = value;
+			set => _imageFolder = value;
 		}
 
 		static ImageSaver()
@@ -81,11 +81,11 @@ namespace Booru_Viewer.Types
 			}
 
 		}
-		public static async Task<Tuple<bool, string>> SaveImage(string ImageURL)
+		public static async Task<Tuple<bool, string>> SaveImage(string imageUrl)
 		{
 			
 			
-			var baseURLLength = (BooruAPI.BaseURL + "/data/").Length;
+			var baseUrlLength = (BooruApi.BaseUrl + "/data/").Length;
 			if (ImageFolder == null)
 			{
 				try
@@ -99,7 +99,7 @@ namespace Booru_Viewer.Types
 				}
 
 			}
-			var imageName = ImageURL.Substring(baseURLLength);
+			var imageName = imageUrl.Substring(baseUrlLength);
 			var splitName = imageName.Split('/');
 			imageName = splitName[splitName.Length - 1];
 			imageName = imageName.Replace("_", "").Replace("sample", "").Replace("-", "");
@@ -110,7 +110,7 @@ namespace Booru_Viewer.Types
 			}
 			try
 			{
-				var response = await client.GetAsync(ImageURL);
+				var response = await Client.GetAsync(imageUrl);
 				if (response.IsSuccessStatusCode)
 				{
 					StorageFile file = await ImageFolder.CreateFileAsync(imageName);

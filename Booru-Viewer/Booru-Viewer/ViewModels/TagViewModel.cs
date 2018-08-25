@@ -13,20 +13,20 @@ namespace Booru_Viewer.ViewModels
 {
 	public class TagViewModel : ViewModelBase, IComparable
 	{
-		private MainPageViewModel parentVM;
+		private MainPageViewModel _parentVm;
 		public Tag Tag;
-		public TagViewModel(Tag tag, MainPageViewModel pageVM)
+		public TagViewModel(Tag tag, MainPageViewModel pageVm)
 		{
 			Tag = tag;
-			name = tag.Name;
-			parentVM = pageVM;
+			_name = tag.Name;
+			_parentVm = pageVm;
 			_type = tag.category;
 		}
 
 		public TagViewModel(Tag tag)
 		{
 			Tag = new Tag(tag.Name.Substring(0), tag.category);
-			name = tag.Name;
+			_name = tag.Name;
 		}
 
 		public TagViewModel()
@@ -47,8 +47,8 @@ namespace Booru_Viewer.ViewModels
 			}
 		}
 
-		private string name;
-		public string Name { get => name; set { name = value; RaisePropertyChanged(); } }
+		private string _name;
+		public string Name { get => _name; set { _name = value; RaisePropertyChanged(); } }
 
 		public bool IsFavourite
 		{
@@ -73,9 +73,9 @@ namespace Booru_Viewer.ViewModels
 		void RemoveTagExecute()
 		{
 
-			parentVM?.RemoveTagExec(this);
-			parentVM?.RaisePropertyChanged("IsSignedOutWithMoreThan2Tags");
-			parentVM?.RaisePropertyChanged("TotalTagCount");
+			_parentVm?.RemoveTagExec(this);
+			_parentVm?.RaisePropertyChanged("IsSignedOutWithMoreThan2Tags");
+			_parentVm?.RaisePropertyChanged("TotalTagCount");
 		}
 
 		bool RemoveTagCanExecute()
@@ -97,7 +97,7 @@ namespace Booru_Viewer.ViewModels
 
 				if (Tag.category == TagType.Unknown || Tag.category == TagType.General)
 				{
-					var taginf = (await BooruAPI.GetTagInfo(Tag.Name));
+					var taginf = (await BooruApi.GetTagInfo(Tag.Name));
 					if (taginf != null)
 					{
 						Tag.Category = taginf.category;
@@ -106,53 +106,53 @@ namespace Booru_Viewer.ViewModels
 				
 				GlobalInfo.FavouriteTags.Add(Tag);
 
-				parentVM?.FavouriteTags.First(x => x.Key == Tag.category).Add(this);
+				_parentVm?.FavouriteTags.First(x => x.Key == Tag.category).Add(this);
 				
-				parentVM?.FavouriteTags.First(x => x.Key == Tag.category).Sort();
-				parentVM?.RaisePropertyChanged("FavouriteTags");
+				_parentVm?.FavouriteTags.First(x => x.Key == Tag.category).Sort();
+				_parentVm?.RaisePropertyChanged("FavouriteTags");
 			}
 			else
 			{
 				GlobalInfo.FavouriteTags.Remove(Tag);
-				parentVM?.FavouriteTags.First(x => x.Key == Tag.category).Remove(this);
+				_parentVm?.FavouriteTags.First(x => x.Key == Tag.category).Remove(this);
 			}
-			parentVM?.RaisePropertyChanged("FavouriteTags");
+			_parentVm?.RaisePropertyChanged("FavouriteTags");
 			RaisePropertyChanged("IsFavourite");
 			RaisePropertyChanged("FavouriteIcon");
-			parentVM?.RaisePropertyChanged("DontHaveSavedSearches");
+			_parentVm?.RaisePropertyChanged("DontHaveSavedSearches");
 			await GlobalInfo.SaveFavouriteTags();
 		}
 
 		async void UnfavouriteTagEx()
 		{
 			GlobalInfo.FavouriteTags.Remove(Tag);
-			parentVM?.FavouriteTags.First(x => x.Key == Tag.category).Remove(this);
+			_parentVm?.FavouriteTags.First(x => x.Key == Tag.category).Remove(this);
 			RaisePropertyChanged("IsFavourite");
 			RaisePropertyChanged("FavouriteIcon");
-			parentVM?.RaisePropertyChanged("DontHaveSavedSearches");
+			_parentVm?.RaisePropertyChanged("DontHaveSavedSearches");
 			await GlobalInfo.SaveFavouriteTags();
 		}
 
 		void AddTagToSearchEx()
 		{
-			if (parentVM == null)
+			if (_parentVm == null)
 				return;
 
-			if (parentVM.CurrentTags.Any(x => x.Name.TrimStart('-', '~') == Tag.Name))
+			if (_parentVm.CurrentTags.Any(x => x.Name.TrimStart('-', '~') == Tag.Name))
 			{
 				return;
 			}
-			parentVM?.CurrentTags.Add(new TagViewModel(Tag, parentVM));
-			parentVM?.RaisePropertyChanged("TotalTagCount");
+			_parentVm?.CurrentTags.Add(new TagViewModel(Tag, _parentVm));
+			_parentVm?.RaisePropertyChanged("TotalTagCount");
 		}
 
 		void StartSearchFromThisEx()
 		{
-			parentVM?.CurrentTags.Clear();
-			parentVM?.CurrentTags.Add(this);
-			parentVM?.RaisePropertyChanged("IsSignedOutWithMoreThan2Tags");
-			parentVM?.RaisePropertyChanged("TotalTagCount");
-			parentVM?.StartSearchExecute();
+			_parentVm?.CurrentTags.Clear();
+			_parentVm?.CurrentTags.Add(this);
+			_parentVm?.RaisePropertyChanged("IsSignedOutWithMoreThan2Tags");
+			_parentVm?.RaisePropertyChanged("TotalTagCount");
+			_parentVm?.StartSearchExecute();
 		}
 
 		void AddPrefixEx(string prefix)

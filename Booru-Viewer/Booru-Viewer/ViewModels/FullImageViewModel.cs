@@ -16,15 +16,15 @@ namespace Booru_Viewer.ViewModels
 		public string FullImageWithLoginURL { get; set; }
 		public string LargeImageURL { get; set; }
 		public string PreviewURL { get; set; }
-		private string id;
+		private string _id;
 		public int Width { get; set; }
 		public int Height { get; set; }
-		public string WebsiteURL { get; set; }
+		public string WebsiteUrl { get; set; }
 		public ObservableCollection<FullImageViewModel> ChildrenImages { get; set; }
 		public FullImageViewModel ParentImage;
 		public ImageModel Image { get; private set; }
 
-		public string SelectedImagePostID
+		public string SelectedImagePostId
 		{
 			get
 			{
@@ -32,32 +32,32 @@ namespace Booru_Viewer.ViewModels
 				{
 					if (ChildrenImages.FirstOrDefault(x => x.CurrentImage == CurrentImage) != null)
 					{
-						return ChildrenImages.First(x => x.CurrentImage == CurrentImage).id;
+						return ChildrenImages.First(x => x.CurrentImage == CurrentImage)._id;
 					}
 				}
 
-				return id;
+				return _id;
 			}
 		}
 
-		public FullImageViewModel(ImageModel image, string id, string previewURL, string imageURLUrl, string websiteURL, List<ImageModel> childImages, FullImageViewModel parentImage, string largeImage = null, int width = 0, int height = 0)
+		public FullImageViewModel(ImageModel image, string id, string previewUrl, string imageUrlUrl, string websiteUrl, List<ImageModel> childImages, FullImageViewModel parentImage, string largeImage = null, int width = 0, int height = 0)
 		{
 			Image = image;
-			FullImageURL = imageURLUrl;
-			FullImageWithLoginURL = imageURLUrl + "?login=" + BooruAPI.Username + "&api_key=" + BooruAPI.APIKey;
-			LargeImageURL = largeImage ?? imageURLUrl;
-			PreviewURL = previewURL;
+			FullImageURL = imageUrlUrl;
+			FullImageWithLoginURL = imageUrlUrl + "?login=" + BooruApi.Username + "&api_key=" + BooruApi.ApiKey;
+			LargeImageURL = largeImage ?? imageUrlUrl;
+			PreviewURL = previewUrl;
 			Width = width;
 			Height = height;
-			WebsiteURL = websiteURL;
+			WebsiteUrl = websiteUrl;
 			ChildrenImages = new ObservableCollection<FullImageViewModel>();
-			this.id = id;
+			this._id = id;
 			if (childImages != null && childImages.Count > 0)
 			{
 				foreach (var childImage in childImages)
 				{
 					ChildrenImages.Add(new FullImageViewModel(childImage, childImage.id, childImage.Preview_File_Url, childImage.File_Url,
-						BooruAPI.BaseURL + "/posts/" + childImage.id, null, this, childImage.Large_File_Url));
+						BooruApi.BaseUrl + "/posts/" + childImage.id, null, this, childImage.Large_File_Url));
 				}
 			}
 

@@ -22,47 +22,47 @@ namespace Booru_Viewer.Types
 
 		public static ObservableCollection<TagViewModel> CurrentTags { get; set; } = new ObservableCollection<TagViewModel>();
 		public static List<string> CurrentSearchTags { get; set; } = new List<string>();
-		private static string currentOrdering = "";
+		private static string _currentOrdering = "";
 
 		public static EventHandler FavouriteImagesLoadedEventHandler;
-		private static List<string> favouriteImages;
+		private static List<string> _favouriteImages;
 
 		public static List<string> FavouriteImages
 		{
 			get
 			{
-				if (favouriteImages == null)
+				if (_favouriteImages == null)
 				{
-					favouriteImages = new List<string>();
+					_favouriteImages = new List<string>();
 					LoadFavouritePosts();
 				}
 
-				return favouriteImages;
+				return _favouriteImages;
 			}
-			set => favouriteImages = value;
+			set => _favouriteImages = value;
 		}
 
 		public static string CurrentOrdering
 		{
-			get => currentOrdering; set => currentOrdering = (value == "" ? "" : "order:" + value);
+			get => _currentOrdering; set => _currentOrdering = (value == "" ? "" : "order:" + value);
 		}
 
 		public static bool[] ContentCheck { get; set; } = { true, true, true };
 
-		private static ObservableCollection<string[]> savedSearches;
-		private static ObservableCollection<Tag> favouriteTags;
+		private static ObservableCollection<string[]> _savedSearches;
+		private static ObservableCollection<Tag> _favouriteTags;
 		public static ObservableCollection<Tag> FavouriteTags
 		{
 			get
 			{
-				if (favouriteTags == null)
+				if (_favouriteTags == null)
 				{
-					favouriteTags = new ObservableCollection<Tag>();
+					_favouriteTags = new ObservableCollection<Tag>();
 					LoadFavouriteTags();
 				}
-				return favouriteTags;
+				return _favouriteTags;
 			}
-			set => favouriteTags = value;
+			set => _favouriteTags = value;
 		}
 
 		public static EventHandler SavedSearchesLoaded;
@@ -71,53 +71,53 @@ namespace Booru_Viewer.Types
 		{
 			get
 			{
-				if (savedSearches == null)
+				if (_savedSearches == null)
 				{
-					savedSearches = new ObservableCollection<string[]>();
+					_savedSearches = new ObservableCollection<string[]>();
 					LoadSavedSearches();
 				}
 
-				return savedSearches;
+				return _savedSearches;
 			}
 		}
 
 		public static int SelectedImage { get; set; } = 0;
-		private static StorageFile SearchesFile;
+		private static StorageFile _searchesFile;
 		public static void RemoveTag(TagViewModel tag)
 		{
 			CurrentTags.Remove(tag);
 		}
 
 		public static EventHandler ImagesSavedForLaterLoaded;
-		private static List<ImageModel> imagesSavedForLater = null;
+		private static List<ImageModel> _imagesSavedForLater = null;
 
 		public static List<ImageModel> ImagesSavedForLater
 		{
 			get
 			{
-				if (imagesSavedForLater == null)
+				if (_imagesSavedForLater == null)
 				{
-					imagesSavedForLater = new List<ImageModel>();
+					_imagesSavedForLater = new List<ImageModel>();
 					LoadSavedForLaterImages();
 				}
 
-				return imagesSavedForLater;
+				return _imagesSavedForLater;
 			}
 		}
 
 		public static async Task SaveSearches(StorageFolder baseFolder = null)
 		{
-			SaveDataToFile(savedSearches.ToList(), "SavedSearches.json");
+			SaveDataToFile(_savedSearches.ToList(), "SavedSearches.json");
 		}
 
 		public static async Task LoadSavedSearches(StorageFolder searchesFolder = null)
 		{
 
 			var searches = await LoadDataToObject<List<string[]>>("SavedSearches.json");
-			savedSearches.Clear();
+			_savedSearches.Clear();
 			foreach (var search in searches)
 			{
-				savedSearches.Add(search);
+				_savedSearches.Add(search);
 			}
 			SavedSearchesLoaded?.Invoke(typeof(GlobalInfo), EventArgs.Empty);
 		}
@@ -125,7 +125,7 @@ namespace Booru_Viewer.Types
 		public static async Task<ObservableCollection<Tag>> GetFavouriteTags()
 		{
 			await LoadFavouriteTags();
-			return favouriteTags;
+			return _favouriteTags;
 
 		}
 
@@ -161,15 +161,15 @@ namespace Booru_Viewer.Types
 				var item = await folder.TryGetItemAsync(fileName);
 				if (item != null)
 				{
-					SearchesFile = await folder.GetFileAsync(fileName);
+					_searchesFile = await folder.GetFileAsync(fileName);
 				}
 				else
 				{
-					SearchesFile = await folder.CreateFileAsync(fileName);
+					_searchesFile = await folder.CreateFileAsync(fileName);
 				}
 
 				var json = JsonConvert.SerializeObject(data);
-				await FileIO.WriteTextAsync(SearchesFile, json);
+				await FileIO.WriteTextAsync(_searchesFile, json);
 			}
 			catch (Exception e)
 			{
@@ -215,8 +215,8 @@ namespace Booru_Viewer.Types
 				Debug.WriteLine("File was null");
 				return new T();
 			}
-			SearchesFile = await folder.GetFileAsync(fileName);
-			var json = await FileIO.ReadTextAsync(SearchesFile);
+			_searchesFile = await folder.GetFileAsync(fileName);
+			var json = await FileIO.ReadTextAsync(_searchesFile);
 			try
 			{
 				data = JsonConvert.DeserializeObject<T>(json, new JsonSerializerSettings
@@ -238,18 +238,18 @@ namespace Booru_Viewer.Types
 
 		public static async Task SaveSavedForLaterImages(StorageFolder baseFolder = null)
 		{
-			await SaveDataToFile(imagesSavedForLater, "ImagesSavedForLater.json");
+			await SaveDataToFile(_imagesSavedForLater, "ImagesSavedForLater.json");
 		}
 
 		public static async Task LoadSavedForLaterImages(StorageFolder baseFolder = null)
 		{
-			imagesSavedForLater = await LoadDataToObject<List<ImageModel>>("ImagesSavedForLater.json");
+			_imagesSavedForLater = await LoadDataToObject<List<ImageModel>>("ImagesSavedForLater.json");
 			ImagesSavedForLaterLoaded?.Invoke(typeof(GlobalInfo), EventArgs.Empty);
 		}
 
 		public static async Task SaveFavouriteTags(StorageFolder baseFolder = null)
 		{
-			await SaveDataToFile(favouriteTags.ToList(), "FavouriteTags.json");
+			await SaveDataToFile(_favouriteTags.ToList(), "FavouriteTags.json");
 
 		}
 
@@ -257,15 +257,15 @@ namespace Booru_Viewer.Types
 		{
 
 			var tags = await LoadDataToObject<List<Tag>>("FavouriteTags.json");
-			favouriteTags.Clear();
+			_favouriteTags.Clear();
 			foreach (var search in tags)
 			{
 				var tag = search;
 
 				tag.Name = tag.Name.TrimStart('-', '~');
-				if (!favouriteTags.Any(x => x.Name == tag.Name))
+				if (!_favouriteTags.Any(x => x.Name == tag.Name))
 				{
-					favouriteTags.Add(tag);
+					_favouriteTags.Add(tag);
 				}
 
 			}
@@ -274,16 +274,16 @@ namespace Booru_Viewer.Types
 
 		public static async Task SaveFavouritePosts(StorageFolder baseFolder = null)
 		{
-			await SaveDataToFile(favouriteImages, "FavouritePosts.json");
+			await SaveDataToFile(_favouriteImages, "FavouritePosts.json");
 		}
 		public static async Task LoadFavouritePosts(StorageFolder searchesFolder = null)
 		{
 			var favouritePosts = await LoadDataToObject<List<string>>("FavouritePosts.json");
-			favouriteImages.Clear();
+			_favouriteImages.Clear();
 			foreach (var image in favouritePosts)
 			{
 
-				favouriteImages.Add(image);
+				_favouriteImages.Add(image);
 			}
 			FavouriteImagesLoadedEventHandler?.Invoke(typeof(GlobalInfo), EventArgs.Empty);
 		}

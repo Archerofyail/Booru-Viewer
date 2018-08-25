@@ -73,12 +73,12 @@ namespace Booru_Viewer.ViewModels
 				{
 
 					ApiKey = savedApiKey;
-					BooruAPI.SetLogin(savedUn, savedApiKey);
+					BooruApi.SetLogin(savedUn, savedApiKey);
 				}
 				else
 				{
 					ApiKey = "";
-					BooruAPI.SetLogin(savedUn, "");
+					BooruApi.SetLogin(savedUn, "");
 				}
 
 			}
@@ -86,7 +86,7 @@ namespace Booru_Viewer.ViewModels
 			
 			//StartSearchExecute();
 			Debug.WriteLine("Count for saved Searches is " + SavedSearches.Count);
-			BooruAPI.TagSearchCompletedHandler += (sender, tuple) =>
+			BooruApi.TagSearchCompletedHandler += (sender, tuple) =>
 			{
 				if (tuple.Item1 && _currentTag.Length > 0)
 				{
@@ -139,13 +139,13 @@ namespace Booru_Viewer.ViewModels
 				RaisePropertyChanged("FavouritePostCount");
 			};
 			GlobalInfo.LoadSavedForLaterImages();
-			savedForLater = new ObservableCollection<FullImageViewModel>();
+			_savedForLater = new ObservableCollection<FullImageViewModel>();
 			GlobalInfo.ImagesSavedForLaterLoaded += (sender, args) =>
 			{
-				savedForLater = new ObservableCollection<FullImageViewModel>();
+				_savedForLater = new ObservableCollection<FullImageViewModel>();
 				foreach (var image in GlobalInfo.ImagesSavedForLater)
 				{
-					savedForLater.Add(new FullImageViewModel(image, image.id, image.Preview_File_Url, image.Large_File_Url, "https://danbooru.donmai.us/posts/" + image.id, null, null));
+					_savedForLater.Add(new FullImageViewModel(image, image.id, image.Preview_File_Url, image.Large_File_Url, "https://danbooru.donmai.us/posts/" + image.id, null, null));
 				}
 				RaisePropertyChanged("SavedForLater");
 
@@ -169,9 +169,9 @@ namespace Booru_Viewer.ViewModels
 			Thumbnails.OnError = ImageLoadOnError;
 			Thumbnails.RefreshAsync();
 
-			BooruAPI.UserLookupEvent += (sender, args) =>
+			BooruApi.UserLookupEvent += (sender, args) =>
 			{
-				var tags = BooruAPI.UserModel?.blacklisted_tags.Split('\r');
+				var tags = BooruApi.UserModel?.blacklisted_tags.Split('\r');
 				if (tags != null && tags.Length > 0)
 				{
 					foreach (var tag in tags)
@@ -184,21 +184,21 @@ namespace Booru_Viewer.ViewModels
 					}
 				}
 			};
-			BooruAPI.GetUser();
+			BooruApi.GetUser();
 		}
 
-		private int favouritePostCount = 0;
+		private int _favouritePostCount = 0;
 
 		public int FavouritePostCount
 		{
 			get
 			{
-				favouritePostCount = GlobalInfo.FavouriteImages.Count;
-				return favouritePostCount;
+				_favouritePostCount = GlobalInfo.FavouriteImages.Count;
+				return _favouritePostCount;
 			}
 			set
 			{
-				favouritePostCount = value;
+				_favouritePostCount = value;
 				RaisePropertyChanged();
 			}
 		}
@@ -475,21 +475,21 @@ namespace Booru_Viewer.ViewModels
 			set => _favouriteTags = value;
 		}
 
-		private ObservableCollection<FullImageViewModel> savedForLater;
+		private ObservableCollection<FullImageViewModel> _savedForLater;
 
 		public ObservableCollection<FullImageViewModel> SavedForLater
 		{
 			get
 			{
-				if (savedForLater.Count != GlobalInfo.ImagesSavedForLater.Count)
+				if (_savedForLater.Count != GlobalInfo.ImagesSavedForLater.Count)
 				{
-					savedForLater = new ObservableCollection<FullImageViewModel>();
+					_savedForLater = new ObservableCollection<FullImageViewModel>();
 					foreach (var image in GlobalInfo.ImagesSavedForLater)
 					{
-						savedForLater.Add(new FullImageViewModel(image, image.id, image.Preview_File_Url, image.Large_File_Url, "https://danbooru.donmai.us/posts/" + image.id, null, null));
+						_savedForLater.Add(new FullImageViewModel(image, image.id, image.Preview_File_Url, image.Large_File_Url, "https://danbooru.donmai.us/posts/" + image.id, null, null));
 					}
 				}
-				return savedForLater;
+				return _savedForLater;
 			}
 		}
 
@@ -585,8 +585,8 @@ namespace Booru_Viewer.ViewModels
 		async void SearchForCurrentTag(string val)
 		{
 			SuggestedTags.Clear();
-			await BooruAPI.SearchTags(val.Replace(" ", "_"), 1, true);
-			await BooruAPI.SearchTags(val.Replace(" ", "_"), 6);
+			await BooruApi.SearchTags(val.Replace(" ", "_"), 1, true);
+			await BooruApi.SearchTags(val.Replace(" ", "_"), 6);
 			SuggestedTags = new ObservableCollection<string>(SuggestedTags.Distinct());
 		}
 
@@ -594,7 +594,7 @@ namespace Booru_Viewer.ViewModels
 
 		public string Username
 		{
-			get => BooruAPI.Username;
+			get => BooruApi.Username;
 			set
 			{
 				_username = value;
@@ -607,7 +607,7 @@ namespace Booru_Viewer.ViewModels
 
 		public string ApiKey
 		{
-			get => BooruAPI.APIKey;
+			get => BooruApi.ApiKey;
 			set
 			{
 
@@ -749,10 +749,10 @@ namespace Booru_Viewer.ViewModels
 		{
 
 
-			BooruAPI.SetLogin(_username, _apiKey);
+			BooruApi.SetLogin(_username, _apiKey);
 
-			ApplicationData.Current.RoamingSettings.Values["Username"] = BooruAPI.Username;
-			ApplicationData.Current.RoamingSettings.Values["APIKey"] = BooruAPI.APIKey;
+			ApplicationData.Current.RoamingSettings.Values["Username"] = BooruApi.Username;
+			ApplicationData.Current.RoamingSettings.Values["APIKey"] = BooruApi.ApiKey;
 			ApplicationData.Current.RoamingSettings.Values["PerPage"] = PerPage;
 			ApplicationData.Current.RoamingSettings.Values["ImageSize"] = ImageSize;
 			RaisePropertyChanged("APIKey");
@@ -795,7 +795,7 @@ namespace Booru_Viewer.ViewModels
 				GlobalInfo.CurrentSearchTags.Clear();
 
 				GlobalInfo.CurrentSearchTags.AddRange(tags);
-				BooruAPI.Page = 1;
+				BooruApi.Page = 1;
 				await Thumbnails.RefreshAsync();
 			}
 			catch (Exception e)
@@ -830,7 +830,6 @@ namespace Booru_Viewer.ViewModels
 		void SearchFavouritesExecute()
 		{
 
-			CurrentTags.Clear();
 			CurrentTag = "fav:" + Username;
 			RaisePropertyChanged("CurrentTags");
 			RaisePropertyChanged("TotalTagCount");
@@ -1005,9 +1004,9 @@ namespace Booru_Viewer.ViewModels
 				SettingsData settings = new SettingsData()
 				{
 					PerPage = PerPage,
-					Username = BooruAPI.Username,
-					APIKey = BooruAPI.APIKey,
-					contentChecks = new[] { _safeChecked, QuestionableChecked, ExplicitChecked }
+					Username = BooruApi.Username,
+					ApiKey = BooruApi.ApiKey,
+					ContentChecks = new[] { _safeChecked, QuestionableChecked, ExplicitChecked }
 				};
 				var saveFolder = result;
 
@@ -1057,10 +1056,10 @@ namespace Booru_Viewer.ViewModels
 					var json = await FileIO.ReadTextAsync(settingsFile);
 					SettingsData data = JsonConvert.DeserializeObject<SettingsData>(json);
 					PerPage = data.PerPage;
-					BooruAPI.SetLogin(data.Username, data.APIKey);
-					SafeChecked = data.contentChecks[0];
-					QuestionableChecked = data.contentChecks[1];
-					ExplicitChecked = data.contentChecks[2];
+					BooruApi.SetLogin(data.Username, data.ApiKey);
+					SafeChecked = data.ContentChecks[0];
+					QuestionableChecked = data.ContentChecks[1];
+					ExplicitChecked = data.ContentChecks[2];
 
 				}
 			}
@@ -1073,7 +1072,7 @@ namespace Booru_Viewer.ViewModels
 			{
 				Debug.WriteLine("Per Page Changed, old value is {0}, new value is {1}", _perPage, (sender as Slider).Value);
 				Debug.WriteLine("PerPage Changed");
-				BooruAPI.Page = 1;
+				BooruApi.Page = 1;
 				_perPage = (int)(sender as Slider).Value;
 				ApplicationData.Current.RoamingSettings.Values["PerPage"] = _perPage;
 				_thumbnails =
@@ -1186,7 +1185,7 @@ namespace Booru_Viewer.ViewModels
 		public ICommand DownloadFavourites => new RelayCommand(DownloadFavouritesEx);
 		async void DownloadFavouritesEx()
 		{
-			var favs = await BooruAPI.GetUserFavourites();
+			var favs = await BooruApi.GetUserFavourites();
 			foreach (var image in favs)
 			{
 				GlobalInfo.FavouriteImages.Add(image.id);

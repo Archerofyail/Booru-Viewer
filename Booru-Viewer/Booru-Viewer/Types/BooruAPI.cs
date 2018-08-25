@@ -11,15 +11,15 @@ using Newtonsoft.Json.Linq;
 
 namespace Booru_Viewer.Types
 {
-	public static class BooruAPI
+	public static class BooruApi
 	{
-		public static string BaseURL { get; private set; } = "https://Danbooru.donmai.us";
-		public static string PostsURL = "/posts.json";
-		public static string TagsURL = "/tags.json";
+		public static string BaseUrl { get; private set; } = "https://Danbooru.donmai.us";
+		public static string PostsUrl = "/posts.json";
+		public static string TagsUrl = "/tags.json";
 		public static string Username { get; private set; } = "";
-		public static string APIKey { get; private set; } = "";
+		public static string ApiKey { get; private set; } = "";
 		public static int Page { get; set; } = 1;
-		private static HttpClient booruClient = new HttpClient();
+		private static HttpClient _booruClient = new HttpClient();
 		public static EventHandler<Tuple<bool, List<Tag>, string>> TagSearchCompletedHandler;
 		public static EventHandler UserLookupEvent;
 
@@ -89,19 +89,19 @@ namespace Booru_Viewer.Types
 				new KeyValuePair<string, string>("tags", tagsAsOne)
 			};
 
-			if (APIKey != "" && Username != "")
+			if (ApiKey != "" && Username != "")
 			{
 				variables.Add(new KeyValuePair<string, string>("login", Username));
-				variables.Add(new KeyValuePair<string, string>("api_key", APIKey));
+				variables.Add(new KeyValuePair<string, string>("api_key", ApiKey));
 			}
 			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(variables);
-			var requestURI =
-				new Uri(BaseURL + PostsURL + "?" + content.ToString());
+			var requestUri =
+				new Uri(BaseUrl + PostsUrl + "?" + content.ToString());
 			try
 			{
 
 
-				response = await booruClient.GetAsync(requestURI);
+				response = await _booruClient.GetAsync(requestUri);
 			}
 			catch (Exception e)
 			{
@@ -124,7 +124,7 @@ namespace Booru_Viewer.Types
 			var signinStuff = new List<KeyValuePair<string, string>>()
 			{
 				new KeyValuePair<string, string>("login", Username),
-				new KeyValuePair<string, string>("api_key", APIKey)
+				new KeyValuePair<string, string>("api_key", ApiKey)
 			};
 
 			HttpFormUrlEncodedContent signinDetails = new HttpFormUrlEncodedContent(signinStuff);
@@ -198,7 +198,7 @@ namespace Booru_Viewer.Types
 			}
 
 			var noDupes = imageLinks.GroupBy(x => x.id).Where(x => x.Count() == 1).Select(x => x.First(y => !string.IsNullOrEmpty(y.id))).ToList();
-			Debug.WriteLine("Page is: " + page + ". URL: " + requestURI);
+			Debug.WriteLine("Page is: " + page + ". URL: " + requestUri);
 			return new Tuple<bool, List<ImageModel>, string>(true, noDupes, response.StatusCode.ToString());
 
 		}
@@ -208,12 +208,12 @@ namespace Booru_Viewer.Types
 			var tags = new List<Tag>();
 			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(new[] { new KeyValuePair<string, string>("search[name" + (isExact ? "]" : "_matches]"), search.ToLower() + (isExact ? "" : "*")),
 				new KeyValuePair<string, string>("search[order]", "name"),  });
-			var requestURI = BaseURL + TagsURL + "?" + content.ToString();
+			var requestUri = BaseUrl + TagsUrl + "?" + content.ToString();
 
 			HttpResponseMessage response = new HttpResponseMessage();
 			try
 			{
-				response = await booruClient.GetAsync(new Uri(requestURI));
+				response = await _booruClient.GetAsync(new Uri(requestUri));
 			}
 			catch (Exception e)
 			{
@@ -244,7 +244,7 @@ namespace Booru_Viewer.Types
 			{
 				tags = allTags;
 			}
-			TagSearchCompletedHandler?.Invoke(typeof(BooruAPI), new Tuple<bool, List<Tag>, string>(true, tags, response.ReasonPhrase));
+			TagSearchCompletedHandler?.Invoke(typeof(BooruApi), new Tuple<bool, List<Tag>, string>(true, tags, response.ReasonPhrase));
 			return new Tuple<bool, List<Tag>, string>(true, tags, response.ReasonPhrase);
 		}
 
@@ -253,13 +253,13 @@ namespace Booru_Viewer.Types
 			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(new[]
 			{
 				new KeyValuePair<string, string>("search[name]", Username), new KeyValuePair<string, string>("login", Username),
-				new KeyValuePair<string, string>("api_key", APIKey),
+				new KeyValuePair<string, string>("api_key", ApiKey),
 			});
-			var requestURI = BaseURL + "/users.json" + "?" + content.ToString();
+			var requestUri = BaseUrl + "/users.json" + "?" + content.ToString();
 			HttpResponseMessage response = new HttpResponseMessage();
 			try
 			{
-				response = await booruClient.GetAsync(new Uri(requestURI));
+				response = await _booruClient.GetAsync(new Uri(requestUri));
 			}
 			catch (Exception e)
 			{
@@ -283,7 +283,7 @@ namespace Booru_Viewer.Types
 		public static async Task<bool> UpdateBlacklistedTags(string blacklistedTags)
 		{
 			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(new[] { new KeyValuePair<string, string>("user[blacklisted_tags]", blacklistedTags), });
-			var requestURI = BaseURL + "/users/" + UserModel.id + ".json?" + content.ToString();
+			var requestUri = BaseUrl + "/users/" + UserModel.id + ".json?" + content.ToString();
 			return false;
 		}
 
@@ -292,12 +292,12 @@ namespace Booru_Viewer.Types
 			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(new[]{
 																			new KeyValuePair<string, string>("post_id", im.id),
 																			new KeyValuePair<string, string>("login", Username),
-																			new KeyValuePair<string, string>("api_key", APIKey),});
+																			new KeyValuePair<string, string>("api_key", ApiKey),});
 			HttpResponseMessage response = new HttpResponseMessage();
-			var requestURI = BaseURL + "/favorites.json?" + content.ToString();
+			var requestUri = BaseUrl + "/favorites.json?" + content.ToString();
 			try
 			{
-				response = await booruClient.PostAsync(new Uri(requestURI), null);
+				response = await _booruClient.PostAsync(new Uri(requestUri), null);
 				Debug.WriteLine(await response.Content.ReadAsStringAsync());
 			}
 			catch (Exception e)
@@ -332,8 +332,8 @@ namespace Booru_Viewer.Types
 			{
 				new KeyValuePair<string, string>("search[name]",tagName.Replace(" ", "_")),
 			});
-			var requestURI = BaseURL + "/tags.json?" + content.ToString();
-			var response = await (booruClient.GetAsync(new Uri(requestURI)));
+			var requestUri = BaseUrl + "/tags.json?" + content.ToString();
+			var response = await (_booruClient.GetAsync(new Uri(requestUri)));
 			if (response == null)
 			{
 				return null;
@@ -359,10 +359,10 @@ namespace Booru_Viewer.Types
 			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(new[]
 			{
 				new KeyValuePair<string, string>("login", Username),
-				new KeyValuePair<string, string>("api_key", APIKey),
+				new KeyValuePair<string, string>("api_key", ApiKey),
 			});
-			var requestURI = BaseURL + "/favorites/" + im.id + ".json?" + content.ToString();
-			var response = await booruClient.DeleteAsync(new Uri(requestURI));
+			var requestUri = BaseUrl + "/favorites/" + im.id + ".json?" + content.ToString();
+			var response = await _booruClient.DeleteAsync(new Uri(requestUri));
 			if (response == null)
 			{
 				return false;
@@ -378,9 +378,9 @@ namespace Booru_Viewer.Types
 
 		private static async Task<string> Get(string endpoint, HttpFormUrlEncodedContent parameters)
 		{
-			var loginInfo = new HttpFormUrlEncodedContent(new[] { new KeyValuePair<string, string>("login", Username), new KeyValuePair<string, string>("api_key", APIKey) });
-			var uri = BaseURL + endpoint + "?" + parameters.ToString() + loginInfo.ToString();
-			var response = await booruClient.GetAsync(new Uri(uri));
+			var loginInfo = new HttpFormUrlEncodedContent(new[] { new KeyValuePair<string, string>("login", Username), new KeyValuePair<string, string>("api_key", ApiKey) });
+			var uri = BaseUrl + endpoint + "?" + parameters.ToString() + loginInfo.ToString();
+			var response = await _booruClient.GetAsync(new Uri(uri));
 			if (response == null)
 			{
 				return null;
@@ -389,15 +389,15 @@ namespace Booru_Viewer.Types
 			return await response.Content.ReadAsStringAsync();
 		}
 
-		public static void SetLogin(string username, string APIKey)
+		public static void SetLogin(string username, string apiKey)
 		{
 			Username = username;
-			BooruAPI.APIKey = APIKey;
+			BooruApi.ApiKey = apiKey;
 		}
 
-		public static void ChangeWebsite(string newBaseURL)
+		public static void ChangeWebsite(string newBaseUrl)
 		{
-			BaseURL = newBaseURL;
+			BaseUrl = newBaseUrl;
 		}
 
 		public static async Task<List<ImageModel>> GetUserFavourites()
