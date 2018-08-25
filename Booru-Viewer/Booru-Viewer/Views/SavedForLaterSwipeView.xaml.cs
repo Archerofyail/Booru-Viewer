@@ -97,6 +97,14 @@ namespace Booru_Viewer.Views
 		{
 			AppBar.Visibility = AppBar.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
 		}
+
+		private void SaveForLaterClicked(object sender, RoutedEventArgs e)
+		{
+			//if (FlipView.SelectedIndex == FlipView.Items.Count - 1)
+			//{
+			//	FlipView.SelectedIndex = FlipView.Items.Count - 2;
+			//}
+		}
 	}
 
 

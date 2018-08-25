@@ -370,12 +370,23 @@ namespace Booru_Viewer.ViewModels
 			}
 			else
 			{
+				GlobalInfo.ImagesSavedForLater.Remove(GlobalInfo.ImagesSavedForLater.First(x=>x.id == Images[GlobalInfo.SelectedImage].Image.id));
 				if (GlobalInfo.ImagesSavedForLater.Count == 1)
 				{
-					return;
+					//Images.RemoveAt(0);
+					
 				}
-				GlobalInfo.ImagesSavedForLater.Remove(GlobalInfo.ImagesSavedForLater.First(x=>x.id == Images[GlobalInfo.SelectedImage].Image.id));
-				Images.Remove(Images[GlobalInfo.SelectedImage]);
+				if (GlobalInfo.SelectedImage == Images.Count - 1)
+				{
+					//Images.RemoveAt(Images.Count - 1);
+					
+				}
+				else
+				{
+				//Images.Remove(Images[GlobalInfo.SelectedImage]);
+
+				}
+				
 			}
 			await GlobalInfo.SaveSavedForLaterImages();
 			RaisePropertyChanged("SaveForLaterIcon");

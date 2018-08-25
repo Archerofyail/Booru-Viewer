@@ -157,6 +157,10 @@ namespace Booru_Viewer.ViewModels
 					CurrentUrl = GlobalInfo.CurrentSearch[value].Large_File_Url;
 					RaisePropertyChanged("CurrentURL");
 					RaisePropertyChanged("FavIcon");
+					RaisePropertyChanged("SaveForLaterIcon");
+					RaisePropertyChanged("FavString");
+					RaisePropertyChanged("SaveForLaterString");
+
 				}
 
 				RaisePropertyChanged();

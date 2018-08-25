@@ -819,6 +819,10 @@
 							</ItemsPanelTemplate>
 						</ListView.ItemsPanel>
 					</ListView>
+					<TextBlock Text="You don't have any images you've saved for later. Get searching!"
+					           Visibility="{Binding DontHaveSavedForLaterImages}"
+					           Grid.Row="1"
+					           Grid.Column="1"/>
 				</Grid>
 			</DataTemplate>
 		</HubSection>
@@ -1004,6 +1008,10 @@
 					</AppBarButton.Flyout>
 				</AppBarButton>
 			</CommandBar.PrimaryCommands>
+			<CommandBar.SecondaryCommands>
+				<AppBarButton Label="Clear Saved for Later List"
+				              Command="{Binding ClearSavedForLater}"/>
+			</CommandBar.SecondaryCommands>
 		</CommandBar>
 	</Page.BottomAppBar>
 </Page>

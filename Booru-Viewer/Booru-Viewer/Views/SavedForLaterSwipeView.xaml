@@ -213,7 +213,8 @@
 			<CommandBar.PrimaryCommands>
 				<AppBarButton
 					Label="{Binding SaveForLaterString}"
-					Command="{Binding SaveImageForLater}">
+					Command="{Binding SaveImageForLater}"
+					Click="SaveForLaterClicked">
 					<AppBarButton.Icon>
 
 						<FontIcon Glyph="{Binding SaveForLaterIcon}">

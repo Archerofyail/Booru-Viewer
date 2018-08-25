@@ -475,18 +475,39 @@ namespace Booru_Viewer.ViewModels
 			set => _favouriteTags = value;
 		}
 
+		private bool _dontHaveSavedForLaterImages = false;
+
+		public bool DontHaveSavedForLaterImages
+		{
+			get => _dontHaveSavedForLaterImages;
+			set
+			{
+				_dontHaveSavedForLaterImages = value;
+				RaisePropertyChanged();
+			}
+		}
+
 		private ObservableCollection<FullImageViewModel> _savedForLater;
 
 		public ObservableCollection<FullImageViewModel> SavedForLater
 		{
 			get
 			{
+				if (GlobalInfo.ImagesSavedForLater.Count == 0)
+				{
+					DontHaveSavedForLaterImages = true;
+				}
+				else
+				{
+					DontHaveSavedForLaterImages = false;
+				}
 				if (_savedForLater.Count != GlobalInfo.ImagesSavedForLater.Count)
 				{
 					_savedForLater = new ObservableCollection<FullImageViewModel>();
 					foreach (var image in GlobalInfo.ImagesSavedForLater)
 					{
 						_savedForLater.Add(new FullImageViewModel(image, image.id, image.Preview_File_Url, image.Large_File_Url, "https://danbooru.donmai.us/posts/" + image.id, null, null));
+
 					}
 				}
 				return _savedForLater;
@@ -902,7 +923,16 @@ namespace Booru_Viewer.ViewModels
 		public ICommand SavedSearchSelected => new RelayCommand<SavedSearchViewModel>(SavedSearchSelectedExec);
 		public ICommand ClearSearch => new RelayCommand(ClearSearchEx);
 		public ICommand RefreshTags => new RelayCommand(RefreshTagsEx);
+		public ICommand ClearSavedForLater => new RelayCommand(ClearSavedForLaterEx);
 
+		async void ClearSavedForLaterEx()
+		{
+			GlobalInfo.ImagesSavedForLater.Clear();
+			await GlobalInfo.SaveSavedForLaterImages();
+			RaisePropertyChanged("SavedForLater");
+			DontHaveSavedForLaterImages = true;
+
+		}
 		void RefreshTagsEx()
 		{
 			Debug.WriteLine("Raise tags changed");
