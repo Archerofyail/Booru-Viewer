@@ -138,7 +138,8 @@ namespace Booru_Viewer.ViewModels
 			{
 				RaisePropertyChanged("FavouritePostCount");
 			};
-
+			GlobalInfo.LoadSavedForLaterImages();
+			savedForLater = new ObservableCollection<FullImageViewModel>();
 			GlobalInfo.ImagesSavedForLaterLoaded += (sender, args) =>
 			{
 				savedForLater = new ObservableCollection<FullImageViewModel>();
@@ -149,11 +150,7 @@ namespace Booru_Viewer.ViewModels
 				RaisePropertyChanged("SavedForLater");
 
 			};
-			savedForLater = new ObservableCollection<FullImageViewModel>();
-			foreach (var image in GlobalInfo.ImagesSavedForLater)
-			{
-				savedForLater.Add(new FullImageViewModel(image, image.id, image.Preview_File_Url, image.Large_File_Url, "https://danbooru.donmai.us/posts/" + image.id, null, null));
-			}
+		
 			//thumbnails.CollectionChanged += (sender, args) => RaisePropertyChanged("Thumbnails");
 			RaisePropertyChanged("SelectedPrefixIndex");
 
@@ -484,6 +481,14 @@ namespace Booru_Viewer.ViewModels
 		{
 			get
 			{
+				if (savedForLater.Count != GlobalInfo.ImagesSavedForLater.Count)
+				{
+					savedForLater = new ObservableCollection<FullImageViewModel>();
+					foreach (var image in GlobalInfo.ImagesSavedForLater)
+					{
+						savedForLater.Add(new FullImageViewModel(image, image.id, image.Preview_File_Url, image.Large_File_Url, "https://danbooru.donmai.us/posts/" + image.id, null, null));
+					}
+				}
 				return savedForLater;
 			}
 		}

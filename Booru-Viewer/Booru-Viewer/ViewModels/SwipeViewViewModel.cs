@@ -213,10 +213,6 @@ namespace Booru_Viewer.ViewModels
 		{
 			get
 			{
-				//if (GlobalInfo.CurrentSearchTags.Contains("fav:" + BooruAPI.Username) || GlobalInfo.CurrentSearchTags.Contains("ordfav:" + BooruAPI.Username))
-				//{
-				//	favIcon = Symbol.Favorite;
-				//}
 				if (GlobalInfo.FavouriteImages.Contains(Images[Index].SelectedImagePostID))
 				{
 					favIcon = Symbol.Favorite;
@@ -279,18 +275,18 @@ namespace Booru_Viewer.ViewModels
 			{
 				if (GlobalInfo.ImagesSavedForLater.Any(x => x.id == Images[Index].Image.id))
 				{
-					favString = "Remove from list";
-					return favString;
+					saveForLaterString = "Remove from list";
+					return saveForLaterString;
 				}
 				else
 				{
-					favString = "Save For Later";
-					return favString;
+					saveForLaterString = "Save For Later";
+					return saveForLaterString;
 				}
 			}
 			set
 			{
-				favString = value;
+				saveForLaterString = value;
 				RaisePropertyChanged();
 			}
 		}
@@ -341,10 +337,11 @@ namespace Booru_Viewer.ViewModels
 			{
 				if (await BooruAPI.FavouriteImage(GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage]))
 				{
-					FavIcon = Symbol.Favorite;
-					FavString = "Unfavourite";
+					
 					GlobalInfo.FavouriteImages.Add(GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].id);
 					await GlobalInfo.SaveFavouritePosts();
+					FavIcon = Symbol.Favorite;
+					FavString = "Unfavourite";
 				}
 
 			}
@@ -354,10 +351,11 @@ namespace Booru_Viewer.ViewModels
 				{
 					var im = GlobalInfo.CurrentSearch[postIndex];
 
-					FavIcon = Symbol.OutlineStar;
-					FavString = "Favourite";
+					
 					GlobalInfo.FavouriteImages.Remove(im.id);
 					await GlobalInfo.SaveFavouritePosts();
+					FavIcon = Symbol.OutlineStar;
+					FavString = "Favourite";
 
 				}
 			}
@@ -378,13 +376,15 @@ namespace Booru_Viewer.ViewModels
 			if (SaveForLaterIcon == "\uE728")
 			{
 				GlobalInfo.ImagesSavedForLater.Add(Images[Index].Image);
-			
 			}
 			else
 			{
 				GlobalInfo.ImagesSavedForLater.Remove(GlobalInfo.ImagesSavedForLater.First(x=>x.id == Images[Index].Image.id));
 			}
 			await GlobalInfo.SaveSavedForLaterImages();
+			RaisePropertyChanged("SaveForLaterIcon");
+			RaisePropertyChanged("SaveForLaterString");
+
 		}
 	}
 }

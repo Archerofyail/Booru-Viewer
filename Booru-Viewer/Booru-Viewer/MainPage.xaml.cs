@@ -265,11 +265,11 @@ namespace Booru_Viewer
 
 		protected override void OnNavigatedTo(NavigationEventArgs e)
 		{
-			//ViewModel?.RaisePropertyChanged("Thumbnails");
+			ViewModel?.RaisePropertyChanged("Thumbnails");
 
 
-			//ViewModel?.RaisePropertyChanged("FavouriteTags");
-			
+			ViewModel?.RaisePropertyChanged("FavouriteTags");
+
 			Frame rootFrame = Window.Current.Content as Frame;
 			if (rootFrame.CanGoBack)
 			{
@@ -284,7 +284,7 @@ namespace Booru_Viewer
 					AppViewBackButtonVisibility.Collapsed;
 			}
 			base.OnNavigatedTo(e);
-			//ViewModel?.RaisePropertyChanged("SavedForLater");
+			ViewModel?.RaisePropertyChanged("SavedForLater");
 		}
 
 		protected override void OnNavigatedFrom(NavigationEventArgs e)
