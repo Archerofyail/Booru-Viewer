@@ -55,6 +55,30 @@
 						</MenuFlyout>
 					</controls:ImageEx.ContextFlyout>
 				</controls:ImageEx>
+
+				<!--<Image Name="Image"
+				                  Source="{Binding Path=PreviewURL}"
+				                  Stretch="Uniform"
+				                  MaxHeight="250"
+				                  MinHeight="160"
+				                  MinWidth="160"
+				                  >
+					<Image.ContextFlyout>
+						<MenuFlyout x:Name="ImageContextFlyout">
+							<MenuFlyoutItem Text="Select"
+							                Click="ImageContextMenuSelectClick">
+
+							</MenuFlyoutItem>
+							<MenuFlyoutItem Text="Save Image"
+							                Command="{Binding ElementName=Page, Path=DataContext.SaveImage}">
+								<MenuFlyoutItem.CommandParameter>
+									<x:Boolean>True</x:Boolean>
+								</MenuFlyoutItem.CommandParameter>
+							</MenuFlyoutItem>
+
+						</MenuFlyout>
+					</Image.ContextFlyout>
+				</Image>-->
 			</DataTemplate>
 
 			<DataTemplate x:Name="ImageTemplateNoSave">
@@ -68,9 +92,18 @@
 				                  MinHeight="160"
 				                  MinWidth="160"
 				                  PlaceholderSource="Assets/Placeholder.png"
-				                  PlaceholderStretch="Uniform">
+				                  PlaceholderStretch="Uniform"
+				                  MaxWidth="250">
 
 				</controls:ImageEx>
+				<!--<Image
+					Name="Image"
+					Source="{Binding Path=PreviewURL}"
+					Stretch="Uniform"
+					MaxHeight="250"
+					MinHeight="160"
+					MinWidth="160"
+					MaxWidth="250"/>-->
 			</DataTemplate>
 			<DataTemplate x:Name="ExcludedTag">
 				<StackPanel Orientation="Horizontal"
@@ -784,9 +817,7 @@
 		</HubSection>
 		<HubSection Header="Saved for Later">
 			<DataTemplate>
-				<Grid BorderBrush="Orange"
-				      BorderThickness="2"
-				      VerticalAlignment="Stretch"
+				<Grid VerticalAlignment="Stretch"
 				      HorizontalAlignment="Stretch">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="Auto"/>
@@ -798,27 +829,23 @@
 						<RowDefinition Height="*"/>
 						<RowDefinition Height="Auto"/>
 					</Grid.RowDefinitions>
-					<ListView
+					<controls:AdaptiveGridView
 							Name="SavedForLaterGridView"
 							ItemsSource="{Binding SavedForLater}"
 							ItemTemplate="{StaticResource ImageTemplateNoSave}"
 							Grid.Column="1"
 							Grid.Row="1"
-							BorderBrush="Red"
-							BorderThickness="2"
 							VerticalAlignment="Stretch"
 							HorizontalAlignment="Stretch"
 							ContainerContentChanging="ListViewBase_OnContainerContentChanging"
 							SelectionMode="None"
 							Margin="0, 24, 0, 0"
 							IsItemClickEnabled="True"
-							ItemClick="ImageGridView_OnItemClick">
-						<ListView.ItemsPanel>
-							<ItemsPanelTemplate>
-								<controls:WrapPanel MaxWidth="600"></controls:WrapPanel>
-							</ItemsPanelTemplate>
-						</ListView.ItemsPanel>
-					</ListView>
+							ItemClick="ImageGridView_OnItemClick"
+							DesiredWidth="250"
+							MaxWidth="500">
+
+					</controls:AdaptiveGridView>
 					<TextBlock Text="You don't have any images you've saved for later. Get searching!"
 					           Visibility="{Binding DontHaveSavedForLaterImages}"
 					           Grid.Row="1"

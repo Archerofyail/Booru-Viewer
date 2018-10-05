@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Booru_Viewer.Models;
 using Microsoft.Toolkit.Uwp.UI.Controls.TextToolbarSymbols;
 using Newtonsoft.Json;
 // ReSharper disable InconsistentNaming
@@ -30,7 +31,7 @@ namespace Booru_Viewer.ViewModels
 		public string Parent_Id { get; set; }
 
 		[JsonIgnore] public List<ImageModel> ChildrenImages = new List<ImageModel>();
-		
+
 		public string rating { get; set; }
 		[JsonIgnore]
 		public string Rating
@@ -46,97 +47,124 @@ namespace Booru_Viewer.ViewModels
 					case "e":
 					return "Explicit";
 					default:
-						return "Safe";
+					return "Safe";
 				}
 			}
 
 		}
 
+		[JsonIgnore] private List<Tag> generalTags = new List<Tag>();
 		[JsonIgnore]
-		public string[] GeneralTags
+		public List<Tag> GeneralTags
 		{
 			get
 			{
-				var tags = Tag_String_General.Split(' ');
-				for (var i = 0; i < tags.Length; i++)
+				if (Tag_String_General.Length == 0)
+				{ return new List<Tag>(); }
+
+				if (generalTags.Count == 0)
 				{
-
-					tags[i] = tags[i].Replace('_', ' ');
+					var tags = Tag_String_General.Split(' ');
+					for (var i = 0; i < tags.Length; i++)
+					{
+						tags[i] = tags[i].Replace('_', ' ');
+						generalTags.Add(new Tag(tags[i]));
+					}
+					
 				}
-
-				return tags;
+				return generalTags;
 			}
 		}
+		[JsonIgnore] private List<Tag> characterTags = new List<Tag>();
 		[JsonIgnore]
-		public string[] CharacterTags
+		public List<Tag> CharacterTags
 		{
 			get
 			{
 				if (Tag_String_Character.Length == 0)
-				{ return new string[0]; }
-				var tags = Tag_String_Character.Split(' ');
-				for (var i = 0; i < tags.Length; i++)
-				{
+				{ return new List<Tag>(); }
 
-					tags[i] = tags[i].Replace('_', ' ');
+				if (characterTags.Count == 0)
+				{
+					var tags = Tag_String_Character.Split(' ');
+					for (var i = 0; i < tags.Length; i++)
+					{
+						tags[i] = tags[i].Replace('_', ' ');
+						characterTags.Add(new Tag(tags[i]));
+					}
+					
 				}
 
-				return tags;
+				return characterTags;
 			}
 		}
+		[JsonIgnore] private List<Tag> artistTags = new List<Tag>();
 		[JsonIgnore]
-		public string[] ArtistTags
+		public List<Tag> ArtistTags
 		{
 			get
 			{
 				if (Tag_String_Artist.Length == 0)
-				{ return new string[0]; }
-				var tags = Tag_String_Artist.Split(' ');
+				{ return new List<Tag>(); }
 
-				for (var i = 0; i < tags.Length; i++)
+				if (artistTags.Count == 0)
 				{
-
-					tags[i] = tags[i].Replace('_', ' ');
+					var tags = Tag_String_Artist.Split(' ');
+					for (var i = 0; i < tags.Length; i++)
+					{
+						tags[i] = tags[i].Replace('_', ' ');
+						artistTags.Add(new Tag(tags[i]));
+					}
+					
 				}
 
-				return tags;
+				return artistTags;
 			}
 		}
+		[JsonIgnore] private List<Tag> copyrightTags = new List<Tag>();
 		[JsonIgnore]
-		public string[] CopyrightTags
+		public List<Tag> CopyrightTags
 		{
 			get
 			{
 				if (Tag_String_Copyright.Length == 0)
-				{ return new string[0]; }
-				var tags = Tag_String_Copyright.Split(' ');
+				{ return new List<Tag>(); }
 
-				for (var i = 0; i < tags.Length; i++)
+				if (copyrightTags.Count == 0)
 				{
-
-					tags[i] = tags[i].Replace('_', ' ');
+					var tags = Tag_String_Copyright.Split(' ');
+					for (var i = 0; i < tags.Length; i++)
+					{
+						tags[i] = tags[i].Replace('_', ' ');
+						copyrightTags.Add(new Tag(tags[i]));
+					}
+					
 				}
 
-				return tags;
+				return copyrightTags;
 			}
 		}
-
+		[JsonIgnore] private List<Tag> metaTags = new List<Tag>();
 		[JsonIgnore]
-		public string[] MetaTags
+		public List<Tag> MetaTags
 		{
 			get
 			{
 				if (Tag_String_Meta.Length == 0)
-				{ return new string[0]; }
-				var tags = Tag_String_Meta.Split(' ');
+				{ return new List<Tag>(); }
 
-				for (var i = 0; i < tags.Length; i++)
+				if (metaTags.Count == 0)
 				{
-
-					tags[i] = tags[i].Replace('_', ' ');
+					var tags = Tag_String_Meta.Split(' ');
+					for (var i = 0; i < tags.Length; i++)
+					{
+						tags[i] = tags[i].Replace('_', ' ');
+						metaTags.Add(new Tag(tags[i]));
+					}
+					
 				}
 
-				return tags;
+				return metaTags;
 			}
 		}
 	}

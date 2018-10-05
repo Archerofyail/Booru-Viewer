@@ -126,7 +126,6 @@
 							                  MaxWidth="{Binding ViewportWidth, ElementName=ImageScrollViewer}"
 							                  VerticalAlignment="Center"
 											  HorizontalAlignment="Center"
-							                  ImageExFailed="ImageEx_OnImageExFailed"
 								              Visibility="{Binding Path=FullImageURL, Converter={StaticResource SourceToVisibilityConverter}, ConverterParameter=True}"
 								                  BorderThickness="1"
 								                  Tapped="ImageTapped">

@@ -84,22 +84,22 @@ namespace Booru_Viewer.ViewModels
 					GeneralTags.Clear();
 					foreach (var tag in genTags)
 					{
-						GeneralTags.Add(new TagViewModel(new Tag(tag)));
+						GeneralTags.Add(new TagViewModel(tag));
 					}
 					CharacterTags.Clear();
 					foreach (var tag in charTags)
 					{
-						CharacterTags.Add(new TagViewModel(new Tag(tag)));
+						CharacterTags.Add(new TagViewModel(tag));
 					}
 					ArtistTags.Clear();
 					foreach (var tag in artistTags)
 					{
-						ArtistTags.Add(new TagViewModel(new Tag(tag)));
+						ArtistTags.Add(new TagViewModel(tag));
 					}
 					CopyrightTags.Clear();
 					foreach (var tag in copyTags)
 					{
-						CopyrightTags.Add(new TagViewModel(new Tag(tag)));
+						CopyrightTags.Add(new TagViewModel(tag));
 					}
 
 				}
@@ -135,27 +135,27 @@ namespace Booru_Viewer.ViewModels
 					RaisePropertyChanged("MetaTags");
 					foreach (var tag in genTags)
 					{
-						GeneralTags.Add(new TagViewModel(new Tag(tag)));
+						GeneralTags.Add(new TagViewModel(tag));
 					}
 
 					foreach (var tag in charTags)
 					{
-						CharacterTags.Add(new TagViewModel(new Tag(tag)));
+						CharacterTags.Add(new TagViewModel(tag));
 					}
 
 					foreach (var tag in artistTags)
 					{
-						ArtistTags.Add(new TagViewModel(new Tag(tag)));
+						ArtistTags.Add(new TagViewModel(tag));
 					}
 
 					foreach (var tag in copyTags)
 					{
-						CopyrightTags.Add(new TagViewModel(new Tag(tag)));
+						CopyrightTags.Add(new TagViewModel(tag));
 					}
 
 					foreach (var metaTag in metaTags)
 					{
-						MetaTags.Add(new TagViewModel(new Tag(metaTag)));
+						MetaTags.Add(new TagViewModel(metaTag));
 					}
 
 					var favTag = BooruApi.Username.ToLower() + " ";
