@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Booru_Viewer.Models;
-using Microsoft.Toolkit.Uwp.UI.Controls.TextToolbarSymbols;
 using Newtonsoft.Json;
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global

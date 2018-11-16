@@ -9,9 +9,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Storage;
-using log4net.Core;
-using log4net.Repository.Hierarchy;
-using Microsoft.HockeyApp.DataContracts;
 
 namespace Booru_Viewer.Types
 {

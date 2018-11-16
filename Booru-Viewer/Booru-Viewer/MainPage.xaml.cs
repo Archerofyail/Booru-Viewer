@@ -9,13 +9,11 @@ using System.Diagnostics;
 using System.Linq;
 using Windows.Storage;
 using Windows.UI.Core;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media;
 using Booru_Viewer.ViewModels;
 using Booru_Viewer.Views;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using Microsoft.Toolkit.Uwp.UI.Extensions;
-using Microsoft.Xaml.Interactions.Core;
 using ListViewBase = Windows.UI.Xaml.Controls.ListViewBase;
 
 

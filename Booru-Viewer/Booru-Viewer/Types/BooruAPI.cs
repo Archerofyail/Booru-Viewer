@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Booru_Viewer.ViewModels;
 using Newtonsoft.Json;
 using Booru_Viewer.Models;
-using Newtonsoft.Json.Linq;
 
 namespace Booru_Viewer.Types
 {

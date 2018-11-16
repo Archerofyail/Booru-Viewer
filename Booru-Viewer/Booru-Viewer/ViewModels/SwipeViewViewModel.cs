@@ -10,7 +10,6 @@ using Windows.Storage;
 using Windows.System;
 using Windows.UI.Notifications;
 using Windows.UI.Xaml.Controls;
-using Booru_Viewer.Models;
 using Microsoft.Toolkit.Uwp;
 using Microsoft.Toolkit.Uwp.Notifications;
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
@@ -11,8 +10,6 @@ using Windows.Storage;
 using Windows.System;
 using Windows.UI.Notifications;
 using Windows.UI.Xaml.Controls;
-using Booru_Viewer.Models;
-using Microsoft.Toolkit.Uwp;
 using Microsoft.Toolkit.Uwp.Notifications;
 
 namespace Booru_Viewer.ViewModels
