@@ -40,7 +40,7 @@ namespace Booru_Viewer.ViewModels
 			if (_appSettings["PerPage"] != null)
 			{
 				_perPage = (int)_appSettings["PerPage"];
-				RaisePropertyChanged("PerPage");
+				//RaisePropertyChanged("PerPage");
 			}
 			if (_appSettings["SafeChecked"] != null)
 			{
@@ -151,10 +151,7 @@ namespace Booru_Viewer.ViewModels
 
 			};
 		
-			//thumbnails.CollectionChanged += (sender, args) => RaisePropertyChanged("Thumbnails");
-			RaisePropertyChanged("SelectedPrefixIndex");
-
-
+			
 			_thumbnails = new IncrementalLoadingCollection<PostSource, FullImageViewModel>(_perPage);
 			foreach (var model in GlobalInfo.ImageViewModels)
 			{

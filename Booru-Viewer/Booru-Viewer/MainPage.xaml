@@ -61,8 +61,7 @@
 				                  Stretch="Uniform"
 				                  MaxHeight="250"
 				                  MinHeight="160"
-				                  MinWidth="160"
-				                  >
+				                  MinWidth="160">
 					<Image.ContextFlyout>
 						<MenuFlyout x:Name="ImageContextFlyout">
 							<MenuFlyoutItem Text="Select"
@@ -660,8 +659,7 @@
 									 Grid.Row="1"
 									 Grid.ColumnSpan="2"
 									 Grid.Column="0"
-									 MinWidth="500"
-					                 MaxWidth="1000">
+									 Width="500">
 						<i:Interaction.Behaviors>
 							<core:EventTriggerBehavior SourceObject="{Binding ElementName=ImageGridView}">
 								<core:InvokeCommandAction Command="{Binding ImageContextOpened}"></core:InvokeCommandAction>

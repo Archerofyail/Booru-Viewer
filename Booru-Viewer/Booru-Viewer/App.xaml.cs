@@ -6,6 +6,9 @@ using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
+using Microsoft.AppCenter;
+using Microsoft.AppCenter.Crashes;
+using Microsoft.AppCenter.Distribute;
 
 namespace Booru_Viewer
 {
@@ -21,6 +24,7 @@ namespace Booru_Viewer
 		public App()
 		{
 			HockeyClient.Current.Configure("0de2f83cc20641698253f50f0a9e06e0");
+			//AppCenter.Start("0de2f83cc20641698253f50f0a9e06e0", typeof(Crashes), typeof(Distribute));
 			this.InitializeComponent();
 			this.Suspending += OnSuspending;
 			
