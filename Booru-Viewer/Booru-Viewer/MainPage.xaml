@@ -378,14 +378,18 @@
 			</DataTemplate>
 		</ResourceDictionary>
 	</Page.Resources>
-	<Hub Name="MainHub">
-		<HubSection Header="Search Results"
+	<Grid>
+		<Pivot Name="MainHub">
+
+			<PivotItem Header="Search"
 					Name="SearchResultsSection">
-			<DataTemplate>
+
 				<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
 		  Name="RootGrid"
 		  MinHeight="250"
-		  VerticalAlignment="Stretch">
+		  VerticalAlignment="Stretch"
+				      HorizontalAlignment="Stretch">
+
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition />
 						<ColumnDefinition />
@@ -641,6 +645,10 @@
 								</Style>
 							</ComboBox.ItemContainerStyle>
 						</ComboBox>
+						<TextBlock Text="Nothing happened"
+						           Name="VisStateChanged">
+
+						</TextBlock>
 					</StackPanel>
 					<controls:AdaptiveGridView   Background="{StaticResource BackgroundThemeBrush}"
 									 ItemTemplate="{StaticResource ImageTemplate}"
@@ -659,16 +667,13 @@
 									 Grid.Row="1"
 									 Grid.ColumnSpan="2"
 									 Grid.Column="0"
-									 Width="500">
+									 MinWidth="500">
 						<i:Interaction.Behaviors>
 							<core:EventTriggerBehavior SourceObject="{Binding ElementName=ImageGridView}">
 								<core:InvokeCommandAction Command="{Binding ImageContextOpened}"></core:InvokeCommandAction>
 							</core:EventTriggerBehavior>
 						</i:Interaction.Behaviors>
-						<controls:AdaptiveGridView.Resources>
 
-
-						</controls:AdaptiveGridView.Resources>
 					</controls:AdaptiveGridView>
 					<TextBlock Text="{Binding NoImagesText}"
 				   Visibility="{Binding DontHaveImages}"
@@ -720,51 +725,14 @@
 					</Button>
 
 
-					<VisualStateManager.VisualStateGroups>
-						<VisualStateGroup>
-							<VisualState x:Name="Below640">
-								<VisualState.StateTriggers>
-									<AdaptiveTrigger MinWindowHeight="0"></AdaptiveTrigger>
-								</VisualState.StateTriggers>
-								<VisualState.Setters>
-									<Setter Target="SavedSearchesList.MaxHeight"
-								Value="250"></Setter>
-									<Setter Target="SearchAppBarButton.Flyout.FlyoutPresenterStyle"
-								Value="{StaticResource Below750SearchFlyout}"></Setter>
-								</VisualState.Setters>
 
-							</VisualState>
-							<VisualState>
-								<VisualState.StateTriggers>
-									<AdaptiveTrigger MinWindowHeight="750"></AdaptiveTrigger>
-								</VisualState.StateTriggers>
-								<VisualState.Setters>
-									<Setter Target="SavedSearchesList.MaxHeight"
-								Value="450"></Setter>
-									<Setter Target="SearchAppBarButton.Flyout.FlyoutPresenterStyle"
-								Value="{StaticResource Below1200SearchFlyout}"></Setter>
-								</VisualState.Setters>
-							</VisualState>
-							<VisualState>
-								<VisualState.StateTriggers>
-									<AdaptiveTrigger MinWindowHeight="1100"></AdaptiveTrigger>
-								</VisualState.StateTriggers>
-								<VisualState.Setters>
-									<Setter Target="SavedSearchesList.MaxHeight"
-								Value="450"></Setter>
-									<Setter Target="SearchAppBarButton.Flyout.FlyoutPresenterStyle"
-								Value="{StaticResource Above1200SearchFlyout}"></Setter>
-								</VisualState.Setters>
-							</VisualState>
-						</VisualStateGroup>
-					</VisualStateManager.VisualStateGroups>
 				</Grid>
-			</DataTemplate>
-		</HubSection>
-		<HubSection Header="Saved Searches"
+
+			</PivotItem>
+			<PivotItem Header="Saved Searches"
 					Name="SavedSearchesHub"
 					>
-			<DataTemplate>
+
 				<Grid
 					Name="SavedSearchGrid">
 					<Grid.ColumnDefinitions>
@@ -811,12 +779,15 @@
 							Visibility="Collapsed"
 							/>
 				</Grid>
-			</DataTemplate>
-		</HubSection>
-		<HubSection Header="Saved for Later">
-			<DataTemplate>
+
+
+			</PivotItem>
+			<PivotItem Header="Saved Images"
+		            HorizontalAlignment="Stretch">
+
 				<Grid VerticalAlignment="Stretch"
 				      HorizontalAlignment="Stretch">
+
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="Auto"/>
 						<ColumnDefinition Width="*"/>
@@ -827,7 +798,7 @@
 						<RowDefinition Height="*"/>
 						<RowDefinition Height="Auto"/>
 					</Grid.RowDefinitions>
-					<ListView
+					<controls:AdaptiveGridView
 							Name="SavedForLaterGridView"
 							ItemsSource="{Binding SavedForLater}"
 							ItemTemplate="{StaticResource ImageTemplateNoSave}"
@@ -835,27 +806,25 @@
 							Grid.Row="1"
 							VerticalAlignment="Stretch"
 							HorizontalAlignment="Stretch"
-							ContainerContentChanging="ListViewBase_OnContainerContentChanging"
 							SelectionMode="None"
 							Margin="0, 24, 0, 0"
 							IsItemClickEnabled="True"
 							ItemClick="ImageGridView_OnItemClick"
-							MaxWidth="500">
-						<ListView.ItemsPanel>
-							<ItemsPanelTemplate>
-								<controls:WrapPanel Orientation="Horizontal"/>
-							</ItemsPanelTemplate>
-						</ListView.ItemsPanel>
+						DesiredWidth="250">
 
-					</ListView>
+					</controls:AdaptiveGridView>
 					<TextBlock Text="You don't have any images you've saved for later. Get searching!"
 					           Visibility="{Binding DontHaveSavedForLaterImages}"
 					           Grid.Row="1"
 					           Grid.Column="1"/>
+
 				</Grid>
-			</DataTemplate>
-		</HubSection>
-	</Hub>
+
+
+
+			</PivotItem>
+		</Pivot>
+	</Grid>
 
 	<Page.BottomAppBar>
 		<CommandBar VerticalAlignment="Bottom">

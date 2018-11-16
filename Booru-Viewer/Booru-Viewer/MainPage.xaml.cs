@@ -50,8 +50,7 @@ namespace Booru_Viewer
 			//	GlobalInfo.FavouriteImages.Add(image.id.ToString(), image);
 			//}
 			this.NavigationCacheMode = NavigationCacheMode.Required;
-
-
+			
 			Loaded += (sender, args) =>
 			{
 				ViewModel = DataContext as MainPageViewModel;
@@ -500,7 +499,9 @@ namespace Booru_Viewer
 			if (_savedSearchInvoke != null || _savedSearchesListForReal != null)
 			{
 				_savedSearchInvoke.Command.Execute(e.ClickedItem);
-				MainHub.ScrollToSection(SearchResultsSection);
+				SearchResultsSection.StartBringIntoView(new BringIntoViewOptions{AnimationDesired = true});
+				
+				
 			}
 			else
 			{
@@ -521,7 +522,7 @@ namespace Booru_Viewer
 			{
 				var i = _savedSearchesListForReal.Items.IndexOf(list.DataContext);
 				_savedSearchInvoke.Command.Execute(_savedSearchesListForReal.Items[i]);
-				MainHub.ScrollToSection(SearchResultsSection);
+				SearchResultsSection.StartBringIntoView(new BringIntoViewOptions{AnimationDesired = true});
 			}
 		}
 
