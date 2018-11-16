@@ -86,7 +86,7 @@ namespace Booru_Viewer.ViewModels
 			}
 			preppedTags.Add("order:score");
 
-			var imageResults = (await BooruApi.SearchPosts(preppedTags.ToArray(), 1, 5)).Item2.Select(x => x.Preview_File_Url).ToArray();
+			var imageResults = (await BooruApi.SearchPosts(preppedTags.ToArray(), 1, 4)).Item2.Select(x => x.Preview_File_Url).ToArray();
 			SearchPreview = imageResults;
 			Debug.WriteLine("Got all images");
 			

@@ -102,14 +102,26 @@ namespace Booru_Viewer
 				};
 				_searchDialog.Opened += (sender4, args4) =>
 				{
-					var childrenOfDialog = AllChildren(_searchDialog.ContentTemplateRoot);
-					_addTagButton = childrenOfDialog.OfType<Button>().First(x => x.Name == "AddTagButton");
-					_searchButton = childrenOfDialog.OfType<Button>().First(x => x.Name == "SearchButton");
-					_searchFavouritesButton = childrenOfDialog.OfType<Button>().First(x => x.Name == "SearchFavouritesButton");
-					_savedSearchesList = childrenOfDialog.OfType<ListView>().First(x => x.Name == "SavedSearchesList");
-					_searchButton.Loaded += (sender1, args1) => { _searchButton.CommandParameter = SearchAppBarButton; };
-					_searchFavouritesButton.Loaded += (sender2, args2) => { _searchButton.CommandParameter = SearchAppBarButton; };
-					_tagTextBox = childrenOfDialog.OfType<AutoSuggestBox>().First(x => x.Name == "TagTextBox");
+					if (_searchDialog.ContentTemplateRoot != null)
+					{
+						var childrenOfDialog = AllChildren(_searchDialog.ContentTemplateRoot);
+
+						_addTagButton = childrenOfDialog.OfType<Button>().First(x => x.Name == "AddTagButton");
+						_searchButton = childrenOfDialog.OfType<Button>().First(x => x.Name == "SearchButton");
+						_searchFavouritesButton = childrenOfDialog.OfType<Button>()
+							.First(x => x.Name == "SearchFavouritesButton");
+						_savedSearchesList = childrenOfDialog.OfType<ListView>()
+							.First(x => x.Name == "SavedSearchesList");
+						_searchButton.Loaded += (sender1, args1) =>
+						{
+							_searchButton.CommandParameter = SearchAppBarButton;
+						};
+						_searchFavouritesButton.Loaded += (sender2, args2) =>
+						{
+							_searchButton.CommandParameter = SearchAppBarButton;
+						};
+						_tagTextBox = childrenOfDialog.OfType<AutoSuggestBox>().First(x => x.Name == "TagTextBox");
+					}
 
 				};
 				SearchClicked(null, null);
@@ -499,9 +511,7 @@ namespace Booru_Viewer
 			if (_savedSearchInvoke != null || _savedSearchesListForReal != null)
 			{
 				_savedSearchInvoke.Command.Execute(e.ClickedItem);
-				SearchResultsSection.StartBringIntoView(new BringIntoViewOptions{AnimationDesired = true});
-				
-				
+				MainHub.SelectedIndex = 0;
 			}
 			else
 			{
@@ -522,13 +532,28 @@ namespace Booru_Viewer
 			{
 				var i = _savedSearchesListForReal.Items.IndexOf(list.DataContext);
 				_savedSearchInvoke.Command.Execute(_savedSearchesListForReal.Items[i]);
-				SearchResultsSection.StartBringIntoView(new BringIntoViewOptions{AnimationDesired = true});
+				MainHub.SelectedIndex = 0;
 			}
 		}
 
 		private void ListViewBase_OnContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
 		{
 			Debug.WriteLine("Items in saved list changed");
+		}
+
+		private void MainHub_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			if (MainHub.SelectedIndex != 0)
+			{
+				SearchAppBarButton.Visibility = Visibility.Collapsed;
+				SelectButton.Visibility = Visibility.Collapsed;
+			}
+
+			else
+			{
+				SearchAppBarButton.Visibility = Visibility.Visible;
+				SelectButton.Visibility = Visibility.Visible;
+			}
 		}
 	}
 }
