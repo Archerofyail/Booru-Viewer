@@ -343,14 +343,13 @@
 						<ListView.ItemTemplate>
 
 							<DataTemplate>
-								<controls:ImageEx Source="{Binding}"
+								<Image Source="{Binding}"
 													  MaxHeight="150"
 													  MaxWidth="150"
 													  MinWidth="0"
-													  PlaceholderSource="Assets/Placeholder.png"
-													  PlaceholderStretch="UniformToFill"
+													
 													  Stretch="UniformToFill"
-													  ImageExOpened="ImageExBase_OnImageExOpened"
+													 
 												  HorizontalAlignment="Stretch"
 												  VerticalAlignment="Stretch"
 													Margin="0"/>
@@ -661,7 +660,8 @@
 									 Grid.Row="1"
 									 Grid.ColumnSpan="2"
 									 Grid.Column="0"
-									 Width="500">
+									 MinWidth="500"
+					                 MaxWidth="1000">
 						<i:Interaction.Behaviors>
 							<core:EventTriggerBehavior SourceObject="{Binding ElementName=ImageGridView}">
 								<core:InvokeCommandAction Command="{Binding ImageContextOpened}"></core:InvokeCommandAction>
@@ -829,7 +829,7 @@
 						<RowDefinition Height="*"/>
 						<RowDefinition Height="Auto"/>
 					</Grid.RowDefinitions>
-					<controls:AdaptiveGridView
+					<ListView
 							Name="SavedForLaterGridView"
 							ItemsSource="{Binding SavedForLater}"
 							ItemTemplate="{StaticResource ImageTemplateNoSave}"
@@ -842,10 +842,14 @@
 							Margin="0, 24, 0, 0"
 							IsItemClickEnabled="True"
 							ItemClick="ImageGridView_OnItemClick"
-							DesiredWidth="250"
 							MaxWidth="500">
+						<ListView.ItemsPanel>
+							<ItemsPanelTemplate>
+								<controls:WrapPanel Orientation="Horizontal"/>
+							</ItemsPanelTemplate>
+						</ListView.ItemsPanel>
 
-					</controls:AdaptiveGridView>
+					</ListView>
 					<TextBlock Text="You don't have any images you've saved for later. Get searching!"
 					           Visibility="{Binding DontHaveSavedForLaterImages}"
 					           Grid.Row="1"
