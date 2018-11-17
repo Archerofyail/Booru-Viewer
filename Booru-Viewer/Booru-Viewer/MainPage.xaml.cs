@@ -193,7 +193,30 @@ namespace Booru_Viewer
 		}
 
 
+		void TryUpdateSearchDialogVariables()
+		{
+			if (_searchDialog.ContentTemplateRoot != null)
+			{
+				var childrenOfDialog = AllChildren(_searchDialog.ContentTemplateRoot);
 
+				_addTagButton = childrenOfDialog.OfType<Button>().First(x => x.Name == "AddTagButton");
+				_searchButton = childrenOfDialog.OfType<Button>().First(x => x.Name == "SearchButton");
+				_searchFavouritesButton = childrenOfDialog.OfType<Button>()
+					.First(x => x.Name == "SearchFavouritesButton");
+				_savedSearchesList = childrenOfDialog.OfType<ListView>()
+					.First(x => x.Name == "SavedSearchesList");
+				_searchButton.Loaded += (sender1, args1) =>
+				{
+					_searchButton.CommandParameter = SearchAppBarButton;
+				};
+				_searchFavouritesButton.Loaded += (sender2, args2) =>
+				{
+					_searchButton.CommandParameter = SearchAppBarButton;
+				};
+				_tagTextBox = childrenOfDialog.OfType<AutoSuggestBox>().First(x => x.Name == "TagTextBox");
+			}
+
+		}
 		private void GridView_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			//if (sender is GridView grid && grid.SelectionMode == ListViewSelectionMode.Single)
@@ -235,7 +258,7 @@ namespace Booru_Viewer
 
 		private void AddTagClicked(object sender, RoutedEventArgs e)
 		{
-
+			TryUpdateSearchDialogVariables();
 			_tagTextBox.GetBindingExpression(AutoSuggestBox.TextProperty).UpdateSource();
 		}
 
@@ -257,8 +280,8 @@ namespace Booru_Viewer
 
 		private void TagTextBox_KeyUp(object sender, KeyRoutedEventArgs e)
 		{
-
-			if (e.Key == Windows.System.VirtualKey.Enter && e.KeyStatus.IsKeyReleased)
+			TryUpdateSearchDialogVariables();
+			if (e.Key == Windows.System.VirtualKey.Enter && e.KeyStatus.IsKeyReleased && _addTagButton != null)
 			{
 				if (_addTagButton.Command.CanExecute(_addTagButton))
 				{
@@ -485,11 +508,13 @@ namespace Booru_Viewer
 
 		private void SearchClicked(object sender, RoutedEventArgs e)
 		{
+			TryUpdateSearchDialogVariables();
 			_searchDialog?.Hide();
 		}
 
 		private void CloseSearchDialogClick(object sender, RoutedEventArgs e)
 		{
+			TryUpdateSearchDialogVariables();
 			_searchDialog.Hide();
 		}
 

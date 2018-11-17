@@ -104,7 +104,7 @@ namespace Booru_Viewer.Types
 
 		public static async Task SaveSearches(StorageFolder baseFolder = null)
 		{
-			SaveDataToFile(_savedSearches.ToList(), "SavedSearches.json");
+			await SaveDataToFile(_savedSearches.ToList(), "SavedSearches.json", baseFolder);
 		}
 
 		public static async Task LoadSavedSearches(StorageFolder searchesFolder = null)
@@ -235,7 +235,7 @@ namespace Booru_Viewer.Types
 
 		public static async Task SaveSavedForLaterImages(StorageFolder baseFolder = null)
 		{
-			await SaveDataToFile(_imagesSavedForLater, "ImagesSavedForLater.json");
+			await SaveDataToFile(_imagesSavedForLater, "ImagesSavedForLater.json", baseFolder);
 		}
 
 		public static async Task LoadSavedForLaterImages(StorageFolder baseFolder = null)
@@ -246,7 +246,7 @@ namespace Booru_Viewer.Types
 
 		public static async Task SaveFavouriteTags(StorageFolder baseFolder = null)
 		{
-			await SaveDataToFile(_favouriteTags.ToList(), "FavouriteTags.json");
+			await SaveDataToFile(_favouriteTags.ToList(), "FavouriteTags.json", baseFolder);
 
 		}
 

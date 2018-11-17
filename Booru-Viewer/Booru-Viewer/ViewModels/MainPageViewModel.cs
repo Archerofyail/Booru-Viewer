@@ -635,6 +635,11 @@ namespace Booru_Viewer.ViewModels
 			}
 		}
 
+		public bool IsSignedIn
+		{
+			get => !string.IsNullOrEmpty(ApiKey + Username);
+		}
+
 		public string SaveFolder => ImageSaver.ImageFolder.Path;
 
 		public async void GetSaveFolder()
@@ -720,6 +725,8 @@ namespace Booru_Viewer.ViewModels
 			try
 			{
 				SavedSearches.Remove(search);
+				var removed = GlobalInfo.SavedSearches.Remove(search.Tags);
+				Debug.WriteLine("Removed Search from list? " + removed);
 				RaisePropertyChanged("DontHaveSavedSearches");
 				GlobalInfo.SaveSearches();
 			}
@@ -1028,6 +1035,7 @@ namespace Booru_Viewer.ViewModels
 			{
 				await GlobalInfo.SaveSearches(result);
 				await GlobalInfo.SaveFavouriteTags(result);
+				await GlobalInfo.SaveSavedForLaterImages(result);
 				SettingsData settings = new SettingsData()
 				{
 					PerPage = PerPage,
@@ -1039,7 +1047,15 @@ namespace Booru_Viewer.ViewModels
 
 				if (result.DisplayName != "Booru-Viewer")
 				{
-					saveFolder = await result.GetFolderAsync("Booru-Viewer");
+					var check = await result.TryGetItemAsync("Booru-Viewer");
+					if (check != null && check.IsOfType(StorageItemTypes.Folder))
+					{
+						saveFolder = await result.GetFolderAsync("Booru-Viewer");
+					}
+					else
+					{
+						saveFolder = await result.CreateFolderAsync("Booru-Viewer");
+					}
 				}
 				var obj = await saveFolder.TryGetItemAsync("Settings.json");
 				StorageFile settingsFile;
@@ -1071,10 +1087,7 @@ namespace Booru_Viewer.ViewModels
 				await GlobalInfo.LoadFavouriteTags(result);
 				await GlobalInfo.SaveFavouriteTags();
 				var saveFolder = result;
-				if (result.Name != "Booru-Viewer")
-				{
-					saveFolder = await result.GetFolderAsync("Booru-Viewer");
-				}
+				
 				var obj = await saveFolder.TryGetItemAsync("Settings.json");
 				StorageFile settingsFile;
 				if (obj != null)
@@ -1087,6 +1100,8 @@ namespace Booru_Viewer.ViewModels
 					SafeChecked = data.ContentChecks[0];
 					QuestionableChecked = data.ContentChecks[1];
 					ExplicitChecked = data.ContentChecks[2];
+					RaisePropertyChanged("Username");
+					RaisePropertyChanged("ApiKey");
 
 				}
 			}

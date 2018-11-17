@@ -84,11 +84,20 @@ namespace Booru_Viewer.ViewModels
 				}
 				i++;
 			}
-			preppedTags.Add("order:score");
 
-			var imageResults = (await BooruApi.SearchPosts(preppedTags.ToArray(), 1, 4)).Item2.Select(x => x.Preview_File_Url).ToArray();
-			SearchPreview = imageResults;
-			Debug.WriteLine("Got all images");
+			if (!string.IsNullOrEmpty(BooruApi.ApiKey))
+			{
+				preppedTags.Add("order:score");
+			}
+
+			var result = (await BooruApi.SearchPosts(preppedTags.ToArray(), 1, 4));
+			if (result.Item2 != null && result.Item2.Count > 0)
+			{
+				var imageResults = result.Item2.Select(x=>x.Preview_File_Url).ToArray();
+				SearchPreview = imageResults;
+				Debug.WriteLine("Got all images");
+			}
+			
 			
 		}
 		public ICommand StartSearch => new RelayCommand(StartSearchExecute);

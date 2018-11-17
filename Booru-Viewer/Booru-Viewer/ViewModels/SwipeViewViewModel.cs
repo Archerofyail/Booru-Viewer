@@ -15,7 +15,7 @@ using Microsoft.Toolkit.Uwp.Notifications;
 
 namespace Booru_Viewer.ViewModels
 {
-	class SwipeViewViewModel : ViewModelBase
+	public class SwipeViewViewModel : ViewModelBase
 	{
 
 		private int _perPage = 20;
@@ -67,6 +67,11 @@ namespace Booru_Viewer.ViewModels
 				{
 					_images = GlobalInfo.ImageViewModels;
 				}
+
+				foreach (var image in _images)
+				{
+					image.parentVm = this;
+				}
 				//ImageChangedEvent?.Invoke(this, EventArgs.Empty);
 
 				return _images;
@@ -74,14 +79,26 @@ namespace Booru_Viewer.ViewModels
 
 		}
 
-		void ChangeImageData(object sender, EventArgs eventArgs)
+		public void ChangeImageData(object sender, EventArgs eventArgs)
 		{
 			if (GlobalInfo.SelectedImage < GlobalInfo.CurrentSearch.Count && GlobalInfo.SelectedImage >= 0)
 			{
-				var genTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].GeneralTags;
-				var charTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].CharacterTags;
-				var artistTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].ArtistTags;
-				var copyTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].CopyrightTags;
+				ImageModel img = null;
+				if (GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].id ==
+				    Images[GlobalInfo.SelectedImage].SelectedImagePostId)
+				{
+					img = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage];
+				}
+				else
+				{
+					img = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].ChildrenImages
+						.First(x => Images[GlobalInfo.SelectedImage].SelectedImagePostId == x.id);
+				}
+
+				var genTags = img.GeneralTags;
+				var charTags = img.CharacterTags;
+				var artistTags = img.ArtistTags;
+				var copyTags = img.CopyrightTags;
 
 				GeneralTags.Clear();
 				foreach (var tag in genTags)
@@ -103,7 +120,16 @@ namespace Booru_Viewer.ViewModels
 				{
 					CopyrightTags.Add(new TagViewModel(tag));
 				}
-
+				if (GlobalInfo.FavouriteImages.Contains(Images[Index].SelectedImagePostId))
+				{
+					FavIcon = Symbol.Favorite;
+					FavString = "Unfavourite";
+				}
+				else
+				{
+					FavString = "Favourite";
+					FavIcon = Symbol.OutlineStar;
+				}
 			}
 		}
 
@@ -116,12 +142,24 @@ namespace Booru_Viewer.ViewModels
 				GlobalInfo.SelectedImage = value;
 				if (value >= 0 && value < GlobalInfo.ImageViewModels.Count)
 				{
-					var genTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].GeneralTags;
-					var charTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].CharacterTags;
-					var artistTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].ArtistTags;
-					var copyTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].CopyrightTags;
-					var metaTags = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].MetaTags;
-					Rating = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].Rating;
+					ImageModel img = null;
+					if (GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].id ==
+					    Images[GlobalInfo.SelectedImage].SelectedImagePostId)
+					{
+						img = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage];
+					}
+					else
+					{
+						img = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].ChildrenImages
+							.First(x => Images[GlobalInfo.SelectedImage].SelectedImagePostId == x.id);
+					}
+
+					var genTags = img.GeneralTags;
+					var charTags = img.CharacterTags;
+					var artistTags = img.ArtistTags;
+					var copyTags = img.CopyrightTags;
+					var metaTags = img.MetaTags;
+					Rating = img.Rating;
 					GeneralTags.Clear();
 					CharacterTags.Clear();
 					ArtistTags.Clear();
@@ -236,9 +274,13 @@ namespace Booru_Viewer.ViewModels
 		{
 			get
 			{
-				if (GlobalInfo.CurrentSearchTags.Contains("fav:archerofyail") || GlobalInfo.CurrentSearchTags.Contains("ordfav:archerofyail"))
+				if (GlobalInfo.FavouriteImages.Contains(Images[Index].SelectedImagePostId))
 				{
 					_favString = "Unfavourite";
+				}
+				else
+				{
+					_favString = "Favourite";
 				}
 				return _favString;
 			}
@@ -255,7 +297,7 @@ namespace Booru_Viewer.ViewModels
 		{
 			get
 			{
-				if (GlobalInfo.ImagesSavedForLater.Any(x => x.id == Images[Index].Image.id))
+				if (GlobalInfo.ImagesSavedForLater.Any(x => x.id == Images[Index].SelectedImagePostId))
 				{
 					return "\uE8D9";
 				}
@@ -335,10 +377,21 @@ namespace Booru_Viewer.ViewModels
 			var postIndex = GlobalInfo.SelectedImage;
 			if (FavIcon == Symbol.OutlineStar)
 			{
-				if (await BooruApi.FavouriteImage(GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage]))
+				ImageModel img = null;
+				if (GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].id ==
+				    Images[GlobalInfo.SelectedImage].SelectedImagePostId)
+				{
+					img = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage];
+				}
+				else
+				{
+					img = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].ChildrenImages
+						.First(x => Images[GlobalInfo.SelectedImage].SelectedImagePostId == x.id);
+				}
+				if (await BooruApi.FavouriteImage(img))
 				{
 
-					GlobalInfo.FavouriteImages.Add(GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].id);
+					GlobalInfo.FavouriteImages.Add(img.id);
 					await GlobalInfo.SaveFavouritePosts();
 					FavIcon = Symbol.Favorite;
 					FavString = "Unfavourite";
@@ -347,7 +400,18 @@ namespace Booru_Viewer.ViewModels
 			}
 			else
 			{
-				if (await BooruApi.UnfavouriteImage(GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage]))
+				ImageModel img = null;
+				if (GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].id ==
+				    Images[GlobalInfo.SelectedImage].SelectedImagePostId)
+				{
+					img = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage];
+				}
+				else
+				{
+					img = GlobalInfo.CurrentSearch[GlobalInfo.SelectedImage].ChildrenImages
+						.First(x => Images[GlobalInfo.SelectedImage].SelectedImagePostId == x.id);
+				}
+				if (await BooruApi.UnfavouriteImage(img))
 				{
 					var im = GlobalInfo.CurrentSearch[postIndex];
 

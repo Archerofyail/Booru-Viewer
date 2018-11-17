@@ -1010,7 +1010,7 @@
 												Margin="4"></Button>
 									</StackPanel>
 								</StackPanel>
-								<StackPanel>
+								<StackPanel Visibility="{Binding IsSignedIn}">
 									<TextBlock Text="Download or delete your favourites info"></TextBlock>
 									<StackPanel Orientation="Horizontal">
 										<Button Content="Download Favourites"

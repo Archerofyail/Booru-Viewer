@@ -132,7 +132,14 @@ namespace Booru_Viewer.Types
 				var toRemove = new List<ImageModel>();
 				for (var i = 0; i < imageLinks.Count; i++)
 				{
+
 					var img = imageLinks[i];
+					if (img.File_Url == null && img.Large_File_Url == null)
+					{
+						toRemove.Add(img);
+						continue;
+					}
+
 					if (!img.File_Url.EndsWith("mp4") &&
 						!img.File_Url.EndsWith("webm") &&
 						!img.File_Url.EndsWith("zip") &&
@@ -421,7 +428,7 @@ namespace Booru_Viewer.Types
 				}
 
 				Debug.WriteLine("Downloaded page " + index + "of favourites");
-
+				
 			} while ((index - 2) * 100 < UserModel.favorite_count && !caughtUp);
 
 
