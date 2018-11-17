@@ -32,8 +32,7 @@ namespace Booru_Viewer.ViewModels
 
 		public MainPageViewModel()
 		{
-			GetSaveFolder();
-
+			
 			_appSettings = ApplicationData.Current.RoamingSettings.Values;
 			var savedUn = _appSettings["Username"] as string;
 			var savedApiKey = _appSettings["APIKey"] as string;
@@ -84,7 +83,6 @@ namespace Booru_Viewer.ViewModels
 			}
 
 			
-			//StartSearchExecute();
 			Debug.WriteLine("Count for saved Searches is " + SavedSearches.Count);
 			BooruApi.TagSearchCompletedHandler += (sender, tuple) =>
 			{
@@ -133,7 +131,6 @@ namespace Booru_Viewer.ViewModels
 					RaisePropertyChanged("DontHaveSavedSearches");
 				}
 			};
-			//GlobalInfo.LoadFavouritePosts();
 			GlobalInfo.FavouriteImagesLoadedEventHandler += (sender, args) =>
 			{
 				RaisePropertyChanged("FavouritePostCount");
@@ -153,6 +150,7 @@ namespace Booru_Viewer.ViewModels
 		
 			
 			_thumbnails = new IncrementalLoadingCollection<PostSource, FullImageViewModel>(_perPage);
+			//BooruApi.Page = 1;
 			foreach (var model in GlobalInfo.ImageViewModels)
 			{
 				_thumbnails.Add(model);
@@ -164,8 +162,7 @@ namespace Booru_Viewer.ViewModels
 			};
 			Thumbnails.OnEndLoading = ImageOnLoadFinish;
 			Thumbnails.OnError = ImageLoadOnError;
-			Thumbnails.RefreshAsync();
-
+			
 			BooruApi.UserLookupEvent += (sender, args) =>
 			{
 				var tags = BooruApi.UserModel?.blacklisted_tags.Split('\r');
@@ -559,7 +556,10 @@ namespace Booru_Viewer.ViewModels
 				GlobalInfo.CurrentOrdering = SelectedOrderIndex > 0 ? OrderOptions[SelectedOrderIndex] : "";
 				RaisePropertyChanged("IsSignedOutWithMoreThan2Tags");
 				RaisePropertyChanged("TotalTagCount");
-				StartSearchExecute();
+				if (_selectedOrderIndex > 0 && GlobalInfo.CurrentOrdering != OrderOptions[_selectedOrderIndex])
+				{
+					StartSearchExecute();
+				}
 			}
 		}
 
@@ -812,7 +812,7 @@ namespace Booru_Viewer.ViewModels
 		{
 			try
 			{
-
+				Debug.WriteLine(Environment.StackTrace);
 				SelectedPrefixIndex = 0;
 				var tags = await PrepTags();
 				GlobalInfo.CurrentSearch.Clear();

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -12,6 +13,7 @@ using Windows.UI.Core;
 using Windows.UI.Xaml.Media;
 using Booru_Viewer.ViewModels;
 using Booru_Viewer.Views;
+using Microsoft.Toolkit.Uwp;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using Microsoft.Toolkit.Uwp.UI.Extensions;
 using ListViewBase = Windows.UI.Xaml.Controls.ListViewBase;
@@ -24,19 +26,53 @@ namespace Booru_Viewer
 	public sealed partial class MainPage : Page
 	{
 		private MainPageViewModel ViewModel { get; set; }
-		private GridView _imageGridView;
-		private Button _searchButton;
-		private Button _searchFavouritesButton;
-		private Button _addTagButton;
-		private ContentDialog _confirmAgeDialog;
-		private ContentDialog _searchDialog;
-		private ListView _savedSearchesList;
-		private AutoSuggestBox _tagTextBox;
-		private ListView _savedSearchesListForReal;
-
-		private Button _savedSearchInvoke;
 		//private ListView SavedSearchesList;
 		private bool _isMultiSelectEnabled = false;
+
+		void PageLoaded(object sender, RoutedEventArgs routedEventArgs)
+		{
+			DataContext = new MainPageViewModel();
+			ViewModel = DataContext as MainPageViewModel;
+
+			//SavedSearchCommandInvoker = childrenOfHub.OfType<InvokeCommandAction>().First();
+
+			ImageGridView.Loaded += (sender3, args3) =>
+			{
+				ImageGridView.RightTapped += (o, eventArgs) =>
+				{
+					eventArgs.Handled = false;
+					var elements = VisualTreeHelper.FindElementsInHostCoordinates(eventArgs.GetPosition(o as UIElement), ImageGridView);
+					var imageView = elements.First((x) => x.GetType() == typeof(ImageEx)) as ImageEx;
+					Debug.WriteLine("imageView is " + imageView);
+					ViewModel.ImageContextOpened = imageView.DataContext as FullImageViewModel;
+				};
+
+
+
+			};
+
+			//if (SearchButton != null)
+			//{
+			//	var command = SearchButton.Command;
+			//	if (command != null)
+			//	{
+			//		command.Execute(SearchButton);
+			//	}
+			//	else
+			//	{
+			//		Debug.WriteLine("search command returned null");
+			//	}
+
+			//}
+			if (ImageGridView.Items?.Count > 0 && GlobalInfo.SelectedImage > 0 && GlobalInfo.SelectedImage <= ImageGridView.Items.Count - 1)
+			{
+				ImageGridView.ScrollIntoView(ImageGridView.Items[GlobalInfo.SelectedImage]);
+			}
+
+			Debug.WriteLine("Image count in gridview is  " + ImageGridView.Items.Count);
+			Debug.WriteLine("Image count in GlobalInfo is  " + GlobalInfo.CurrentSearch.Count);
+			Debug.WriteLine("Image count in GlobalInfo ViewModels is  " + GlobalInfo.ImageViewModels.Count);
+		}
 
 		public MainPage()
 		{
@@ -50,96 +86,8 @@ namespace Booru_Viewer
 			//	GlobalInfo.FavouriteImages.Add(image.id.ToString(), image);
 			//}
 			this.NavigationCacheMode = NavigationCacheMode.Required;
-			
-			Loaded += (sender, args) =>
-			{
-				ViewModel = DataContext as MainPageViewModel;
-				var childrenOfHub = AllChildren(MainHub);
-				_imageGridView = childrenOfHub.OfType<GridView>().First(x => x.Name == "ImageGridView");
 
-				_confirmAgeDialog = childrenOfHub.OfType<ContentDialog>().First(x => x.Name == "ConfirmAgeDialog");
-				_searchDialog = childrenOfHub.OfType<ContentDialog>().First(x => x.Name == "SearchDialog");
-				//SavedSearchCommandInvoker = childrenOfHub.OfType<InvokeCommandAction>().First();
-
-				SavedSearchesHub.Loaded += (o, eventArgs1) =>
-				{
-					var childs = AllChildren(SavedSearchesHub);
-					_savedSearchesListForReal = childs.OfType<ListView>().FirstOrDefault(x => x.Name == "SavedSearchesListForReal");
-					_savedSearchInvoke = childs.OfType<Button>().FirstOrDefault(x => x.Name == "SavedSearchInvoke");
-				};
-				_imageGridView.Loaded += (sender3, args3) =>
-				{
-					_imageGridView.RightTapped += (o, eventArgs) =>
-					{
-						eventArgs.Handled = false;
-						var elements = VisualTreeHelper.FindElementsInHostCoordinates(eventArgs.GetPosition(o as UIElement), _imageGridView);
-						var imageView = elements.First((x) => x.GetType() == typeof(ImageEx)) as ImageEx;
-						Debug.WriteLine("imageView is " + imageView);
-						ViewModel.ImageContextOpened = imageView.DataContext as FullImageViewModel;
-					};
-
-					if (GlobalInfo.CurrentSearch.Count > 0)
-					{
-						Debug.WriteLine("ImageCount coming back is: " + GlobalInfo.CurrentSearch.Count);
-						int layoutcount = 0;
-						_imageGridView.LayoutUpdated += (sender1, o) =>
-						{
-							if (layoutcount == 0)
-							{
-								layoutcount++;
-								if (_imageGridView.Items.Count > 0)
-								{
-									var image = _imageGridView.Items[GlobalInfo.SelectedImage];
-									_imageGridView.ScrollIntoView(image, ScrollIntoViewAlignment.Leading);
-								}
-							}
-
-						};
-						_imageGridView.UpdateLayout();
-
-					}
-
-				};
-				_searchDialog.Opened += (sender4, args4) =>
-				{
-					if (_searchDialog.ContentTemplateRoot != null)
-					{
-						var childrenOfDialog = AllChildren(_searchDialog.ContentTemplateRoot);
-
-						_addTagButton = childrenOfDialog.OfType<Button>().First(x => x.Name == "AddTagButton");
-						_searchButton = childrenOfDialog.OfType<Button>().First(x => x.Name == "SearchButton");
-						_searchFavouritesButton = childrenOfDialog.OfType<Button>()
-							.First(x => x.Name == "SearchFavouritesButton");
-						_savedSearchesList = childrenOfDialog.OfType<ListView>()
-							.First(x => x.Name == "SavedSearchesList");
-						_searchButton.Loaded += (sender1, args1) =>
-						{
-							_searchButton.CommandParameter = SearchAppBarButton;
-						};
-						_searchFavouritesButton.Loaded += (sender2, args2) =>
-						{
-							_searchButton.CommandParameter = SearchAppBarButton;
-						};
-						_tagTextBox = childrenOfDialog.OfType<AutoSuggestBox>().First(x => x.Name == "TagTextBox");
-					}
-
-				};
-				SearchClicked(null, null);
-				if (_searchButton != null)
-				{
-					var command = _searchButton.Command;
-					if (command != null)
-					{
-						command.Execute(_searchButton);
-					}
-					else
-					{
-						Debug.WriteLine("search command returned null");
-					}
-
-				}
-			};
-
+			Loaded += PageLoaded;
 
 
 			QuestionableCheckbox.Loaded += (sender, args) =>
@@ -193,30 +141,6 @@ namespace Booru_Viewer
 		}
 
 
-		void TryUpdateSearchDialogVariables()
-		{
-			if (_searchDialog.ContentTemplateRoot != null)
-			{
-				var childrenOfDialog = AllChildren(_searchDialog.ContentTemplateRoot);
-
-				_addTagButton = childrenOfDialog.OfType<Button>().First(x => x.Name == "AddTagButton");
-				_searchButton = childrenOfDialog.OfType<Button>().First(x => x.Name == "SearchButton");
-				_searchFavouritesButton = childrenOfDialog.OfType<Button>()
-					.First(x => x.Name == "SearchFavouritesButton");
-				_savedSearchesList = childrenOfDialog.OfType<ListView>()
-					.First(x => x.Name == "SavedSearchesList");
-				_searchButton.Loaded += (sender1, args1) =>
-				{
-					_searchButton.CommandParameter = SearchAppBarButton;
-				};
-				_searchFavouritesButton.Loaded += (sender2, args2) =>
-				{
-					_searchButton.CommandParameter = SearchAppBarButton;
-				};
-				_tagTextBox = childrenOfDialog.OfType<AutoSuggestBox>().First(x => x.Name == "TagTextBox");
-			}
-
-		}
 		private void GridView_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			//if (sender is GridView grid && grid.SelectionMode == ListViewSelectionMode.Single)
@@ -229,7 +153,7 @@ namespace Booru_Viewer
 
 		private void GridView_MultiSelectChanged(object sender, SelectionChangedEventArgs e)
 		{
-			SaveButton.IsEnabled = _imageGridView.SelectedItems.Count > 0;
+			SaveButton.IsEnabled = ImageGridView.SelectedItems.Count > 0;
 
 		}
 
@@ -244,22 +168,22 @@ namespace Booru_Viewer
 					GlobalInfo.SelectedImage = index;
 					Frame.Navigate(typeof(SwipeView));
 				}
-				
+				else if (grid.Name == "SavedForLaterGridView")
+				{
+					var index = grid.Items.IndexOf(e.ClickedItem);
+					Debug.WriteLine("Index is " + index);
+					GlobalInfo.SelectedImage = index;
+					Frame.Navigate(typeof(SavedForLaterSwipeView));
+				}
+
 			}
-			else if (sender is ListView list && list.Name == "SavedForLaterGridView")
-			{
-				var index = list.Items.IndexOf(e.ClickedItem);
-				Debug.WriteLine("Index is " + index);
-				GlobalInfo.SelectedImage = index;
-				Frame.Navigate(typeof(SavedForLaterSwipeView));
-			}
+
 
 		}
 
 		private void AddTagClicked(object sender, RoutedEventArgs e)
 		{
-			TryUpdateSearchDialogVariables();
-			_tagTextBox.GetBindingExpression(AutoSuggestBox.TextProperty).UpdateSource();
+			TagTextBox.GetBindingExpression(AutoSuggestBox.TextProperty).UpdateSource();
 		}
 
 		private void SaveLoginDataButtonTapped(object sender, TappedRoutedEventArgs e)
@@ -280,12 +204,12 @@ namespace Booru_Viewer
 
 		private void TagTextBox_KeyUp(object sender, KeyRoutedEventArgs e)
 		{
-			TryUpdateSearchDialogVariables();
-			if (e.Key == Windows.System.VirtualKey.Enter && e.KeyStatus.IsKeyReleased && _addTagButton != null)
+
+			if (e.Key == Windows.System.VirtualKey.Enter && e.KeyStatus.IsKeyReleased && AddTagButton != null)
 			{
-				if (_addTagButton.Command.CanExecute(_addTagButton))
+				if (AddTagButton.Command.CanExecute(AddTagButton))
 				{
-					_addTagButton.Command.Execute(_addTagButton);
+					AddTagButton.Command.Execute(AddTagButton);
 				}
 			}
 
@@ -298,12 +222,8 @@ namespace Booru_Viewer
 
 		protected override void OnNavigatedTo(NavigationEventArgs e)
 		{
-			ViewModel?.RaisePropertyChanged("Thumbnails");
-
-
-			ViewModel?.RaisePropertyChanged("FavouriteTags");
-
 			Frame rootFrame = Window.Current.Content as Frame;
+			
 			if (rootFrame.CanGoBack)
 			{
 				// Show UI in title bar if opted-in and in-app backstack is not empty.
@@ -317,13 +237,12 @@ namespace Booru_Viewer
 					AppViewBackButtonVisibility.Collapsed;
 			}
 			base.OnNavigatedTo(e);
-			ViewModel?.RaisePropertyChanged("SavedForLater");
 		}
 
 		protected override void OnNavigatedFrom(NavigationEventArgs e)
 		{
 			Debug.WriteLine("ImageCount is: " + GlobalInfo.CurrentSearch.Count);
-			Debug.WriteLine("Globalinfo imageviewmodels count is " + GlobalInfo.ImageViewModels.Count + ", itemssource is " + (_imageGridView.Items).Count);
+			Debug.WriteLine("Globalinfo imageviewmodels count is " + GlobalInfo.ImageViewModels.Count + ", itemssource is " + (ImageGridView.Items).Count);
 		}
 
 		private void SavedSearchSelection(object sender, SelectionChangedEventArgs e)
@@ -347,9 +266,9 @@ namespace Booru_Viewer
 
 		private void BackToTopTapped(object sender, TappedRoutedEventArgs e)
 		{
-			if (_imageGridView.Items.Count > 0)
+			if (ImageGridView.Items.Count > 0)
 			{
-				_imageGridView.ScrollIntoView(_imageGridView.Items[0]);
+				ImageGridView.ScrollIntoView(ImageGridView.Items[0]);
 			}
 		}
 
@@ -410,12 +329,12 @@ namespace Booru_Viewer
 			if (!_isMultiSelectEnabled)
 			{
 
-				_imageGridView.ItemClick -= ImageGridView_OnItemClick;
-				_imageGridView.SelectionChanged -= GridView_SelectionChanged;
-				_imageGridView.SelectionChanged += GridView_MultiSelectChanged;
+				ImageGridView.ItemClick -= ImageGridView_OnItemClick;
+				ImageGridView.SelectionChanged -= GridView_SelectionChanged;
+				ImageGridView.SelectionChanged += GridView_MultiSelectChanged;
 				selectButton.Icon = new SymbolIcon(Symbol.Cancel);
 				_isMultiSelectEnabled = true;
-				_imageGridView.SelectionMode = ListViewSelectionMode.Multiple;
+				ImageGridView.SelectionMode = ListViewSelectionMode.Multiple;
 				SearchAppBarButton.Visibility = Visibility.Collapsed;
 				SettingsButton.Visibility = Visibility.Collapsed;
 				SelectAllButton.Visibility = Visibility.Visible;
@@ -424,17 +343,17 @@ namespace Booru_Viewer
 			else
 			{
 				SaveButton.Visibility = Visibility.Collapsed;
-				Debug.WriteLine(_imageGridView.SelectedRanges);
-				_imageGridView.SelectedItems.Clear();
-				_imageGridView.SelectionChanged -= GridView_MultiSelectChanged;
-				_imageGridView.ItemClick += ImageGridView_OnItemClick;
-				_imageGridView.SelectionChanged += GridView_SelectionChanged;
+				Debug.WriteLine(ImageGridView.SelectedRanges);
+				ImageGridView.SelectedItems.Clear();
+				ImageGridView.SelectionChanged -= GridView_MultiSelectChanged;
+				ImageGridView.ItemClick += ImageGridView_OnItemClick;
+				ImageGridView.SelectionChanged += GridView_SelectionChanged;
 
 				SelectAllButton.Visibility = Visibility.Collapsed;
 				SaveButton.Visibility = Visibility.Collapsed;
 				selectButton.Icon = new SymbolIcon(Symbol.Bullets);
 				_isMultiSelectEnabled = false;
-				_imageGridView.SelectionMode = ListViewSelectionMode.None;
+				ImageGridView.SelectionMode = ListViewSelectionMode.None;
 				SearchAppBarButton.Visibility = Visibility.Visible;
 				SettingsButton.Visibility = Visibility.Visible;
 			}
@@ -444,9 +363,9 @@ namespace Booru_Viewer
 
 		private void SelectAllClicked(object sender, RoutedEventArgs e)
 		{
-			foreach (var img in _imageGridView.Items)
+			foreach (var img in ImageGridView.Items)
 			{
-				_imageGridView.SelectedItems.Add(img);
+				ImageGridView.SelectedItems.Add(img);
 			}
 		}
 
@@ -455,25 +374,25 @@ namespace Booru_Viewer
 			var imageViewModel = (sender as FrameworkElement).DataContext as FullImageViewModel;
 
 			MultiSelectButtonTapped(SelectButton, new RoutedEventArgs());
-			_imageGridView.SelectedItems.Add(imageViewModel);
+			ImageGridView.SelectedItems.Add(imageViewModel);
 
 		}
 
 		private void SaveButton_OnClick(object sender, RoutedEventArgs e)
 		{
-			ViewModel.SaveSelectedImages.Execute(_imageGridView.SelectedItems);
+			ViewModel.SaveSelectedImages.Execute(ImageGridView.SelectedItems);
 
 			SelectAllButton.Visibility = Visibility.Collapsed;
 			SaveButton.Visibility = Visibility.Collapsed;
 			_isMultiSelectEnabled = false;
 			SelectButton.Icon = new SymbolIcon(Symbol.Bullets);
-			_imageGridView.SelectionMode = ListViewSelectionMode.None;
+			ImageGridView.SelectionMode = ListViewSelectionMode.None;
 			SearchAppBarButton.Visibility = Visibility.Visible;
 			SettingsButton.Visibility = Visibility.Visible;
 			SaveButton.IsEnabled = false;
-			_imageGridView.SelectionChanged -= GridView_MultiSelectChanged;
-			_imageGridView.ItemClick += ImageGridView_OnItemClick;
-			_imageGridView.SelectionChanged += GridView_SelectionChanged;
+			ImageGridView.SelectionChanged -= GridView_MultiSelectChanged;
+			ImageGridView.ItemClick += ImageGridView_OnItemClick;
+			ImageGridView.SelectionChanged += GridView_SelectionChanged;
 		}
 
 		private void Over18Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
@@ -493,7 +412,7 @@ namespace Booru_Viewer
 
 		private async void UnlockExplicitContentButton_OnClick(object sender, RoutedEventArgs e)
 		{
-			await _confirmAgeDialog.ShowAsync();
+			await ConfirmAgeDialog.ShowAsync();
 		}
 
 		private void NoImagestextSizeChanged(object sender, SizeChangedEventArgs e)
@@ -503,19 +422,17 @@ namespace Booru_Viewer
 
 		private async void SearchButtonClicked(object sender, RoutedEventArgs e)
 		{
-			await _searchDialog.ShowAsync();
+			await SearchDialog.ShowAsync();
 		}
 
 		private void SearchClicked(object sender, RoutedEventArgs e)
 		{
-			TryUpdateSearchDialogVariables();
-			_searchDialog?.Hide();
+			SearchDialog?.Hide();
 		}
 
 		private void CloseSearchDialogClick(object sender, RoutedEventArgs e)
 		{
-			TryUpdateSearchDialogVariables();
-			_searchDialog.Hide();
+			SearchDialog.Hide();
 		}
 
 		public List<Control> AllChildren(DependencyObject parent)
@@ -533,9 +450,9 @@ namespace Booru_Viewer
 
 		private void SavedSearchesListForReal_OnItemClick(object sender, ItemClickEventArgs e)
 		{
-			if (_savedSearchInvoke != null || _savedSearchesListForReal != null)
+			if (SavedSearchInvoke != null && SavedSearchesListForReal != null)
 			{
-				_savedSearchInvoke.Command.Execute(e.ClickedItem);
+				SavedSearchInvoke.Command.Execute(e.ClickedItem);
 				MainHub.SelectedIndex = 0;
 			}
 			else
@@ -555,8 +472,8 @@ namespace Booru_Viewer
 			var parent = list.FindAscendant<ListView>();
 			if (parent != null)
 			{
-				var i = _savedSearchesListForReal.Items.IndexOf(list.DataContext);
-				_savedSearchInvoke.Command.Execute(_savedSearchesListForReal.Items[i]);
+				var i = SavedSearchesListForReal.Items.IndexOf(list.DataContext);
+				SavedSearchInvoke.Command.Execute(SavedSearchesListForReal.Items[i]);
 				MainHub.SelectedIndex = 0;
 			}
 		}
@@ -573,12 +490,17 @@ namespace Booru_Viewer
 				SearchAppBarButton.Visibility = Visibility.Collapsed;
 				SelectButton.Visibility = Visibility.Collapsed;
 			}
-
 			else
 			{
 				SearchAppBarButton.Visibility = Visibility.Visible;
 				SelectButton.Visibility = Visibility.Visible;
 			}
+			if (MainHub.SelectedIndex == 1)
+			{
+				FindName("SavedSearchGrid");
+			}
+
+
 		}
 	}
 }

@@ -12,10 +12,6 @@
 	  xmlns:i="using:Microsoft.Xaml.Interactivity"
 	  xmlns:core="using:Microsoft.Xaml.Interactions.Core">
 
-	<Page.DataContext>
-		<vm1:MainPageViewModel></vm1:MainPageViewModel>
-	</Page.DataContext>
-
 	<Page.Resources>
 		<ResourceDictionary>
 
@@ -30,54 +26,15 @@
 			<DataTemplate x:Name="ImageTemplate">
 
 				<controls:ImageEx Name="Image"
-								  Source="{Binding Path=PreviewURL}"
+								  Source="{Binding PreviewURL}"
 								  Stretch="Uniform"
-								  ImageExOpened="ImageOpened"
-								  ImageExFailed="ImageEx_OnImageExFailed"
 								  MaxHeight="250"
 								  MinHeight="160"
 								  MinWidth="160"
 								  PlaceholderSource="Assets/Placeholder.png"
 								  PlaceholderStretch="Uniform">
-					<controls:ImageEx.ContextFlyout>
-						<MenuFlyout x:Name="ImageContextFlyout">
-							<MenuFlyoutItem Text="Select"
-											Click="ImageContextMenuSelectClick">
-
-							</MenuFlyoutItem>
-							<MenuFlyoutItem Text="Save Image"
-											Command="{Binding ElementName=Page, Path=DataContext.SaveImage}">
-								<MenuFlyoutItem.CommandParameter>
-									<x:Boolean>True</x:Boolean>
-								</MenuFlyoutItem.CommandParameter>
-							</MenuFlyoutItem>
-
-						</MenuFlyout>
-					</controls:ImageEx.ContextFlyout>
+					
 				</controls:ImageEx>
-
-				<!--<Image Name="Image"
-				                  Source="{Binding Path=PreviewURL}"
-				                  Stretch="Uniform"
-				                  MaxHeight="250"
-				                  MinHeight="160"
-				                  MinWidth="160">
-					<Image.ContextFlyout>
-						<MenuFlyout x:Name="ImageContextFlyout">
-							<MenuFlyoutItem Text="Select"
-							                Click="ImageContextMenuSelectClick">
-
-							</MenuFlyoutItem>
-							<MenuFlyoutItem Text="Save Image"
-							                Command="{Binding ElementName=Page, Path=DataContext.SaveImage}">
-								<MenuFlyoutItem.CommandParameter>
-									<x:Boolean>True</x:Boolean>
-								</MenuFlyoutItem.CommandParameter>
-							</MenuFlyoutItem>
-
-						</MenuFlyout>
-					</Image.ContextFlyout>
-				</Image>-->
 			</DataTemplate>
 
 			<DataTemplate x:Name="ImageTemplateNoSave">
@@ -95,14 +52,6 @@
 				                  MaxWidth="250">
 
 				</controls:ImageEx>
-				<!--<Image
-					Name="Image"
-					Source="{Binding Path=PreviewURL}"
-					Stretch="Uniform"
-					MaxHeight="250"
-					MinHeight="160"
-					MinWidth="160"
-					MaxWidth="250"/>-->
 			</DataTemplate>
 			<DataTemplate x:Name="ExcludedTag">
 				<StackPanel Orientation="Horizontal"
@@ -323,7 +272,9 @@
 								 Grid.Column="0"
 							     VerticalAlignment="Stretch"
 					          IsItemClickEnabled="True"
-					          ItemClick="PreviewPictureClicked">
+					          ItemClick="PreviewPictureClicked"
+					          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+					          ScrollViewer.VerticalScrollBarVisibility="Disabled" >
 						<ListView.ItemsPanel>
 							<ItemsPanelTemplate>
 								<VirtualizingStackPanel Orientation="Horizontal"/>
@@ -764,7 +715,8 @@
 					>
 
 				<Grid
-					Name="SavedSearchGrid">
+					Name="SavedSearchGrid"
+					x:DeferLoadStrategy="Lazy">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="Auto"/>
 						<ColumnDefinition Width="*"/>

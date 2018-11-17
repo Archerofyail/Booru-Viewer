@@ -315,7 +315,7 @@ namespace Booru_Viewer.ViewModels
 		{
 			get
 			{
-				if (GlobalInfo.ImagesSavedForLater.Any(x => x.id == Images[Index].Image.id))
+				if (GlobalInfo.ImageViewModels.Count != 0 && Images.Count!= 0&& GlobalInfo.ImagesSavedForLater.Any(x => x.id == Images[Index].Image.id))
 				{
 					_saveForLaterString = "Remove from list";
 					return _saveForLaterString;
