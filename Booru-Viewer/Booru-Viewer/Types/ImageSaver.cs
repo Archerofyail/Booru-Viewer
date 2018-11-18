@@ -20,6 +20,9 @@ namespace Booru_Viewer.Types
 
 		public static event ImageFinishedSavingEventHandler ImageFinishedSavingEvent;
 
+		public delegate void ImageFolderLoadedEvent();
+
+		public static event ImageFolderLoadedEvent ImageFolderLoadedEventHandler;
 		public static StorageFolder ImageFolder
 		{
 			get
@@ -39,26 +42,27 @@ namespace Booru_Viewer.Types
 		}
 
 
-		private static void GetFolder()
+		private static async void GetFolder()
 		{
 			if (ApplicationData.Current.LocalSettings.Values["SaveFolderToken"] is string folderToken)
 			{
-				var folder = StorageApplicationPermissions.FutureAccessList.GetFolderAsync(folderToken).GetResults();
+				var folder = await StorageApplicationPermissions.FutureAccessList.GetFolderAsync(folderToken);
 				ImageFolder = folder;
 				return;
 
 			}
 
-			var item = KnownFolders.PicturesLibrary.TryGetItemAsync("Booru-Viewer").GetResults();
+			var item = await KnownFolders.PicturesLibrary.TryGetItemAsync("Booru-Viewer");
 			if (item != null)
 			{
 
-				ImageFolder = KnownFolders.PicturesLibrary.GetFolderAsync("Booru-Viewer").GetResults();
+				ImageFolder = await KnownFolders.PicturesLibrary.GetFolderAsync("Booru-Viewer");
 			}
 			else
 			{
-				ImageFolder = KnownFolders.PicturesLibrary.CreateFolderAsync("Booru-Viewer").GetResults();
+				ImageFolder = await KnownFolders.PicturesLibrary.CreateFolderAsync("Booru-Viewer");
 			}
+			ImageFolderLoadedEventHandler?.Invoke();
 		}
 		public static async Task GetFolderAsync()
 		{
@@ -79,7 +83,7 @@ namespace Booru_Viewer.Types
 			{
 				ImageFolder = await KnownFolders.PicturesLibrary.CreateFolderAsync("Booru-Viewer");
 			}
-
+			ImageFolderLoadedEventHandler?.Invoke();
 		}
 		public static async Task<Tuple<bool, string>> SaveImage(string imageUrl)
 		{

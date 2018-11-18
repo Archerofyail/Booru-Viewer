@@ -26,15 +26,12 @@ namespace Booru_Viewer
 	public sealed partial class MainPage : Page
 	{
 		private MainPageViewModel ViewModel { get; set; }
-		//private ListView SavedSearchesList;
-		private bool _isMultiSelectEnabled = false;
+		private bool _isMultiSelectEnabled;
 
 		void PageLoaded(object sender, RoutedEventArgs routedEventArgs)
 		{
 			DataContext = new MainPageViewModel();
 			ViewModel = DataContext as MainPageViewModel;
-
-			//SavedSearchCommandInvoker = childrenOfHub.OfType<InvokeCommandAction>().First();
 
 			ImageGridView.Loaded += (sender3, args3) =>
 			{
@@ -46,24 +43,8 @@ namespace Booru_Viewer
 					Debug.WriteLine("imageView is " + imageView);
 					ViewModel.ImageContextOpened = imageView.DataContext as FullImageViewModel;
 				};
-
-
-
 			};
 
-			//if (SearchButton != null)
-			//{
-			//	var command = SearchButton.Command;
-			//	if (command != null)
-			//	{
-			//		command.Execute(SearchButton);
-			//	}
-			//	else
-			//	{
-			//		Debug.WriteLine("search command returned null");
-			//	}
-
-			//}
 			if (ImageGridView.Items?.Count > 0 && GlobalInfo.SelectedImage > 0 && GlobalInfo.SelectedImage <= ImageGridView.Items.Count - 1)
 			{
 				ImageGridView.ScrollIntoView(ImageGridView.Items[GlobalInfo.SelectedImage]);
@@ -77,19 +58,7 @@ namespace Booru_Viewer
 		public MainPage()
 		{
 			InitializeComponent();
-
-
-
-			//var favs = BooruAPI.GetUserFavourites().Result;
-			//foreach (var image in favs)
-			//{
-			//	GlobalInfo.FavouriteImages.Add(image.id.ToString(), image);
-			//}
-			this.NavigationCacheMode = NavigationCacheMode.Required;
-
 			Loaded += PageLoaded;
-
-
 			QuestionableCheckbox.Loaded += (sender, args) =>
 			{
 				var isOver18 = ApplicationData.Current.RoamingSettings.Values["IsOver18"];
@@ -140,16 +109,6 @@ namespace Booru_Viewer
 			};
 		}
 
-
-		private void GridView_SelectionChanged(object sender, SelectionChangedEventArgs e)
-		{
-			//if (sender is GridView grid && grid.SelectionMode == ListViewSelectionMode.Single)
-			//{
-
-			//	GlobalInfo.SelectedImage = grid.SelectedIndex;
-			//}
-			//Frame.Navigate(typeof(SwipeView));
-		}
 
 		private void GridView_MultiSelectChanged(object sender, SelectionChangedEventArgs e)
 		{
@@ -330,7 +289,6 @@ namespace Booru_Viewer
 			{
 
 				ImageGridView.ItemClick -= ImageGridView_OnItemClick;
-				ImageGridView.SelectionChanged -= GridView_SelectionChanged;
 				ImageGridView.SelectionChanged += GridView_MultiSelectChanged;
 				selectButton.Icon = new SymbolIcon(Symbol.Cancel);
 				_isMultiSelectEnabled = true;
@@ -347,8 +305,6 @@ namespace Booru_Viewer
 				ImageGridView.SelectedItems.Clear();
 				ImageGridView.SelectionChanged -= GridView_MultiSelectChanged;
 				ImageGridView.ItemClick += ImageGridView_OnItemClick;
-				ImageGridView.SelectionChanged += GridView_SelectionChanged;
-
 				SelectAllButton.Visibility = Visibility.Collapsed;
 				SaveButton.Visibility = Visibility.Collapsed;
 				selectButton.Icon = new SymbolIcon(Symbol.Bullets);
@@ -392,7 +348,6 @@ namespace Booru_Viewer
 			SaveButton.IsEnabled = false;
 			ImageGridView.SelectionChanged -= GridView_MultiSelectChanged;
 			ImageGridView.ItemClick += ImageGridView_OnItemClick;
-			ImageGridView.SelectionChanged += GridView_SelectionChanged;
 		}
 
 		private void Over18Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
@@ -415,11 +370,6 @@ namespace Booru_Viewer
 			await ConfirmAgeDialog.ShowAsync();
 		}
 
-		private void NoImagestextSizeChanged(object sender, SizeChangedEventArgs e)
-		{
-			Debug.WriteLine("no image text visibility is " + (sender as TextBlock).Visibility);
-		}
-
 		private async void SearchButtonClicked(object sender, RoutedEventArgs e)
 		{
 			await SearchDialog.ShowAsync();
@@ -435,19 +385,6 @@ namespace Booru_Viewer
 			SearchDialog.Hide();
 		}
 
-		public List<Control> AllChildren(DependencyObject parent)
-		{
-			var list = new List<Control>();
-			for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
-			{
-				var child = VisualTreeHelper.GetChild(parent, i);
-				if (child is Control)
-					list.Add(child as Control);
-				list.AddRange(AllChildren(child));
-			}
-			return list;
-		}
-
 		private void SavedSearchesListForReal_OnItemClick(object sender, ItemClickEventArgs e)
 		{
 			if (SavedSearchInvoke != null && SavedSearchesListForReal != null)
@@ -461,11 +398,6 @@ namespace Booru_Viewer
 			}
 		}
 
-		private void ImageExBase_OnImageExOpened(object sender, ImageExOpenedEventArgs e)
-		{
-			Debug.WriteLine("ImageEx opened with source: " + (sender as ImageEx).Source);
-		}
-
 		private void PreviewPictureClicked(object sender, ItemClickEventArgs e)
 		{
 			var list = sender as ListView;
@@ -476,11 +408,6 @@ namespace Booru_Viewer
 				SavedSearchInvoke.Command.Execute(SavedSearchesListForReal.Items[i]);
 				MainHub.SelectedIndex = 0;
 			}
-		}
-
-		private void ListViewBase_OnContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
-		{
-			Debug.WriteLine("Items in saved list changed");
 		}
 
 		private void MainHub_OnSelectionChanged(object sender, SelectionChangedEventArgs e)

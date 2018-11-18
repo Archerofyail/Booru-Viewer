@@ -86,7 +86,7 @@ namespace Booru_Viewer.Types
 		}
 
 		public static EventHandler ImagesSavedForLaterLoaded;
-		private static List<ImageModel> _imagesSavedForLater = null;
+		private static List<ImageModel> _imagesSavedForLater;
 
 		public static List<ImageModel> ImagesSavedForLater
 		{

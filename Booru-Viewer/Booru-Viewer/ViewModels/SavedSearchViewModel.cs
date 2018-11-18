@@ -35,7 +35,7 @@ namespace Booru_Viewer.ViewModels
 			}
 		}
 
-		private string[] _searchPreview = null;
+		private string[] _searchPreview;
 		public string[] SearchPreview
 		{
 			get

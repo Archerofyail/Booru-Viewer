@@ -438,7 +438,8 @@
 					   x:Name="SearchDialog"
 					   HorizontalAlignment="Stretch"
 					   VerticalAlignment="Top">
-						<ScrollViewer>
+						<ScrollViewer VerticalScrollBarVisibility="Auto"
+						              HorizontalScrollBarVisibility="Disabled">
 							<StackPanel>
 								<Button HorizontalAlignment="Right"
 						VerticalAlignment="Top"
@@ -636,7 +637,6 @@
 									 AllowFocusOnInteraction="True"
 									 IncrementalLoadingThreshold="1"
 									 IncrementalLoadingTrigger="Edge"
-									 SelectionChanged="GridView_SelectionChanged"
 									 IsItemClickEnabled="True"
 									 ItemClick="ImageGridView_OnItemClick"
 									 DesiredWidth="250"
@@ -658,7 +658,6 @@
 				   VerticalAlignment="Center"
 				   HorizontalAlignment="Center"
 				   Grid.Row="1"
-				   SizeChanged="NoImagestextSizeChanged"
 				   Grid.Column="0"
 				   Grid.ColumnSpan="2" />
 
