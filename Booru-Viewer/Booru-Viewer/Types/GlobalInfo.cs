@@ -110,7 +110,7 @@ namespace Booru_Viewer.Types
 		public static async Task LoadSavedSearches(StorageFolder searchesFolder = null)
 		{
 
-			var searches = await LoadDataToObject<List<string[]>>("SavedSearches.json");
+			var searches = await LoadDataToObject<List<string[]>>("SavedSearches.json", searchesFolder);
 			_savedSearches.Clear();
 			foreach (var search in searches)
 			{
@@ -240,7 +240,7 @@ namespace Booru_Viewer.Types
 
 		public static async Task LoadSavedForLaterImages(StorageFolder baseFolder = null)
 		{
-			_imagesSavedForLater = await LoadDataToObject<List<ImageModel>>("ImagesSavedForLater.json");
+			_imagesSavedForLater = await LoadDataToObject<List<ImageModel>>("ImagesSavedForLater.json", baseFolder);
 			ImagesSavedForLaterLoaded?.Invoke(typeof(GlobalInfo), EventArgs.Empty);
 		}
 
@@ -253,7 +253,7 @@ namespace Booru_Viewer.Types
 		public static async Task LoadFavouriteTags(StorageFolder tagsFolder = null)
 		{
 
-			var tags = await LoadDataToObject<List<Tag>>("FavouriteTags.json");
+			var tags = await LoadDataToObject<List<Tag>>("FavouriteTags.json", tagsFolder);
 			_favouriteTags.Clear();
 			foreach (var search in tags)
 			{

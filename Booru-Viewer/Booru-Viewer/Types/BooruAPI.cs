@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Booru_Viewer.ViewModels;
 using Newtonsoft.Json;
 using Booru_Viewer.Models;
+using Microsoft.HockeyApp;
 
 namespace Booru_Viewer.Types
 {
@@ -118,7 +119,16 @@ namespace Booru_Viewer.Types
 
 			var json = await response.Content.ReadAsStringAsync();
 
-			imageLinks = JsonConvert.DeserializeObject<List<ImageModel>>(json);
+			imageLinks = JsonConvert.DeserializeObject<List<ImageModel>>(json, new JsonSerializerSettings
+			{
+				Error =
+				(sender, args) =>
+				{
+					Debug.WriteLine("Error while deserializing image search results: " + args.ErrorContext.Error.Message);
+					args.ErrorContext.Handled = true;
+					HockeyClient.Current.TrackException(args.ErrorContext.Error);
+				}
+			});
 
 			var signinStuff = new List<KeyValuePair<string, string>>()
 			{
@@ -236,7 +246,16 @@ namespace Booru_Viewer.Types
 				return data;
 			}
 			var json = await response.Content.ReadAsStringAsync();
-			List<Tag> allTags = JsonConvert.DeserializeObject<List<Tag>>(json);
+			List<Tag> allTags = JsonConvert.DeserializeObject<List<Tag>>(json, new JsonSerializerSettings
+			{
+				Error =
+				(sender, args) =>
+				{
+					Debug.WriteLine("Error while deserializing list of tags: " + args.ErrorContext.Error.Message);
+					args.ErrorContext.Handled = true;
+					HockeyClient.Current.TrackException(args.ErrorContext.Error);
+				}
+			});
 
 			if (limit != -1)
 			{
@@ -256,8 +275,13 @@ namespace Booru_Viewer.Types
 
 		public static async Task<UserModel> GetUser()
 		{
-			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(new[]
+			if (string.IsNullOrEmpty(Username) && string.IsNullOrEmpty(ApiKey))
 			{
+				return UserModel;
+			}
+
+			HttpFormUrlEncodedContent content = new HttpFormUrlEncodedContent(new[]
+				{
 				new KeyValuePair<string, string>("search[name]", Username), new KeyValuePair<string, string>("login", Username),
 				new KeyValuePair<string, string>("api_key", ApiKey),
 			});
@@ -277,7 +301,16 @@ namespace Booru_Viewer.Types
 				return null;
 			}
 			var json = await response.Content.ReadAsStringAsync();
-			UserModel user = JsonConvert.DeserializeObject<List<UserModel>>(json)[0];
+			UserModel user = JsonConvert.DeserializeObject<List<UserModel>>(json, new JsonSerializerSettings
+			{
+				Error =
+				(sender, args) =>
+				{
+					Debug.WriteLine("Error while deserializing user: " + args.ErrorContext.Error.Message);
+					args.ErrorContext.Handled = true;
+					HockeyClient.Current.TrackException(args.ErrorContext.Error);
+				}
+			})[0];
 			UserModel = user;
 			if (UserLookupEvent != null)
 			{
@@ -320,7 +353,16 @@ namespace Booru_Viewer.Types
 			var responseData = await response.Content.ReadAsStringAsync();
 			if (responseData != null)
 			{
-				var jobj = JsonConvert.DeserializeObject<ImageModel>(responseData);
+				var jobj = JsonConvert.DeserializeObject<ImageModel>(responseData, new JsonSerializerSettings
+				{
+					Error =
+					(sender, args) =>
+					{
+						Debug.WriteLine("Error while deserializing image: " + args.ErrorContext.Error.Message);
+						args.ErrorContext.Handled = true;
+						HockeyClient.Current.TrackException(args.ErrorContext.Error);
+					}
+				});
 				var isSuccess = jobj.id == im.id;
 
 				if (isSuccess)
@@ -347,11 +389,13 @@ namespace Booru_Viewer.Types
 			var json = await response.Content.ReadAsStringAsync();
 			var tag = JsonConvert.DeserializeObject<List<Tag>>(json, new JsonSerializerSettings
 			{
-				Error = (sender, args) =>
-{
-	Debug.WriteLine(args.ErrorContext.Error.Message);
-	args.ErrorContext.Handled = true;
-}
+				Error =
+				(sender, args) =>
+				{
+					Debug.WriteLine("Error while deserializing tag: " + args.ErrorContext.Error.Message);
+					args.ErrorContext.Handled = true;
+					HockeyClient.Current.TrackException(args.ErrorContext.Error);
+				}
 			});
 			if (tag.Count >= 1)
 			{
@@ -428,7 +472,7 @@ namespace Booru_Viewer.Types
 				}
 
 				Debug.WriteLine("Downloaded page " + index + "of favourites");
-				
+
 			} while ((index - 2) * 100 < UserModel.favorite_count && !caughtUp);
 
 

@@ -167,7 +167,7 @@ ecf/
 rcf/
 
 # Windows Store app package directory
-AppPackages/
+AppPackages*/
 BundleArtifacts/
 
 # Visual Studio cache files

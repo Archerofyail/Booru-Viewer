@@ -18,6 +18,7 @@ using Windows.UI.Notifications;
 using GalaSoft.MvvmLight;
 using Windows.UI.Xaml.Controls;
 using Booru_Viewer.Models;
+using Microsoft.HockeyApp;
 using Microsoft.Toolkit.Uwp;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Newtonsoft.Json;
@@ -173,6 +174,7 @@ namespace Booru_Viewer.ViewModels
 						{
 							var name = tag.Replace("\n", "");
 							ExcludedTags.Add(new TagViewModel(new Tag(name.Trim())));
+							RaisePropertyChanged("ExcludedTags");
 						}
 					}
 				}
@@ -809,7 +811,6 @@ namespace Booru_Viewer.ViewModels
 		{
 			try
 			{
-				Debug.WriteLine(Environment.StackTrace);
 				SelectedPrefixIndex = 0;
 				var tags = await PrepTags();
 				GlobalInfo.CurrentSearch.Clear();
@@ -1032,6 +1033,7 @@ namespace Booru_Viewer.ViewModels
 				await GlobalInfo.SaveSearches(result);
 				await GlobalInfo.SaveFavouriteTags(result);
 				await GlobalInfo.SaveSavedForLaterImages(result);
+				await GlobalInfo.SaveFavouritePosts(result);
 				SettingsData settings = new SettingsData()
 				{
 					PerPage = PerPage,
@@ -1082,6 +1084,10 @@ namespace Booru_Viewer.ViewModels
 				await GlobalInfo.SaveSearches();
 				await GlobalInfo.LoadFavouriteTags(result);
 				await GlobalInfo.SaveFavouriteTags();
+				await GlobalInfo.LoadFavouritePosts(result);
+				await GlobalInfo.SaveFavouritePosts();
+				await GlobalInfo.LoadSavedForLaterImages(result);
+				await GlobalInfo.SaveSavedForLaterImages();
 				var saveFolder = result;
 				
 				var obj = await saveFolder.TryGetItemAsync("Settings.json");
@@ -1090,15 +1096,24 @@ namespace Booru_Viewer.ViewModels
 				{
 					settingsFile = await saveFolder.GetFileAsync("Settings.json");
 					var json = await FileIO.ReadTextAsync(settingsFile);
-					SettingsData data = JsonConvert.DeserializeObject<SettingsData>(json);
+					SettingsData data = JsonConvert.DeserializeObject<SettingsData>(json, new JsonSerializerSettings{Error =
+						(sender, args) =>
+						{
+							Debug.WriteLine("Error while deserializing user: " + args.ErrorContext.Error.Message);
+							args.ErrorContext.Handled = true;
+							HockeyClient.Current.TrackException(args.ErrorContext.Error);
+						}});
 					PerPage = data.PerPage;
 					BooruApi.SetLogin(data.Username, data.ApiKey);
 					SafeChecked = data.ContentChecks[0];
 					QuestionableChecked = data.ContentChecks[1];
 					ExplicitChecked = data.ContentChecks[2];
+					_appSettings["Username"] = data.Username;
+					_appSettings["APIKey"] = data.ApiKey;
 					RaisePropertyChanged("Username");
 					RaisePropertyChanged("ApiKey");
-
+					await BooruApi.GetUser();
+					RaisePropertyChanged("ExcludedTags");
 				}
 			}
 		}

@@ -13,6 +13,7 @@ using Windows.UI.Core;
 using Windows.UI.Xaml.Media;
 using Booru_Viewer.ViewModels;
 using Booru_Viewer.Views;
+using Microsoft.HockeyApp;
 using Microsoft.Toolkit.Uwp;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using Microsoft.Toolkit.Uwp.UI.Extensions;
@@ -53,6 +54,7 @@ namespace Booru_Viewer
 			Debug.WriteLine("Image count in gridview is  " + ImageGridView.Items.Count);
 			Debug.WriteLine("Image count in GlobalInfo is  " + GlobalInfo.CurrentSearch.Count);
 			Debug.WriteLine("Image count in GlobalInfo ViewModels is  " + GlobalInfo.ImageViewModels.Count);
+			
 		}
 
 		public MainPage()

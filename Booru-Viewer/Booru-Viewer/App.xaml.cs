@@ -24,7 +24,7 @@ namespace Booru_Viewer
 		public App()
 		{
 			HockeyClient.Current.Configure("0de2f83cc20641698253f50f0a9e06e0");
-			//AppCenter.Start("0de2f83cc20641698253f50f0a9e06e0", typeof(Crashes), typeof(Distribute));
+			//AppCenter.Start(" 8565e9185cb4cd9fd15132b4b233586b", typeof(Crashes), typeof(Distribute));
 			this.InitializeComponent();
 			this.Suspending += OnSuspending;
 			

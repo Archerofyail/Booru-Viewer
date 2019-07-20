@@ -8,7 +8,7 @@ namespace Booru_Viewer.Models
 			public int id { get; set; }
 			public DateTime created_at { get; set; }
 			public string name { get; set; }
-			public int inviter_id { get; set; }
+			public int? inviter_id { get; set; }
 			public int level { get; set; }
 			public int base_upload_limit { get; set; }
 			public int post_upload_count { get; set; }
